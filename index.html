@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en_US">
+
+<head>
+    <link rel="manifest" href="vcds-parser.webmanifest" />
+    <link rel="icon" type="image/png" href="icons/windows-app-icon.png" />
+
+    <meta charset="utf-8" />
+    <title>VCDS Scanner</title>
+    <meta name="viewport" content="width=device-width" />
+</head>
+
+<body>
+    <h1>VCDS Parser</h1>
+    <p>A parser for VCDS reports.</p>
+    <form id="scan">
+        <label for="file-path">Select a file to parse.</label>
+        <input type="file" id="scan-file-path" required />
+        <button type="submit">Scan</button>
+    </form>
+
+    <pre id="scan-content"></pre>
+
+    <script src="app.js" defer></script>
+</body>
+
+
+</html>

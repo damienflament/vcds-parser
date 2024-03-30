@@ -1,0 +1,56 @@
+{
+    "name": "VCDS Parser",
+    "short_name": "VCDSP",
+    "description": "Parses VCDS reports.",
+    "start_url": "/",
+    "id": "/",
+    "display": "standalone",
+    "background_color": "#aaaaab",
+    "theme_color": "#00427b",
+    "icons": [
+        {
+            "src": "icons/windows-app-icon.png",
+            "sizes": "44x44",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/windows-small-tile.png",
+            "sizes": "71x71",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/windows-medium-tile.png",
+            "sizes": "150x150",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/windows-large-tile.png",
+            "sizes": "310x310",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/windows-store-logo.png",
+            "sizes": "50x50",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/scalable-icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshot.png",
+            "sizes": "1014x548",
+            "type": "image/png",
+            "form_factor": "wide"
+        }
+    ]
+}
