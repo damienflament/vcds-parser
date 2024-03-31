@@ -3,7 +3,7 @@ const CACHE_NAME = `vcds-parser-${VERSION}`;
 
 const STATIC_RESOURCES = [
     "/",
-    "/manifest.json",
+    "/vcds-parser.webmanifest",
     "/index.html",
     "/app.js",
     "/icons/windows-app-icon.png"
