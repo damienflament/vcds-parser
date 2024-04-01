@@ -69,13 +69,13 @@ async function takeControl() {
 async function fetchFromCache(url) {
     const cache = await caches.open(CACHE_NAME)
         .catch(reason => console.error(`Failed to open cache ${CACHE_NAME}: `, reason));
-    const response = await cache.match(url)
+    let response = await cache.match(url)
         .catch(reason => console.error(`No response cached for URL ${url}: `, reason));
 
     if (!response) {
         response = new Response(null, { status: 404 });
 
-        log("Response not cached for URL: ", url)
+        console.warn("Response not cached for URL: ", url)
     }
 
     return response;
