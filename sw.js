@@ -1,8 +1,9 @@
-"use strict";
-
 /**
  * Service Worker.
  */
+
+"use strict";
+
 const VERSION = "0.1"
 const CACHE_NAME = `vcds-parser-${VERSION}`;
 
@@ -34,7 +35,7 @@ async function cacheStaticResources() {
     const cache = await caches.open(CACHE_NAME);
 
     await cache.addAll(STATIC_RESOURCES)
-        .catch("Unable to add resources to cache.");
+        .catch(reason => console.error("Unable to add resources to cache:", reason));
 }
 
 /**
@@ -45,17 +46,17 @@ async function cacheStaticResources() {
  */
 async function takeControl() {
     const names = await caches.keys()
-        .catch("Unable to retrieve cache names from the storage");
+        .catch(reason => console.error("Unable to retrieve cache names from the storage: ", reason));
 
     for (const name of names) {
         if (name != CACHE_NAME) {
             await caches.delete(name)
-                .catch(console.error("Unable to delete cache: ", name));
+                .catch(reason => console.error(`Unable to delete cache ${name}: `, reason));
         }
     }
 
     await clients.claim()
-        .catch(console.error("Unable to take control of the clients"));
+        .catch(reason => console.error("Unable to take control of the clients: ", reason));
 }
 
 /**
@@ -66,13 +67,15 @@ async function takeControl() {
  * @returns {Promise<Response>} The response
  */
 async function fetchFromCache(url) {
-    const cache = await caches.open(CACHE_NAME);
-    const response = await cache.match(url);
+    const cache = await caches.open(CACHE_NAME)
+        .catch(reason => console.error(`Failed to open cache ${CACHE_NAME}: `, reason));
+    const response = await cache.match(url)
+        .catch(reason => console.error(`No response cached for URL ${url}: `, reason));
 
     if (!response) {
         response = new Response(null, { status: 404 });
 
-        console.warn("Response not cached for URL: ", url)
+        log("Response not cached for URL: ", url)
     }
 
     return response;
