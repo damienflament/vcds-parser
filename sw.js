@@ -1,3 +1,8 @@
+"use strict";
+
+/**
+ * Service Worker.
+ */
 const VERSION = "0.1"
 const CACHE_NAME = `vcds-parser-${VERSION}`;
 
@@ -28,36 +33,49 @@ const STATIC_RESOURCES = [
 async function cacheStaticResources() {
     const cache = await caches.open(CACHE_NAME);
 
-    await cache.addAll(STATIC_RESOURCES);
+    await cache.addAll(STATIC_RESOURCES)
+        .catch("Unable to add resources to cache.");
 }
 
 /**
- * Clears all caches except {@link CACHE_NAME} cache.
+ * Registers this Service Worker as the controller of the clients in the current
+ * scope.
+ *
+ * All caches except {@link CACHE_NAME} are cleared before registration.
  */
-async function clearCaches() {
-    const names = await caches.keys();
+async function takeControl() {
+    const names = await caches.keys()
+        .catch("Unable to retrieve cache names from the storage");
 
     for (const name of names) {
         if (name != CACHE_NAME) {
-            await caches.delete(name);
+            await caches.delete(name)
+                .catch(console.error("Unable to delete cache: ", name));
         }
     }
 
-    await clients.claim();
+    await clients.claim()
+        .catch(console.error("Unable to take control of the clients"));
 }
 
 /**
- *  Returns a response from the {@link CACHE_NAME} cache for the given {@link url}.
- *  If no response matches the {@link url}, a 404 response is returned.
+ *  Fetches a response from the {@link CACHE_NAME} cache for the given
+ * {@link url}. If no response matches the {@link url}, a 404 response is returned.
  *
  * @param {String} url The requested URL
  * @returns {Promise<Response>} The response
  */
 async function fetchFromCache(url) {
     const cache = await caches.open(CACHE_NAME);
-    const cachedResponse = await caches.match(url);
+    const response = await cache.match(url);
 
-    return cachedResponse || new Response(null, { status: 404 })
+    if (!response) {
+        response = new Response(null, { status: 404 });
+
+        console.warn("Response not cached for URL: ", url)
+    }
+
+    return response;
 }
 
 /**
@@ -80,7 +98,7 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
-    event.waitUntil(clearCaches())
+    event.waitUntil(takeControl())
 });
 
 self.addEventListener("fetch", forceFetchFromCache);
