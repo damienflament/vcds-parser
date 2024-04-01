@@ -13,13 +13,15 @@ function showFileContent() {
 
     let file = filePathEl.files[0];
 
-    fileNameEl.textContent = file.name;
+    if (file) {
+        fileNameEl.textContent = file.name;
 
-    reader.onload = () => {
-        contentEl.textContent = reader.result;
-    };
+        reader.onload = () => {
+            contentEl.textContent = reader.result;
+        };
 
-    reader.readAsText(file);
+        reader.readAsText(file);
+    }
 }
 
 /**
