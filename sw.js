@@ -5,8 +5,21 @@ const STATIC_RESOURCES = [
     "/",
     "/vcds-parser.webmanifest",
     "/index.html",
-    "/app.js",
-    "/icons/windows-app-icon.png"
+    "/assets/icons/scalable-icon.svg",
+    "/assets/icons/windows-app-icon.png",
+    "/assets/icons/windows-large-tile.png",
+    "/assets/icons/windows-medium-tile.png",
+    "/assets/icons/windows-small-tile.png",
+    "/assets/icons/windows-store-logo.png",
+    "/assets/logo.png",
+    "/assets/screenshot.png",
+    "/assets/bulma.min.css",
+    "/assets/fontawesome/css/fontawesome.min.css",
+    "/assets/fontawesome/css/solid.min.css",
+    "/assets/fontawesome/webfonts/fa-solid-900.ttf",
+    "/assets/fontawesome/webfonts/fa-solid-900.woff2",
+    "/assets/style.css",
+    "/app.js"
 ];
 
 /**

@@ -3,26 +3,47 @@
 
 <head>
     <link rel="manifest" type="application/manifest+json" href="vcds-parser.webmanifest" />
-    <link rel="icon" type="image/png" href="icons/windows-app-icon.png" />
+    <link rel="icon" type="image/png" href="assets/icons/windows-app-icon.png" />
 
     <meta charset="utf-8" />
     <title>VCDS Scanner</title>
-    <meta name="viewport" content="width=device-width" />
+
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <link rel="stylesheet" href="assets/bulma.min.css" />
+    <link rel="stylesheet" href="assets/fontawesome/css/fontawesome.min.css" />
+    <link rel="stylesheet" href="assets/fontawesome/css/solid.min.css" />
+    <link rel="stylesheet" href="assets/style.css" />
 </head>
 
 <body>
-    <h1>VCDS Parser</h1>
-    <p>A parser for VCDS reports.</p>
-    <form id="scan">
-        <label for="file-path">Select a file to parse.</label>
-        <input type="file" id="scan-file-path" required />
-        <button type="submit">Scan</button>
-    </form>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <img src="assets/logo.png" alt="VCDS Parser logo" />
+            </div>
+        </div>
+    </nav>
 
-    <pre id="scan-content"></pre>
+    <section class="section">
+        <div class="file has-name is-fullwidth">
+            <label class="file-label">
+                <input id="scan-file-path" class="file-input" type="file" />
+
+                <span class="file-cta">
+                    <span class="file-icon">
+                        <i class="fas fa-upload"></i>
+                    </span>
+                    <span class="file-label">File to parse</span>
+                </span>
+
+                <span id="scan-file-name" class="file-name">...</span>
+            </label>
+        </div>
+
+        <pre id="scan-content" class="textarea" style="height: auto;"></pre>
+    </section>
 
     <script src="app.js" defer></script>
 </body>
-
 
 </html>

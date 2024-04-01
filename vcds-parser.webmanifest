@@ -9,37 +9,37 @@
     "theme_color": "#00427b",
     "icons": [
         {
-            "src": "icons/windows-app-icon.png",
+            "src": "assets/icons/windows-app-icon.png",
             "sizes": "44x44",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "icons/windows-small-tile.png",
+            "src": "assets/icons/windows-small-tile.png",
             "sizes": "71x71",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "icons/windows-medium-tile.png",
+            "src": "assets/icons/windows-medium-tile.png",
             "sizes": "150x150",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "icons/windows-large-tile.png",
+            "src": "assets/icons/windows-large-tile.png",
             "sizes": "310x310",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "icons/windows-store-logo.png",
+            "src": "assets/icons/windows-store-logo.png",
             "sizes": "50x50",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "icons/scalable-icon.svg",
+            "src": "assets/icons/scalable-icon.svg",
             "sizes": "any",
             "type": "image/svg+xml",
             "purpose": "any"
@@ -47,7 +47,7 @@
     ],
     "screenshots": [
         {
-            "src": "screenshot.png",
+            "src": "assets/screenshot.png",
             "sizes": "1014x548",
             "type": "image/png",
             "form_factor": "wide"

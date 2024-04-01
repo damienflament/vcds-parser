@@ -1,10 +1,13 @@
-const formEl = document.getElementById("scan");
 const filePathEl = document.getElementById("scan-file-path");
+const fileNameEl = document.getElementById("scan-file-name");
 const contentEl = document.getElementById("scan-content");
 
 function showFileContent() {
     const reader = new FileReader();
+
     let file = filePathEl.files[0];
+
+    fileNameEl.textContent = file.name;
 
     reader.onload = () => {
         contentEl.textContent = reader.result;
@@ -28,9 +31,5 @@ function registerServiceWorker() {
     }
 }
 
-formEl.addEventListener("submit", (event) => {
-    event.preventDefault();
-    showFileContent();
-});
-
 registerServiceWorker();
+filePathEl.addEventListener("change", showFileContent);
