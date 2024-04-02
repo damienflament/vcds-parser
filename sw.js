@@ -32,10 +32,11 @@ const STATIC_RESOURCES = [
  * Adds {@link STATIC_RESOURCES} to the {@link CACHE_NAME} cache.
  */
 async function cacheStaticResources() {
-    const cache = await caches.open(CACHE_NAME);
+    const cache = await caches.open(CACHE_NAME)
+        .catch(reason => console.error(`Failed to open cache ${CACHE_NAME}:`, reason));
 
     await cache.addAll(STATIC_RESOURCES)
-        .catch(reason => console.error("Unable to add resources to cache:", reason));
+        .catch(reason => console.error("Failed to add resources to cache:", reason));
 }
 
 /**
@@ -46,17 +47,17 @@ async function cacheStaticResources() {
  */
 async function takeControl() {
     const names = await caches.keys()
-        .catch(reason => console.error("Unable to retrieve cache names from the storage: ", reason));
+        .catch(reason => console.error("Failed to retrieve cache names from the storage:", reason));
 
     for (const name of names) {
         if (name != CACHE_NAME) {
             await caches.delete(name)
-                .catch(reason => console.error(`Unable to delete cache ${name}: `, reason));
+                .catch(reason => console.error(`Failed to delete cache ${name}:`, reason));
         }
     }
 
     await clients.claim()
-        .catch(reason => console.error("Unable to take control of the clients: ", reason));
+        .catch(reason => console.error("Failed to take control of the clients:", reason));
 }
 
 /**
@@ -70,12 +71,10 @@ async function fetchFromCache(url) {
     const cache = await caches.open(CACHE_NAME)
         .catch(reason => console.error(`Failed to open cache ${CACHE_NAME}: `, reason));
     let response = await cache.match(url)
-        .catch(reason => console.error(`No response cached for URL ${url}: `, reason));
+        .catch(reason => console.error(`Failed to search within cache for URL ${url}: `, reason));
 
     if (!response) {
         response = new Response(null, { status: 404 });
-
-        console.warn("Response not cached for URL: ", url)
     }
 
     return response;
@@ -97,10 +96,12 @@ function forceFetchFromCache(event) {
 }
 
 self.addEventListener("install", (event) => {
+    console.debug("Installing Service Worker...");
     event.waitUntil(cacheStaticResources());
 });
 
 self.addEventListener("activate", (event) => {
+    console.debug("Activating Service Worker...")
     event.waitUntil(takeControl())
 });
 
