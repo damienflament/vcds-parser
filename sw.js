@@ -25,7 +25,8 @@ const STATIC_RESOURCES = [
     "/assets/fontawesome/webfonts/fa-solid-900.ttf",
     "/assets/fontawesome/webfonts/fa-solid-900.woff2",
     "/assets/style.css",
-    "/app.js"
+    "/lib/application.js",
+    "/lib/service-worker.js"
 ];
 
 /**
