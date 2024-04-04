@@ -4,7 +4,7 @@
 
 "use strict";
 
-const VERSION = "0.1"
+const VERSION = "0.1";
 const CACHE_NAME = `vcds-parser-${VERSION}`;
 
 const STATIC_RESOURCES = [
@@ -72,6 +72,7 @@ async function takeControl() {
 async function fetchFromCache(url) {
     const cache = await caches.open(CACHE_NAME)
         .catch(reason => console.error(`Failed to open cache ${CACHE_NAME}: `, reason));
+
     let response = await cache.match(url)
         .catch(reason => console.error(`Failed to search within cache for URL ${url}: `, reason));
 
@@ -103,8 +104,8 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
-    console.debug("Activating Service Worker...")
-    event.waitUntil(takeControl())
+    console.debug("Activating Service Worker...");
+    event.waitUntil(takeControl());
 });
 
 self.addEventListener("fetch", forceFetchFromCache);
