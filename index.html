@@ -43,14 +43,7 @@
         <pre id="scan-content" class="textarea" style="height: auto;"></pre>
     </div>
 
-    <script type="module" defer>
-        import { registerServiceWorker } from "./lib/service-worker.js";
-        import { setupEventListeners } from "./lib/application.js";
-
-        registerServiceWorker("sw.js");
-        setupEventListeners();
-
-    </script>
+    <script type="module" src="main.js" defer></script>
 </body>
 
 </html>
