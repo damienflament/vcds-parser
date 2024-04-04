@@ -66,8 +66,8 @@ async function takeControl() {
  *  Fetches a response from the {@link CACHE_NAME} cache for the given
  * {@link url}. If no response matches the {@link url}, a 404 response is returned.
  *
- * @param {String} url The requested URL
- * @returns {Promise<Response>} The response
+ * @param {String} url the requested URL
+ * @returns {Promise<Response>} the response
  */
 async function fetchFromCache(url) {
     const cache = await caches.open(CACHE_NAME)
@@ -85,7 +85,7 @@ async function fetchFromCache(url) {
 /**
  * Prevents the application to fetch data from the server.
  *
- * @param {FetchEvent} event
+ * @param {FetchEvent} event the fetch event to handle
  */
 function forceFetchFromCache(event) {
     let url = event.request.url;
