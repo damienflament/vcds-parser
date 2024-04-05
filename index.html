@@ -27,7 +27,7 @@
     <div class="section">
         <div class="file has-name is-fullwidth">
             <label class="file-label">
-                <input id="scan-file-path" class="file-input" type="file">
+                <input id="scan-file-path" class="file-input" type="file" onchange="app.openFile(this.files[0])">
 
                 <span class="file-cta">
                     <span class="file-icon">
@@ -43,7 +43,14 @@
         <pre id="scan-content" class="textarea" style="height: auto;"></pre>
     </div>
 
-    <script type="module" src="main.js" defer></script>
+    <script type="module" defer>
+        import { registerServiceWorker } from "./lib/service-worker.js";
+        import { Application } from "./lib/application.js";
+
+        registerServiceWorker("sw.js");
+
+        globalThis.app = new Application(window);
+    </script>
 </body>
 
 </html>
