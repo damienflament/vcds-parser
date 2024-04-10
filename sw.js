@@ -27,6 +27,7 @@ const STATIC_RESOURCES = [
     "/assets/style.css",
     "/lib/application.js",
     "/lib/configuration.js",
+    "/lib/filesystem.js",
     "/lib/logging.js",
     "/lib/service-worker.js"
 ];
