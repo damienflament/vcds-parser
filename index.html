@@ -24,24 +24,47 @@
         </div>
     </nav>
 
+
     <div class="section">
+        <div id="open-last-used-directory-notification" class="notification is-hidden">
+            <button class="delete" onclick="this.closest('.notification').classList.add('is-hidden')"></button>
+            <p>Do you want to load the last opened directory ?
+                <button class="button" onclick="app.openLastUsedDirectory();
+                    this.closest('.notification').classList.add('is-hidden');">Yes,
+                    open it.</button>
+            </p>
+        </div>
+
         <div class="file has-name is-fullwidth">
             <label class="file-label">
-                <input id="scan-file-path" class="file-input" type="file" accept=".txt"
-                    onchange=" app.openFile(this.files[0])">
+                <button onclick="app.openDirectory()"></button>
 
                 <span class="file-cta">
                     <span class="file-icon">
                         <i class="fas fa-upload"></i>
                     </span>
-                    <span class="file-label">File to parse</span>
+                    <span class="file-label">Scans directory</span>
                 </span>
 
-                <span id="scan-file-name" class="file-name">...</span>
+                <span id="directory-path" class="file-name">...</span>
             </label>
         </div>
 
-        <pre id="scan-content" class="textarea" style="height: auto;"></pre>
+        <div class="tabs">
+            <ul id="tabs">
+                <li id="tab-template" class="is-hidden">
+                    <a data-file="" onclick="app.openFile(this.dataFile)">template</a>
+                </li>
+                <li id="tab-template" class="is-active">
+                    <a data-file="" onclick="app.openFile(this.dataFile)">foo</a>
+                </li>
+                <li id="tab-template">
+                    <a data-file="" onclick="app.openFile(this.dataFile)">bar</a>
+                </li>
+            </ul>
+        </div>
+
+        <pre id="file-content" class="textarea" style="height: auto;"></pre>
     </div>
 
     <script type="module" defer>
