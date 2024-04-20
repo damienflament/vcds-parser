@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="assets/icons/windows-app-icon.png">
 
     <meta charset="utf-8">
-    <title>VCDS Scanner</title>
+    <title>VCDS Parser</title>
 
     <meta name="viewport" content="width=device-width initial-scale=1">
     <link rel="stylesheet" href="assets/bulma.min.css">
@@ -16,65 +16,7 @@
 </head>
 
 <body>
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <div class="navbar-item">
-                <img src="assets/logo.png" alt="VCDS Parser logo">
-            </div>
-        </div>
-    </nav>
-
-
-    <div class="section">
-        <div id="open-last-used-directory-notification" class="notification is-hidden">
-            <button class="delete" onclick="this.closest('.notification').classList.add('is-hidden')"></button>
-            <p>Do you want to load the last opened directory ?
-                <button class="button" onclick="app.openLastUsedDirectory();
-                    this.closest('.notification').classList.add('is-hidden');">Yes,
-                    open it.</button>
-            </p>
-        </div>
-
-        <div class="file has-name is-fullwidth">
-            <label class="file-label">
-                <button onclick="app.openDirectory()"></button>
-
-                <span class="file-cta">
-                    <span class="file-icon">
-                        <i class="fas fa-upload"></i>
-                    </span>
-                    <span class="file-label">Scans directory</span>
-                </span>
-
-                <span id="directory-path" class="file-name">...</span>
-            </label>
-        </div>
-
-        <div class="tabs">
-            <ul id="tabs">
-                <li id="tab-template" class="is-hidden">
-                    <a data-file="" onclick="app.openFile(this.dataFile)">template</a>
-                </li>
-                <li id="tab-template" class="is-active">
-                    <a data-file="" onclick="app.openFile(this.dataFile)">foo</a>
-                </li>
-                <li id="tab-template">
-                    <a data-file="" onclick="app.openFile(this.dataFile)">bar</a>
-                </li>
-            </ul>
-        </div>
-
-        <pre id="file-content" class="textarea" style="height: auto;"></pre>
-    </div>
-
-    <script type="module" defer>
-        import { registerServiceWorker } from "./lib/service-worker.js";
-        import Application from "./lib/application.js";
-
-        registerServiceWorker("sw.js");
-
-        globalThis.app = new Application(window);
-    </script>
+    <script type="module" src="app.js"></script>
 </body>
 
 </html>

@@ -4,36 +4,41 @@
 
 "use strict";
 
-const VERSION = "0.1";
+const VERSION = "0.1-dev";
 const CACHE_NAME = `vcds-parser-${VERSION}`;
 
+/** Static resources */
 const STATIC_RESOURCES = [
     "/",
-    "/vcds-parser.webmanifest",
-    "/index.html",
+    "/assets/fontawesome/css/fontawesome.min.css",
+    "/assets/fontawesome/css/solid.min.css",
+    "/assets/fontawesome/webfonts/fa-solid-900.ttf",
+    "/assets/fontawesome/webfonts/fa-solid-900.woff2",
     "/assets/icons/scalable-icon.svg",
     "/assets/icons/windows-app-icon.png",
     "/assets/icons/windows-large-tile.png",
     "/assets/icons/windows-medium-tile.png",
     "/assets/icons/windows-small-tile.png",
     "/assets/icons/windows-store-logo.png",
+    "/assets/bulma.min.css",
     "/assets/logo.png",
     "/assets/screenshot.png",
-    "/assets/bulma.min.css",
-    "/assets/fontawesome/css/fontawesome.min.css",
-    "/assets/fontawesome/css/solid.min.css",
-    "/assets/fontawesome/webfonts/fa-solid-900.ttf",
-    "/assets/fontawesome/webfonts/fa-solid-900.woff2",
     "/assets/style.css",
-    "/lib/application.js",
-    "/lib/configuration.js",
+    "/assets/van-1.5.0.debug.js",
+    "/assets/van-1.5.0.js",
+    "/assets/van-1.5.0.min.js",
+    "/lib/components.js",
     "/lib/filesystem.js",
-    "/lib/logging.js",
-    "/lib/service-worker.js"
+    "/lib/service-worker.js",
+    "/lib/storage.js",
+    "/lib/van.js",
+    "/app.js",
+    "/index.html",
+    "/vcds-parser.webmanifest"
 ];
 
 /**
- * Adds {@link STATIC_RESOURCES} to the {@link CACHE_NAME} cache.
+ * Adds static resources to the cache.
  */
 async function cacheStaticResources() {
     const cache = await caches.open(CACHE_NAME)
@@ -65,8 +70,9 @@ async function takeControl() {
 }
 
 /**
- *  Fetches a response from the {@link CACHE_NAME} cache for the given
- * {@link url}. If no response matches the {@link url}, a 404 response is returned.
+ * Fetches a response from the cache for the given URL.
+ *
+ * If no response matches the URL, a 404 response is returned.
  *
  * @param {String} url the requested URL
  * @returns {Promise<Response>} the response
