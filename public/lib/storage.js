@@ -103,7 +103,7 @@ export class Storage extends EventTarget {
  * @param {Storage} storage the storage where to keep the state
  */
 export function persist(state, storage) {
-    storage.addEventListener("ready", (ev) => {
+    storage.addEventListener("ready", () => {
         for (const name in state) {
             const stateItem = state[name];
 
