@@ -19,6 +19,8 @@
     "lib": "lib"
   },
   "scripts": {
+    "start": "caddy start",
+    "stop": "caddy stop",
     "lint": "npx eslint"
   },
   "devDependencies": {
