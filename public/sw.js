@@ -4,7 +4,7 @@
 
 "use strict";
 
-const VERSION = "0.1-dev";
+const VERSION = "0.1.0-dev";
 const CACHE_NAME = `vcds-parser-${VERSION}`;
 
 /** Static resources */

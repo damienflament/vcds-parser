@@ -1,0 +1,31 @@
+{
+	http_port 8080
+	https_port 8443
+	admin off
+}
+
+localhost:8443 {
+	root * ./public/
+	file_server
+	log _ {
+		output stderr
+		format filter {
+			wrap console
+			fields {
+				resp_headers delete
+				bytes_read delete
+				user_id delete
+				duration delete
+				size delete
+				request>proto delete
+				request>method delete
+				request>remote_ip delete
+				request>remote_port delete
+				request>client_ip delete
+				request>host delete
+				request>headers delete
+				request>tls delete
+			}
+		}
+	}
+}

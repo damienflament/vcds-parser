@@ -1,0 +1,24 @@
+{
+  "name": "vcds-parser",
+  "version": "0.1.0-dev",
+  "description": "Parses VCDS reports.",
+  "keywords": [
+    "vcds",
+    "vag",
+    "vag-com",
+    "vagcom",
+    "diagnostic"
+  ],
+  "author": {
+    "name": "Damien Flament",
+    "email": "damien.flament@gmx.com"
+  },
+  "license": "ISC",
+  "browser": "app/index.html",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "dev": "caddy run"
+  }
+}
