@@ -8,11 +8,9 @@
 
 "use strict";
 
-import { writeFileSync } from "fs";
-import fsExtra from "fs-extra";
+import fs from "fs-extra";
 import klawSync from "klaw-sync";
 import { relative, resolve } from "path";
-const { readJsonSync, writeJsonSync } = fsExtra;
 
 const PACKAGE = resolve(import.meta.dirname, "../package.json");
 const PUBLIC = resolve(import.meta.dirname, "../public/");
@@ -21,25 +19,27 @@ const CONFIG = resolve(PUBLIC, "config.js");
 
 const jsonOptions = { spaces: 4 };
 
-const info = readJsonSync(PACKAGE);
-const manifest = readJsonSync(MANIFEST);
+fs.readJson(PACKAGE).then(info => {
+    fs.readJson(MANIFEST).then(manifest => {
+        console.log("Updating manifest...");
 
-console.log("Updating manifest...");
-manifest.description = info.description;
+        manifest.description = info.description;
 
-writeJsonSync(MANIFEST, manifest, jsonOptions);
+        return fs.writeJson(MANIFEST, manifest, jsonOptions);
+    });
 
-console.log("Generating config...");
-const config = {
-    version: info.version,
-    cacheName: info.name + "-" + info.version,
-    staticResources: klawSync(PUBLIC, { nodir: true })
-        .map(({ path }) => "/" + relative(PUBLIC, path))
-        .concat(["/"])
-};
+    console.log("Generating config...");
+    const config = {
+        version: info.version,
+        cacheName: info.name + "-" + info.version,
+        staticResources: klawSync(PUBLIC, { nodir: true })
+            .map(({ path }) => "/" + relative(PUBLIC, path))
+            .concat(["/"])
+    };
 
-writeFileSync(CONFIG,
-    "export default "
-    + JSON.stringify(config, (_, v) => v, jsonOptions.spaces)
-    + ";"
-);
+    return fs.writeFile(CONFIG,
+        "export default "
+        + JSON.stringify(config, (_, v) => v, jsonOptions.spaces)
+        + ";"
+    );
+});
