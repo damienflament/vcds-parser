@@ -22,7 +22,8 @@
     "start": "caddy start",
     "stop": "caddy stop",
     "lint": "npx eslint",
-    "configure": "node scripts/configure.mjs"
+    "configure": "node scripts/configure.mjs",
+    "version": "npm run configure && git add -A public/"
   },
   "devDependencies": {
     "@eslint/js": "^9.1.1",
