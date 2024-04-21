@@ -5,11 +5,11 @@
 
 import { DirectoryPicker, Menu, Navbar, Notification, NotificationArea, Section } from "./lib/components.js";
 import { listDirectory, requestPermission } from "./lib/filesystem.js";
-// import { registerServiceWorker } from "./lib/service-worker.js";
+import { registerServiceWorker } from "./lib/service-worker.js";
 import { Storage, persist } from "./lib/storage.js";
 import van from "./lib/van.js";
 
-// registerServiceWorker("./sw.js");
+registerServiceWorker("./sw.js");
 
 const App = () => {
     const { pre } = van.tags;
@@ -62,7 +62,7 @@ const App = () => {
     const notificationsArea = NotificationArea();
 
     return [
-        Navbar({ logo: { src: "/assets/logo.png", alt: "VCDS Parser Logo" } }),
+        Navbar({ logo: { src: "/assets/logo.png", alt: "application logo" } }),
         Section(
             notificationsArea,
             DirectoryPicker({

@@ -10,8 +10,11 @@
  */
 export function registerServiceWorker(path) {
     if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register(path)
-            .catch(reason => console.error("Service worker registration failed:", reason));
+        navigator.serviceWorker.register(
+            path,
+            { type: "module", }
+        )
+            .catch(reason => console.error("Failed to register service worker:", reason));
     } else {
         console.error("Service workers are not supported.");
     }

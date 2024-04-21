@@ -21,11 +21,14 @@
   "scripts": {
     "start": "caddy start",
     "stop": "caddy stop",
-    "lint": "npx eslint"
+    "lint": "npx eslint",
+    "configure": "node scripts/configure.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.1.1",
     "eslint": "^9.1.0",
-    "globals": "^15.0.0"
+    "fs-extra": "^11.2.0",
+    "globals": "^15.0.0",
+    "klaw-sync": "^6.0.0"
   }
 }

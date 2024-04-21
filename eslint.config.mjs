@@ -1,5 +1,5 @@
-import globals from "globals";
 import js from "@eslint/js";
+import globals from "globals";
 
 export default [
   {
@@ -8,7 +8,7 @@ export default [
   },
 
   {
-    // Browser globals are available in this application
+    // Browser globals are available in this application.
     files: ["public/**/*.js"],
     languageOptions: {
       globals: globals.browser
@@ -16,10 +16,18 @@ export default [
   },
 
   {
-    // The file registered as a Service Worker has access to related globals
+    // The file registered as a Service Worker has access to related globals.
     files: ["public/sw.js"],
     languageOptions: {
       globals: globals.serviceworker
+    }
+  },
+
+  {
+    // Scripts are executed in the global Node context.
+    files: ["scripts/*.mjs"],
+    languageOptions: {
+      globals: globals.nodeBuiltin
     }
   },
 
