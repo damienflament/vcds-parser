@@ -1,7 +1,7 @@
 {
   "name": "vcds-parser",
   "version": "0.1.0-dev",
-  "description": "Parses VCDS reports.",
+  "description": "An application to parse your VCDS reports.",
   "keywords": [
     "vcds",
     "vag",

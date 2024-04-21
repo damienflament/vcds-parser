@@ -1,7 +1,7 @@
 {
   "name": "VCDS Parser",
   "short_name": "VCDSP",
-  "description": "Parses VCDS reports.",
+  "description": "An application to parse your VCDS reports.",
   "start_url": "/",
   "id": "/",
   "display": "standalone",
