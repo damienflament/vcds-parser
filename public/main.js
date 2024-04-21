@@ -5,7 +5,7 @@
 
 import { DirectoryPicker, Menu, Navbar, Notification, NotificationArea, Section } from './lib/components.js'
 import { listDirectory, requestPermission } from './lib/filesystem.js'
-import { registerServiceWorker } from './lib/service-worker.js'
+import { registerServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
 import van from './lib/van.js'
 
