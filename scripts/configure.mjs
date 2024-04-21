@@ -6,40 +6,43 @@
  * static resources list.
  */
 
-"use strict";
+'use strict'
 
-import fs from "fs-extra";
-import klawSync from "klaw-sync";
-import { relative, resolve } from "path";
+import fs from 'fs-extra'
+import klawSync from 'klaw-sync'
+import { relative, resolve } from 'path'
+import standard from 'standard'
 
-const PACKAGE = resolve(import.meta.dirname, "../package.json");
-const PUBLIC = resolve(import.meta.dirname, "../public/");
-const MANIFEST = resolve(PUBLIC, "vcds-parser.webmanifest");
-const CONFIG = resolve(PUBLIC, "config.js");
+const PACKAGE = resolve(import.meta.dirname, '../package.json')
+const PUBLIC = resolve(import.meta.dirname, '../public/')
+const MANIFEST = resolve(PUBLIC, 'vcds-parser.webmanifest')
+const CONFIG = resolve(PUBLIC, 'config.js')
 
-const jsonOptions = { spaces: 4 };
+const jsonOptions = { spaces: 2 }
 
 fs.readJson(PACKAGE).then(info => {
-    fs.readJson(MANIFEST).then(manifest => {
-        console.log("Updating manifest...");
+  fs.readJson(MANIFEST).then(manifest => {
+    console.log('Updating manifest...')
 
-        manifest.description = info.description;
+    manifest.description = info.description
 
-        return fs.writeJson(MANIFEST, manifest, jsonOptions);
-    });
+    return fs.writeJson(MANIFEST, manifest, jsonOptions)
+  })
 
-    console.log("Generating config...");
-    const config = {
-        version: info.version,
-        cacheName: info.name + "-" + info.version,
-        staticResources: klawSync(PUBLIC, { nodir: true })
-            .map(({ path }) => "/" + relative(PUBLIC, path))
-            .concat(["/"])
-    };
+  console.log('Generating config...')
 
-    return fs.writeFile(CONFIG,
-        "export default "
-        + JSON.stringify(config, (_, v) => v, jsonOptions.spaces)
-        + ";"
-    );
-});
+  const config = {
+    version: info.version,
+    cacheName: info.name + '-' + info.version,
+    staticResources: klawSync(PUBLIC, { nodir: true })
+      .map(({ path }) => '/' + relative(PUBLIC, path))
+      .concat(['/'])
+  }
+
+  // Configuration file is indented by JSON then linted by Standard.
+  return standard.lintText(
+    'export default ' + JSON.stringify(config, (_, v) => v, jsonOptions.spaces)
+    , { fix: true }
+  )
+    .then(res => fs.writeFile(CONFIG, res[0].output))
+})

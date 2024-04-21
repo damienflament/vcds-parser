@@ -21,7 +21,7 @@
   "scripts": {
     "start": "caddy start",
     "stop": "caddy stop",
-    "lint": "npx eslint",
+    "lint": "npx standard | npx snazzy",
     "configure": "node scripts/configure.mjs",
     "version": "npm run configure && git add -A public/"
   },
@@ -30,6 +30,13 @@
     "eslint": "^9.1.0",
     "fs-extra": "^11.2.0",
     "globals": "^15.0.0",
-    "klaw-sync": "^6.0.0"
+    "klaw-sync": "^6.0.0",
+    "snazzy": "^9.0.0",
+    "standard": "^17.1.0"
+  },
+  "standard": {
+    "ignore": [
+      "**/vendor/"
+    ]
   }
 }

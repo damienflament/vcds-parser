@@ -1,56 +1,56 @@
 {
-    "name": "VCDS Parser",
-    "short_name": "VCDSP",
-    "description": "Parses VCDS reports.",
-    "start_url": "/",
-    "id": "/",
-    "display": "standalone",
-    "background_color": "#aaaaab",
-    "theme_color": "#00427b",
-    "icons": [
-        {
-            "src": "assets/icons/windows-app-icon.png",
-            "sizes": "44x44",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "assets/icons/windows-small-tile.png",
-            "sizes": "71x71",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "assets/icons/windows-medium-tile.png",
-            "sizes": "150x150",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "assets/icons/windows-large-tile.png",
-            "sizes": "310x310",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "assets/icons/windows-store-logo.png",
-            "sizes": "50x50",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "assets/icons/scalable-icon.svg",
-            "sizes": "any",
-            "type": "image/svg+xml",
-            "purpose": "any"
-        }
-    ],
-    "screenshots": [
-        {
-            "src": "assets/screenshot.png",
-            "sizes": "1014x548",
-            "type": "image/png",
-            "form_factor": "wide"
-        }
-    ]
+  "name": "VCDS Parser",
+  "short_name": "VCDSP",
+  "description": "Parses VCDS reports.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#aaaaab",
+  "theme_color": "#00427b",
+  "icons": [
+    {
+      "src": "assets/icons/windows-app-icon.png",
+      "sizes": "44x44",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/windows-small-tile.png",
+      "sizes": "71x71",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/windows-medium-tile.png",
+      "sizes": "150x150",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/windows-large-tile.png",
+      "sizes": "310x310",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/windows-store-logo.png",
+      "sizes": "50x50",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/scalable-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshot.png",
+      "sizes": "1014x548",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
 }
