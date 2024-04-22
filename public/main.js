@@ -5,11 +5,18 @@
 
 import { DirectoryPicker, Menu, Navbar, Notification, NotificationArea, Section } from './lib/components.js'
 import { listDirectory, requestPermission } from './lib/filesystem.js'
-import { registerServiceWorker } from './lib/serviceworker.js'
+import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
 import van from './lib/van.js'
 
-registerServiceWorker('./sw.js')
+// The service worker is registered unless the 'nosw' URL parameter is defined.
+const url = new URL(window.location.href)
+
+if (url.searchParams.has('nosw')) {
+  unregisterServiceWorker()
+} else {
+  registerServiceWorker('./sw.js')
+}
 
 const App = () => {
   const { pre } = van.tags
