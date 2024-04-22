@@ -1,5 +1,5 @@
 {
-	http_port 8080
+	auto_https disable_redirects
 	https_port 8443
 }
 
