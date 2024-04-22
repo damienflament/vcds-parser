@@ -21,6 +21,7 @@
   "scripts": {
     "start": "caddy start",
     "stop": "caddy stop",
+    "serve": "caddy run",
     "lint": "npx standard | npx snazzy",
     "configure": "node scripts/configure.mjs",
     "version": "npm run configure && git add -A public/"
@@ -37,6 +38,9 @@
   "standard": {
     "ignore": [
       "**/vendor/"
+    ],
+    "globals": [
+      "FileReader"
     ]
   }
 }
