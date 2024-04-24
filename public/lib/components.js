@@ -10,12 +10,17 @@ import van from './van.js'
 
 const { a, aside, button, div, i, img, label, li, p, span, ul } = van.tags
 
-/** A responsive horizontal navigation bar. */
-export const Navbar = ({ logo: { src: logoSrc, alt: logoAlt } }) =>
+/**
+ * A responsive horizontal navigation bar.
+ *
+ * @param {string} logo.src the logo path
+ * @param {string} logo.alt the logo alternative description
+ */
+export const Navbar = ({ logo: { src, alt } }) =>
   div({ class: 'navbar' },
     div({ class: 'navbar-brand' },
       div({ class: 'navbar-item' },
-        img({ src: logoSrc, alt: logoAlt })
+        img({ src, alt })
       )
     )
   )
@@ -30,29 +35,18 @@ export const FontAwesome = name => i({ class: `fa-solid fa-${name}` })
  * A directory upload input using Javascript.
  *
  * @param {string} label the input label
- * @param {state<FileSystemDirectoryHandle>} directoryState the state to update with the picked directory
  * @param {string} directoryName the name of the selected directory
+ * @param {() => any} onclick called when the user clicked on the button
  */
 export const DirectoryPicker = (
   {
     label: pickerLabel,
-    directoryState: directory,
-    directoryName: name
+    directoryName: name,
+    onclick: callback
   }) =>
   div({ class: 'file has-name is-fullwidth' },
     label({ class: 'file-label' },
-      button({
-        onclick: async () => {
-          try {
-            directory.val = await window.showDirectoryPicker()
-          } catch (e) {
-            if (e instanceof DOMException && e.name === 'AbortError') {
-              // The user aborted the directory picker.
-              ;
-            }
-          }
-        }
-      }),
+      button({ onclick: () => callback() }),
       span({ class: 'file-cta' },
         span({ class: 'file-icon' },
           FontAwesome('upload')
@@ -68,17 +62,27 @@ export const DirectoryPicker = (
  *
  * @param {string} label the menu label
  * @param {[state<any>]} itemsState the items
- * @param {(any) => any} formatter a formatting function to apply on each item
+ * @param {(any) => any} formatter called to get the label for the given item
+ * @param {(any) => any} onclick called with the given item when clicked
+ * @param {(any) => boolean} isSelected called to check if the given item is selected
  */
 export const Menu = (
   {
     label: menuLabel,
     itemsState: items,
-    formatter = (i) => i
+    formatter,
+    onclick: callback,
+    isSelected
   }) =>
-  aside({ class: 'menu' },
+  aside({ class: 'menu block' },
     p({ class: 'menu-label' }, menuLabel),
-    () => ul({ class: 'menu-list' }, items.val.map(i => li(a(formatter(i)))))
+    () => ul({ class: 'menu-list' }, items.val.map(i =>
+      li(a(
+        {
+          class: isSelected(i) ? 'is-active' : '',
+          onclick: () => callback(i)
+        }, formatter(i)))
+    ))
   )
 
 /**
@@ -91,9 +95,13 @@ export const NotificationArea = () => div({ class: 'block container' })
  *
  * @param {string} message the message to display
  * @param {string} label the button label
- * @param {() => any} action the button callback
+ * @param {() => any} onclick called when the button is clicked
  */
-export const Notification = ({ message, label, action }) =>
+export const Notification = ({
+  message,
+  label: buttonLabel,
+  onclick: callback
+}) =>
   div({ class: 'notification' },
     button({
       class: 'delete',
@@ -106,10 +114,10 @@ export const Notification = ({ message, label, action }) =>
           button({
             class: 'button is-primary',
             onclick: (ev) => {
-              action()
+              callback()
               ev.target.closest('div.notification').remove()
             }
-          }, label)
+          }, buttonLabel)
         )
       )
     )

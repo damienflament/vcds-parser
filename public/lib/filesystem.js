@@ -8,11 +8,10 @@
  *
  * Readonly permission is queried. If necessary, permission is requested.
  *
- * The returned permission should be "granted" or "denied". If it is
- * "prompt", it means the permission must be requested due to a user
- * interaction.
+ * The returned permission should be "granted" or "denied". If it is "prompt",
+ * it means the permission must be requested after a user interaction.
  *
- * @param {FileSystemHandle} file the file to request the permission for
+ * @param {FileSystemHandle} file the handle to the file to request the permission for
  * @returns {Promise<PermissionState>} the permission for the given file
  */
 export async function requestPermission (file) {
@@ -25,8 +24,8 @@ export async function requestPermission (file) {
     try {
       permission = await file.requestPermission(options)
 
-      // If the permission is still "prompt" after we prompted the
-      // user, he musted cancel it.
+      // If the permission is still "prompt" after we prompted the user, he
+      // musted cancel it.
       // We regard this as a bug and put the value "denied".
       if (permission === 'prompt') {
         permission = 'denied'
@@ -58,4 +57,40 @@ export async function listDirectory (directory) {
   }
 
   return files
+}
+
+/**
+ * Loads the content of the given file into the given state.
+ *
+ * @param {FileSystemFileHandle} fileHandle the handle to the file to load content from
+ * @param {(any) => any} onsuccess called with the loaded content as parameter
+ */
+export async function loadFileContent (fileHandle, onsuccess) {
+  const options = { mode: 'read' }
+
+  fileHandle.queryPermission(options).then(permission => {
+    if (permission === 'granted') {
+      fileHandle.getFile().then(file => {
+        const reader = new FileReader()
+
+        reader.onload = (ev) => { onsuccess(ev.target.result) }
+
+        reader.readAsText(file)
+      })
+    }
+  })
+
+  // const permission = await fileHandle.queryPermission(options)
+
+  // if (permission === 'granted') {
+  //   fileHandle.getFile().then(file => {
+  //     const reader = new FileReader()
+
+  //     reader.onload = (ev) => {
+  //       contentState.val = ev.target.result
+  //     }
+
+  //     reader.readAsText(file)
+  //   })
+  // }
 }
