@@ -68,20 +68,22 @@ export class Storage extends EventTarget {
   }
 
   /**
-   * Requests the value for the given key and passes it to the given callback
-   * when ready.
+   * Gets the value for the given key.
    *
-   * @param {string} key
-   * @param {(any) => any} callback
+   * @param {string} key the key associated with the value to find
+   * @returns {Promise<any>} the value for the given key
    */
-  request (key, callback) {
-    this.#getStore('readonly').get(key).onsuccess = (ev) => callback(ev.target.result)
-  }
+  get = (key) => new Promise((resolve, reject) => {
+    const request = this.#getStore('readonly').get(key)
+
+    request.addEventListener(('success'), (ev) => { resolve(ev.target.result) })
+    request.addEventListener(('error'), (ev) => { reject(ev.target.error) })
+  })
 
   /**
    *  Saves the given value with the given key.
    *
-   * @param {string} key the key to find the saved value
+   * @param {string} key the key to associate with the saved value
    * @param {any} value the value to save
    */
   save (key, value) {
@@ -106,7 +108,7 @@ export function persist (state, storage) {
     for (const name in state) {
       const stateItem = state[name]
 
-      storage.request(name, (value) => {
+      storage.get(name).then(value => {
         stateItem.val = value
 
         van.derive(() => storage.save(name, stateItem.val))
