@@ -35,8 +35,8 @@ const App = () => {
   /** Current directory label */
   const directoryName = van.derive(() =>
     isDirectoryOpened.val
-      ? state.directory.val?.name ?? ''
-      : ''
+      ? state.directory.val.name
+      : 'Open a directory...'
   )
 
   /** Current directory files */
@@ -97,7 +97,7 @@ const App = () => {
       notificationsArea,
       DirectoryPicker({
         label: 'Scans directory',
-        directoryName,
+        name: directoryName,
         onclick: () => window.showDirectoryPicker()
           .then(directory => {
             state.directory.val = directory

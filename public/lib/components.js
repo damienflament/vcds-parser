@@ -35,13 +35,13 @@ export const FontAwesome = name => i({ class: `fa-solid fa-${name}` })
  * A directory upload input using Javascript.
  *
  * @param {string} label the input label
- * @param {string} directoryName the name of the selected directory
+ * @param {string} name the name of the selected directory
  * @param {() => any} onclick called when the user clicked on the button
  */
 export const DirectoryPicker = (
   {
     label: pickerLabel,
-    directoryName: name,
+    name,
     onclick: callback
   }) =>
   div({ class: 'file has-name is-fullwidth' },
