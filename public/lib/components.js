@@ -101,24 +101,24 @@ export const Notification = ({
   message,
   label: buttonLabel,
   onclick: callback
-}) =>
-  div({ class: 'notification' },
-    button({
-      class: 'delete',
-      onclick: ev => ev.target.closest('div.notification').remove()
-    }),
+}) => {
+  const n = div({ class: 'notification' },
+    button({ class: 'delete', onclick: () => { n.remove() } }),
     div({ class: 'level' },
       div({ class: 'level-left' },
         div({ class: 'level-item' }, p(message)),
         div({ class: 'level-item' },
           button({
             class: 'button is-primary',
-            onclick: (ev) => {
+            onclick: () => {
               callback()
-              ev.target.closest('div.notification').remove()
+              n.remove()
             }
           }, buttonLabel)
         )
       )
     )
   )
+
+  return n
+}
