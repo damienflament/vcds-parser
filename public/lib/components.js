@@ -102,23 +102,24 @@ export const Notification = ({
   label: buttonLabel,
   onclick: callback
 }) => {
-  const n = div({ class: 'notification' },
-    button({ class: 'delete', onclick: () => { n.remove() } }),
-    div({ class: 'level' },
-      div({ class: 'level-left' },
-        div({ class: 'level-item' }, p(message)),
-        div({ class: 'level-item' },
-          button({
-            class: 'button is-primary',
-            onclick: () => {
-              callback()
-              n.remove()
-            }
-          }, buttonLabel)
+  const removed = van.state(false)
+  return () => removed.val
+    ? null
+    : div({ class: 'notification' },
+      button({ class: 'delete', onclick: () => { removed.val = true } }),
+      div({ class: 'level' },
+        div({ class: 'level-left' },
+          div({ class: 'level-item' }, p(message)),
+          div({ class: 'level-item' },
+            button({
+              class: 'button is-primary',
+              onclick: () => {
+                callback()
+                removed.val = true
+              }
+            }, buttonLabel)
+          )
         )
       )
     )
-  )
-
-  return n
 }
