@@ -42,11 +42,20 @@ export const DirectoryPicker = (
   {
     label: pickerLabel,
     name,
-    onclick: callback
+    onsuccess: callback
   }) =>
   div({ class: 'file has-name is-fullwidth' },
     label({ class: 'file-label' },
-      button({ onclick: () => callback() }),
+      button({
+        onclick: () => window.showDirectoryPicker()
+          .then(d => callback(d))
+          .catch(e => {
+            if (e instanceof DOMException && e.name === 'AbortError') {
+              // The user aborted the directory picker.
+              ;
+            }
+          })
+      }),
       span({ class: 'file-cta' },
         span({ class: 'file-icon' },
           FontAwesome('upload')
@@ -61,7 +70,7 @@ export const DirectoryPicker = (
  * A simple menu.
  *
  * @param {string} label the menu label
- * @param {[state<any>]} itemsState the items
+ * @param {[State<any>]} itemsState the items
  * @param {(any) => any} formatter called to get the label for the given item
  * @param {(any) => any} onclick called with the given item when clicked
  * @param {(any) => boolean} isSelected called to check if the given item is selected

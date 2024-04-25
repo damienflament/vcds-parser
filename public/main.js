@@ -98,17 +98,10 @@ const App = () => {
       DirectoryPicker({
         label: 'Scans directory',
         name: directoryName,
-        onclick: () => window.showDirectoryPicker()
-          .then(directory => {
-            state.directory.val = directory
-            state.file.val = null
-          })
-          .catch(e => {
-            if (e instanceof DOMException && e.name === 'AbortError') {
-              // The user aborted the directory picker.
-              ;
-            }
-          })
+        onsuccess: (directory) => {
+          state.directory.val = directory
+          state.file.val = null
+        }
       }),
       Menu({
         label: 'Files',
