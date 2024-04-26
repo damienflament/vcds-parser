@@ -1,5 +1,5 @@
 /**
- * Filesystem utlities.
+ * Filesystem utilities.
  * @module
  */
 
