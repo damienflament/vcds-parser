@@ -16,7 +16,7 @@ const config = {
   persistence: true
 }
 
-configureFromUrl(config, new URL(window.location.href))
+configureFromUrl(config, window.location.href)
 
 if (config.serviceWorker) {
   registerServiceWorker('./sw.js')

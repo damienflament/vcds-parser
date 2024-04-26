@@ -6,7 +6,7 @@
 import { camelToDashCase } from './string.js'
 
 /**
- * Loads configuration parameter values from given URL.
+ * Loads configuration parameter values from specified URL.
  *
  * For now, only boolean flags are supported.
  *
@@ -23,10 +23,10 @@ import { camelToDashCase } from './string.js'
  * '?no-database&url-rewriting'
  *
  * @param {object} config the config to setup values
- * @param {URL} [url=''] the URL to load values from
+ * @param {string} the URL to load values from
  */
-export function configureFromUrl (config, url = '') {
-  const parameters = url.searchParams
+export function configureFromUrl (config, url) {
+  const parameters = new URL(url).searchParams
 
   for (const name in config) {
     const paramName = camelToDashCase(name)
