@@ -35,12 +35,16 @@ const App = () => {
     persist(state, storage)
   }
 
-  /** A flag indicating if the directory has been opened. */
-  const isDirectoryOpened = van.state(false)
+  /**
+   * A flag indicating if the directory has been opened.
+   *
+   * If not, it means the state value was just loaded from storage.
+   */
+  const isDirectoryOpen = van.state(false)
 
   /** Current directory label */
   const directoryName = van.derive(() =>
-    isDirectoryOpened.val
+    isDirectoryOpen.val
       ? state.directory.val.name
       : 'Open a directory...'
   )
@@ -64,8 +68,8 @@ const App = () => {
             listDirectory(directory)
               .then((files) => {
                 directoryFiles.val = files
+                isDirectoryOpen.val = true
                 state.file.val ??= files[0]
-                isDirectoryOpened.val = true
               })
             break
 
@@ -87,7 +91,7 @@ const App = () => {
   const fileContent = van.state(null)
 
   van.derive(() => {
-    if (isDirectoryOpened.val && state.file.val) {
+    if (isDirectoryOpen.val && state.file.val) {
       loadFileContent(state.file.val, (c) => { fileContent.val = c })
     } else {
       fileContent.val = ''
