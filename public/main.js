@@ -4,19 +4,25 @@
  */
 
 import { DirectoryPicker, Menu, Navbar, Notification, NotificationArea, Section } from './lib/components.js'
+import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
 import van from './lib/van.js'
 
-const url = new URL(window.location.href)
+/** Application configuration */
+const config = {
+  serviceWorker: true,
+  persistence: true
+}
 
-// The service worker is registered unless the 'no-service-worker' URL parameter
-// is defined.
-if (url.searchParams.has('no-service-worker')) {
-  unregisterServiceWorker()
-} else {
+configureFromUrl(config, new URL(window.location.href))
+
+if (config.serviceWorker) {
   registerServiceWorker('./sw.js')
+} else {
+  console.log('Service Worker disabled.')
+  unregisterServiceWorker()
 }
 
 const App = () => {
@@ -28,17 +34,17 @@ const App = () => {
     file: van.state(null)
   }
 
-  // The state is persisted unless the 'no-persistence' URL parameter is
-  // defined.
-  if (!url.searchParams.has('no-persistence')) {
+  if (config.persistence) {
     const storage = new Storage(window.indexedDB)
     persist(state, storage)
+  } else {
+    console.log('Persistence disabled.')
   }
 
   /**
    * A flag indicating if the directory has been opened.
    *
-   * If not, it means the state value was just loaded from storage.
+   * If not, it means the `state.directory` value was just loaded from storage.
    */
   const isDirectoryOpen = van.state(false)
 
@@ -55,8 +61,8 @@ const App = () => {
   /**
    * Opens the directory.
    *
-   * The directory stored in the persisted state is opened. If a permission
-   * has to be requested to the user, a notification is shown.
+   * The directory stored in the persisted state is opened. If a permission has
+   * to be requested to the user, a notification is shown.
    */
   async function openDirectory () {
     const directory = state.directory.val
