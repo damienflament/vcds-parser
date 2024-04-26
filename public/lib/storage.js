@@ -98,7 +98,8 @@ export class Storage extends EventTarget {
  * When the storage is ready, makes it persist changes on the state.
  *
  * The state properties are cycled. For each of them a request is done to get
- * the stored value. Then property saving is setup as a side effect.
+ * the stored value. If it is undefined, it is initialized with the current
+ * value. Then property saving is setup as a side effect.
  *
  * @param {object} state the state to persist
  * @param {Storage} storage the storage where to keep the state
@@ -109,7 +110,11 @@ export function persist (state, storage) {
       const stateItem = state[name]
 
       storage.get(name).then(value => {
-        stateItem.val = value
+        if (value === undefined) {
+          storage.save(name, stateItem.val)
+        } else {
+          stateItem.val = value
+        }
 
         van.derive(() => storage.save(name, stateItem.val))
       })
