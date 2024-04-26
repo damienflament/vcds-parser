@@ -3,7 +3,7 @@
  * @module
  */
 
-import { DirectoryPicker, Menu, Navbar, Notification, NotificationArea, Section } from './lib/components.js'
+import { DirectoryPicker, Menu, MenuItem, Navbar, Notification, NotificationArea, Section } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
@@ -26,8 +26,6 @@ if (config.serviceWorker) {
 }
 
 const App = () => {
-  const { pre } = van.tags
-
   /** Persisted state */
   const state = {
     directory: van.state(null),
@@ -107,6 +105,8 @@ const App = () => {
   /** Notification area */
   const notificationsArea = NotificationArea()
 
+  const { pre } = van.tags
+
   return [
     Navbar({ logo: { src: '/assets/logo.png', alt: 'application logo' } }),
     Section(
@@ -119,13 +119,16 @@ const App = () => {
           state.file.val = null
         }
       }),
-      Menu({
-        label: 'Files',
-        itemsState: directoryFiles,
-        formatter: f => f.name,
-        onclick: f => { state.file.val = f },
-        isSelected: f => f.name === state.file.val?.name
-      }),
+
+      () => Menu({
+        label: 'Files'
+      }, directoryFiles.val.map(f =>
+        MenuItem({
+          isSelected: f.name === state.file.val?.name,
+          onclick: () => { state.file.val = f }
+        }, f.name)
+      )),
+
       pre({
         class: 'textarea',
         style: 'height: auto;'

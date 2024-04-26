@@ -69,30 +69,35 @@ export const DirectoryPicker = (
 /**
  * A simple menu.
  *
- * @param {string} label the menu label
- * @param {[State<any>]} itemsState the items
- * @param {(any) => any} formatter called to get the label for the given item
- * @param {(any) => any} onclick called with the given item when clicked
- * @param {(any) => boolean} isSelected called to check if the given item is selected
+ * @param {object} param0
+ * @param {string} param0.label the menu label
+ * @param {[any]} children the menu items
  */
 export const Menu = (
   {
-    label: menuLabel,
-    itemsState: items,
-    formatter,
-    onclick: callback,
-    isSelected
-  }) =>
+    label: menuLabel
+  }, ...items) =>
   aside({ class: 'menu block' },
     p({ class: 'menu-label' }, menuLabel),
-    () => ul({ class: 'menu-list' }, items.val.map(i =>
-      li(a(
-        {
-          class: isSelected(i) ? 'is-active' : '',
-          onclick: () => callback(i)
-        }, formatter(i)))
-    ))
+    ul({ class: 'menu-list' }, items)
   )
+
+/**
+   *
+   * @param {object} param0
+   * @param {boolean} param0.isSelected if true, the item is shown as selected
+   * @param {() => any} param0.onclick called when the item is clicked
+   * @param {[any]} children the item children (usually a text node)
+   */
+export const MenuItem = (
+  {
+    isSelected,
+    onclick: callback
+  }, ...children) =>
+  li(a({
+    class: isSelected ? 'is-active' : '',
+    onclick: callback
+  }, children))
 
 /**
  * An area to display notifications.
