@@ -108,8 +108,8 @@ const App = () => {
       DirectoryPicker({
         label: 'Scans directory',
         name: directoryName,
-        onsuccess: (directory) => {
-          state.directory.val = directory
+        onsuccess: d => {
+          state.directory.val = d
           state.file.val = null
         }
       }),
