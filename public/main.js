@@ -9,10 +9,11 @@ import { registerServiceWorker, unregisterServiceWorker } from './lib/servicewor
 import { Storage, persist } from './lib/storage.js'
 import van from './lib/van.js'
 
-// The service worker is registered unless the 'nosw' URL parameter is defined.
 const url = new URL(window.location.href)
 
-if (url.searchParams.has('nosw')) {
+// The service worker is registered unless the 'no-service-worker' URL parameter
+// is defined.
+if (url.searchParams.has('no-service-worker')) {
   unregisterServiceWorker()
 } else {
   registerServiceWorker('./sw.js')
@@ -26,8 +27,13 @@ const App = () => {
     directory: van.state(null),
     file: van.state(null)
   }
-  const storage = new Storage(window.indexedDB)
-  persist(state, storage)
+
+  // The state is persisted unless the 'no-persistence' URL parameter is
+  // defined.
+  if (!url.searchParams.has('no-persistence')) {
+    const storage = new Storage(window.indexedDB)
+    persist(state, storage)
+  }
 
   /** A flag indicating if the directory has been opened. */
   const isDirectoryOpened = van.state(false)
