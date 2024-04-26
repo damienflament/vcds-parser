@@ -73,18 +73,4 @@ export async function loadFileContent (fileHandle, onsuccess) {
       })
     }
   })
-
-  // const permission = await fileHandle.queryPermission(options)
-
-  // if (permission === 'granted') {
-  //   fileHandle.getFile().then(file => {
-  //     const reader = new FileReader()
-
-  //     reader.onload = (ev) => {
-  //       contentState.val = ev.target.result
-  //     }
-
-  //     reader.readAsText(file)
-  //   })
-  // }
 }
