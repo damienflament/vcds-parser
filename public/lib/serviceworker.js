@@ -18,6 +18,7 @@ export function registerServiceWorker (path) {
 
   navigator.serviceWorker.getRegistration()
     .then(registration => {
+      // Do nothing if the specified service worker is already registered
       if (registration) {
         const url = new URL(path, window.location.href)
         const registeredUrl = new URL(registration?.active.scriptURL)
