@@ -57,39 +57,40 @@ const App = () => {
   const directoryFiles = van.state([])
 
   /**
-   * Opens the directory.
+   * Opens the given directory.
    *
-   * The directory stored in the persisted state is opened. If a permission has
-   * to be requested to the user, a notification is shown.
+   * If a permission has to be requested to the user, a notification is shown.
+   *
+   * @param {FileSystemDirectoryHandle} directory the directory to open
    */
-  async function openDirectory () {
-    const directory = state.directory.val
+  async function openDirectory (directory) {
+    requestPermission(directory).then(permission => {
+      switch (permission) {
+        case 'granted':
+          listDirectory(directory)
+            .then((files) => {
+              directoryFiles.val = files
+              isDirectoryOpen.val = true
+              state.file.val ??= files[0] ?? null
+            })
+          break
 
-    if (directory) {
-      requestPermission(directory).then(permission => {
-        switch (permission) {
-          case 'granted':
-            listDirectory(directory)
-              .then((files) => {
-                directoryFiles.val = files
-                isDirectoryOpen.val = true
-                state.file.val ??= files[0] ?? null
-              })
-            break
-
-          case 'prompt':
-            van.add(notificationsArea, Notification({
-              message: 'Do you want to load the last opened directory ?',
-              label: 'Yes, open it',
-              onclick: () => openDirectory()
-            }))
-            break
-        }
-      })
-    }
+        case 'prompt':
+          van.add(notificationsArea, Notification({
+            message: 'Do you want to load the last opened directory ?',
+            label: 'Yes, open it',
+            onclick: () => openDirectory(directory)
+          }))
+          break
+      }
+    })
   }
 
-  van.derive(openDirectory)
+  van.derive(() => {
+    if (state.directory.val) {
+      openDirectory(state.directory.val)
+    }
+  })
 
   /** Selected file content */
   const fileContent = van.state(null)
