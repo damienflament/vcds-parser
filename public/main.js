@@ -73,7 +73,7 @@ const App = () => {
               .then((files) => {
                 directoryFiles.val = files
                 isDirectoryOpen.val = true
-                state.file.val ??= files[0]
+                state.file.val ??= files[0] ?? null
               })
             break
 
