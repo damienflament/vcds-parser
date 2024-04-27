@@ -27,10 +27,7 @@
     "version": "npm run configure && git add -A public/"
   },
   "devDependencies": {
-    "@eslint/js": "^9.1.1",
-    "eslint": "^9.1.0",
     "fs-extra": "^11.2.0",
-    "globals": "^15.0.0",
     "klaw-sync": "^6.0.0",
     "snazzy": "^9.0.0",
     "standard": "^17.1.0"
