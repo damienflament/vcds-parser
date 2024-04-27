@@ -1,11 +1,17 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: main
+    rev: v4.6.0
     hooks:
       - id: check-case-conflict
-      - id: check-illegal-windows-names
       - id: check-symlinks
   - repo: https://github.com/standard/standard
     rev: v17.1.0
     hooks:
       - id: standard
+  - repo: local
+    hooks:
+      - id: configure
+        name: Configure the application
+        entry: npm run configure
+        language: system
+        pass_filenames: false
