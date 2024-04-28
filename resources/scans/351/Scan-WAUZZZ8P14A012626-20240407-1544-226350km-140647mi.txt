@@ -1,0 +1,199 @@
+Sunday,07,April,2024,15:44:55:00009
+VCDS -- Windows Based VAG/VAS Emulator Running on Windows 10 x64
+VCDS Version: 23.11.0.0 (x64)
+Data version: 20231027 DS351.0
+www.Ross-Tech.com
+
+Dealer/Shop Name: Damien Flament
+
+VIN: WAUZZZ8P14A012626   License Plate: 
+
+
+Chassis Type: 8P (1K0)
+Scan: 01 03 08 09 15 16 17 19 25 42 44 46 47 52
+
+VIN: WAUZZZ8P14A012626   Mileage: 226350km-140647miles
+
+00-Steering Angle Sensor -- Status: OK 0000
+01-Engine -- Status: OK 0000
+03-ABS Brakes -- Status: Malfunction 0010
+08-Auto HVAC -- Status: OK 0000
+09-Cent. Elect. -- Status: OK 0000
+15-Airbags -- Status: OK 0000
+16-Steering wheel -- Status: OK 0000
+17-Instruments -- Status: OK 0000
+19-CAN Gateway -- Status: Malfunction 0010
+25-Immobilizer -- Status: OK 0000
+42-Door Elect, Driver -- Status: OK 0000
+44-Steering Assist -- Status: Sporadic communication error 1000
+46-Central Conv. -- Status: OK 0000
+47-Sound System -- Status: OK 0000
+52-Door Elect, Pass. -- Status: Malfunction 0010
+ 
+-------------------------------------------------------------------------------
+Address 01: Engine        Labels: 06F-906-056-AXW.lbl
+   Part No SW: 06F 906 056 S    HW: Hardware No 
+   Component: MED9.5.10       G00 5201  
+   Revision: 00000000    Serial number: AUX7Z0C4FN50EJ
+   Coding: 0000072
+   Shop #: WSC 06435 000 00000
+   VCID: 397998E370599B59C4-806C
+   VINID: 9D196AAAA2200444400421821859A47695
+
+   Subsystem 1 - Part No: 06F 907 807 A
+   Component: NOX  0304280094 004 3608
+   06F907807A  NOX  0304280094 004 3608   
+
+No fault code found.
+Readiness: 1010 0101
+
+-------------------------------------------------------------------------------
+Address 03: ABS Brakes        Labels: 1K0-907-379-MK60-F.clb
+   Part No: 1K0 907 379 D
+   Component: ESP FRONT MK60      0102  
+   Coding: 0053894
+   Shop #: WSC 06435 000 00000
+   VCID: 3365AACB523561090E-8066
+
+2 Faults Found:
+01487 - System Function Test 
+            000 - - - Intermittent
+01486 - System Function Test Activated 
+            000 - -
+
+-------------------------------------------------------------------------------
+Address 08: Auto HVAC        Labels: 8P0-820-043.lbl
+   Part No SW: 8P0 820 043     HW: 8P0 820 043 
+   Component: KlimavollautomatH11 0120  
+   Shop #: WSC 06435 000 00000
+   VCID: 69D908A34079EBD974-803C
+
+No fault code found.
+
+-------------------------------------------------------------------------------
+Address 09: Cent. Elect.        Labels:. 8P0-907-279-23-H.lbl
+   Part No SW: 8P0 907 279 A    HW: 8P0 907 279 A*
+   Component: Bordnetz-SG 1.0 H27 0401  
+   Revision: 00000000    Serial number: 00000006428552
+   Coding: A58C5F0080141000000000000000000000
+   Shop #: WSC 12345 123 12345
+   VCID: 3B7582EB7A65A949D6-806E
+
+   Subsystem 1 - Part No: 8P1 955 119   Labels: 1TX-955-119.CLB
+   Component: Wischer WWS Audi350 0130  
+   Coding: 16711696
+   Shop #: WSC 12345  
+
+No fault code found.
+
+-------------------------------------------------------------------------------
+Address 15: Airbags        Labels: 8P0-959-655-84.lbl
+   Part No SW: 8P0 959 655 F    HW: 8P0 959 655 F
+   Component: Airbag 8.4ED    H01 0130  
+   Coding: 0010602
+   Shop #: WSC 06435 000 00000
+   VCID: 4581E4130CA1EFB9B0-8010
+
+No fault code found.
+
+-------------------------------------------------------------------------------
+Address 16: Steering wheel        Labels: 8P0-953-549.lbl
+   Part No SW: 8P0 953 549     HW: 8P0 953 549 
+   Component: Lenksäulenmodul H07 0020  
+   Coding: 0000022
+   Shop #: WSC 06435 000 00000
+   VCID: 7BF542EB3AE5694996-802E
+
+No fault code found.
+
+-------------------------------------------------------------------------------
+Address 17: Instruments        Labels: 8P0-920-xxx-17-MY7.lbl
+   Part No SW: 8P0 920 900 C    HW: 8P0 920 900 C
+   Component: KOMBIINSTR. VDO H27 0050  
+   Revision: D04         Serial number: 1244CD04004632
+   Coding: 0004103
+   Shop #: WSC 80093 222 69422
+   VCID: 2F6DA6BBBE1D45E96A-807A
+
+No fault code found.
+
+-------------------------------------------------------------------------------
+Address 19: CAN Gateway        Labels:. 1K0-907-530-V1.clb
+   Part No SW: 1K0 907 530 B    HW: 1K0 907 951 
+   Component: Gateway         H07 0050  
+   Revision: 07          Serial number: 1600103428406B
+   Coding: 3D0F0302070100
+   Shop #: WSC 06435 123 12345
+   VCID: 2643439F91E704A199-8072
+
+1 Fault Found:
+01309 - Power Steering Control Module (J500) 
+            004 - No Signal/Communication - Intermittent
+             Freeze Frame:
+                    Fault Status: 00100100
+                    Fault Priority: 2
+                    Fault Frequency: 67
+                    Reset counter: 71
+                    Mileage: 224248 km
+                    Time Indication: 0
+
+
+-------------------------------------------------------------------------------
+Address 25: Immobilizer        Labels: 1K0-920-xxx-25.clb
+   Part No SW: 8P0 920 900 C    HW: 8P0 920 900 C
+   Component: KOMBIINSTR. VDO H27 0050  
+   Revision: D04         Serial number: AUX7Z0C4FN50EJ
+   Shop #: WSC 80093 222 69422
+   VCID: 2F6DA6BBBE1D45E96A-807A
+
+No fault code found.
+
+-------------------------------------------------------------------------------
+Address 42: Door Elect, Driver        Labels: 8P0-959-801-MIN1.lbl
+   Part No: 8P0 959 801 A
+   Component: Tuersteuerger.  H08 0010  
+   Coding: 0000088
+   Shop #: WSC 06435 000 00000
+   VCID: 397998E370599B59C4-806C
+
+No fault code found.
+
+-------------------------------------------------------------------------------
+Address 44: Steering Assist
+Cannot be reached
+
+-------------------------------------------------------------------------------
+Address 46: Central Conv.        Labels: 8P0-959-433.lbl
+   Part No: 8P0 959 433 B
+   Component:    KSG          H02 0020  
+   Coding: 188800186D288505484A0160
+   Shop #: WSC 08330 995 06681
+   VCID: 3B7582EB7A65A949D6-806E
+
+No fault code found.
+
+-------------------------------------------------------------------------------
+Address 47: Sound System        Labels: 8Px-035-382.lbl
+   Part No SW: 8P3 035 382     HW: 8P3 035 382 
+   Component: AB2 SUBWOOFERBOXH10 0080  
+   Revision: 00006       Serial number: 10000001011600
+   Shop #: WSC 00000 000 00000
+   VCID: 70EF65C763A31A1133-8024
+
+No fault code found.
+
+-------------------------------------------------------------------------------
+Address 52: Door Elect, Pass.        Labels: 8P0-959-802-MIN1.lbl
+   Part No: 8P0 959 802 A
+   Component: Tuersteuerger.  H09 0010  
+   Coding: 0000088
+   Shop #: WSC 06435 000 00000
+   VCID: 3A7B87EF755F9041CD-806E
+
+2 Faults Found:
+00929 - Locking Module for Central Locking; Front Passenger Side (F221) 
+            008 - Implausible Signal - Intermittent
+00106 - Signal Central Locking SAVE/LOCK Passenger Side 
+            008 - Implausible Signal
+
+End-------------------------(Elapsed Time: 01:24)--------------------------
