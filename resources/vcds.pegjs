@@ -76,7 +76,7 @@ report
     }
   }
 
-datetime 'une date'
+datetime 'a date and time'
   = dayName ',' day ',' monthName ',' year ',' hours ':' minutes ':' seconds ':00009'
   { return new Date(text()) }
 dayName

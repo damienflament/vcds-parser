@@ -305,7 +305,7 @@ function peg$parse(input, options) {
   var peg$e15 = peg$literalExpectation("(Elapsed Time:", false);
   var peg$e16 = peg$literalExpectation(":", false);
   var peg$e17 = peg$literalExpectation("\r\n", false);
-  var peg$e18 = peg$otherExpectation("une date");
+  var peg$e18 = peg$otherExpectation("a date and time");
   var peg$e19 = peg$literalExpectation(",", false);
   var peg$e20 = peg$literalExpectation(":00009", false);
   var peg$e21 = peg$literalExpectation("Monday", false);
