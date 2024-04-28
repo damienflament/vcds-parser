@@ -24,17 +24,21 @@
     "serve": "caddy run",
     "lint": "npx standard | npx snazzy",
     "configure": "node scripts/configure.mjs",
-    "version": "npm run configure && git add -A public/"
+    "version": "npm run configure && git add -A public/",
+    "parser": "npx peggy -o public/lib/parser.js --format es resources/vcds.pegjs",
+    "parser-dev": "npx peggy -o public/lib/parser.js --format es resources/vcds.pegjs --watch"
   },
   "devDependencies": {
     "fs-extra": "^11.2.0",
     "klaw-sync": "^6.0.0",
+    "peggy": "^4.0.2",
     "snazzy": "^9.0.0",
     "standard": "^17.1.0"
   },
   "standard": {
     "ignore": [
-      "**/vendor/"
+      "**/vendor/",
+      "public/lib/parser.js"
     ],
     "globals": [
       "FileReader"
