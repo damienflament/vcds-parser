@@ -95,22 +95,24 @@ const App = () => {
 
   /** Selected file content */
   const fileContent = van.state('')
-  const fileStructure = van.state('')
 
   van.derive(() => {
     if (isDirectoryOpen.val && state.file.val) {
-      loadFileContent(state.file.val).then(content => {
-        fileContent.val = content
+      loadFileContent(state.file.val)
+        .then(c => { fileContent.val = c })
+    }
+  })
 
-        try {
-          const result = parse(content)
-          fileStructure.val = JSON.stringify(result, null, 4)
-        } catch (e) {
-          fileStructure.val = e.toString()
-        }
-      })
+  const report = van.derive(() => {
+    if (fileContent.val) {
+      try {
+        const result = parse(fileContent.val)
+        return JSON.stringify(result, null, 4)
+      } catch (e) {
+        return e.toString()
+      }
     } else {
-      fileContent.val = ''
+      return ''
     }
   })
 
@@ -144,7 +146,7 @@ const App = () => {
       div({ class: 'columns' },
         div({ class: 'column' },
           pre({
-          }, fileStructure)
+          }, report)
         ),
         div({ class: 'column' },
           pre({
