@@ -34,7 +34,7 @@ report
     l
     'VIN:' _ vin _+ 'Mileage:' _ mileage:mileage eol
     l
-    modulesStatus:module|1.., eol|
+    modulesStatus:moduleStatus+
     l+
     moduleInfos:moduleInfo+
     'End' '-'+ '(Elapsed Time:' _ duration:$( minutes ':' seconds ) ')' '-'+ '\r\n'
@@ -76,35 +76,45 @@ report
     }
   }
 
-datetime 'a date and time'
+datetime
   = dayName ',' day ',' monthName ',' year ',' hours ':' minutes ':' seconds ':00009'
   { return new Date(text()) }
-dayName
+dayName 'the name of a week day'
   = 'Monday' / 'Tuesday' / 'Wednesday' / 'Thursday' / 'Friday' / 'Saturday' /
     'Sunday'
-day = $([0-2][0-9] / '3'[0-1])
-monthName
+day 'a day number'
+  = $([0-2][0-9] / '3'[0-1])
+monthName 'the name of a month'
   = 'January' / 'February' / 'March' / 'April' / 'May' / 'June' / 'July' /
     'August' / 'September' / 'October' / 'November' / 'December'
-year = $[12][0-9]|3|
-hours = $( [01][0-9] / '2'[0-4] )
-minutes = $[0-5][0-9]
-seconds = $[0-5][0-9]
+year 'a year'
+  = $[12][0-9]|3|
+hours 'hours'
+  = $( [01][0-9] / '2'[0-3] )
+minutes 'minutes'
+  = $[0-5][0-9]
+seconds 'seconds'
+  = $[0-5][0-9]
 
-versionSpecifier 'a version specifier' = $( num+ '.' num+ '.' num+ '.' num+ )
-dataVersionDate = $num|8|
-dataVersionSpecifier = $( 'DS' num|3| '.' num )
+versionSpecifier 'a version specifier'
+  = $( num+ '.' num+ '.' num+ '.' num+ )
+dataVersionDate 'a VCDS data version date'
+  = $num|8|
+dataVersionSpecifier 'a VCDS data version specifier'
+  = $( 'DS' num|3| '.' num )
 
-vin 'a VIN' = $uppnum|17|
-licensePlate 'a license plate number' = $[A-Z0-9-]*
-chassis 'a chassis code' = @$uppnum|2| _ '(' uppnum+ ')'
-mileage
+vin 'a VIN (Vehicule Identification Number)'
+  = $uppnum|17|
+licensePlate 'a license plate number'
+  = $[A-Z0-9-]*
+chassis 'a VAG chassis code'
+  = @$uppnum|2| _ '(' uppnum+ ')'
+mileage 'a mileage value in km and miles'
   = km:$num+ 'km' '-' miles:$num+ 'miles'
   { return { km: integer(km), miles: integer(miles) } }
 
-module
-  = address:moduleAddress '-' name:$[^-]+ '--' _
-    'Status:' _ statusDescription:$[^01]+ status:$bin|4|
+moduleStatus
+  = address:moduleAddress '-' name:$[^-]+ '--' _ 'Status:' _ statusDescription:$[^01]+ status:$bin|4| eol
   {
     return {
       address,
@@ -190,7 +200,7 @@ subsystem
     }
   }
 
-faultsSection 'a faults section'
+faultsSection
   = (
     'No fault code found.' eol
     { return [] }
@@ -252,5 +262,5 @@ uppnum 'an alphanumeric uppercase character' = [0-9A-Z]
 _ 'a blank space' = ' '
 w 'a word' = [^ \r\n]+
 l 'an empty line' = _* eol
-eol 'the end of line' = '\r\n' // Those reports are produced under Windows
-rol 'the rest of line' = [^\r]*
+eol 'the end of the line' = '\r\n' // Those reports are produced under Windows
+rol 'the rest of the line' = [^\r]*
