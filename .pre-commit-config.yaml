@@ -15,3 +15,8 @@ repos:
         entry: npm run configure
         language: system
         pass_filenames: false
+      - id: generate-parser
+        name: Generate the parser
+        entry: npm run parser
+        language: system
+        pass_filenames: false
