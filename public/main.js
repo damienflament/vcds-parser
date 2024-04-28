@@ -3,7 +3,7 @@
  * @module
  */
 
-import { DirectoryPicker, Menu, MenuItem, Navbar, Notification, NotificationArea, Section } from './lib/components.js'
+import { DirectoryPicker, Menu, MenuItem, Navbar, Notification, NotificationArea, Section, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { parse } from './lib/report.js'
@@ -103,6 +103,7 @@ const App = () => {
     }
   })
 
+  /** Selected file parsing */
   const report = van.derive(() => {
     if (fileContent.val) {
       try {
@@ -119,7 +120,7 @@ const App = () => {
   /** Notification area */
   const notificationsArea = NotificationArea()
 
-  const { pre, div } = van.tags
+  const { pre, div, footer, p, strong } = van.tags
 
   return [
     Navbar({ logo: { src: '/assets/logo.png', alt: 'application logo' } }),
@@ -151,6 +152,20 @@ const App = () => {
         div({ class: 'column' },
           pre({
           }, fileContent)
+        )
+      )
+    ),
+
+    footer({ class: 'footer' },
+      div({ class: 'content has-text-centered' },
+        p(strong('VCDS Parser'), ' by Damien Flament.')
+      ),
+      div({ class: 'field is-grouped is-grouped-centered' },
+        div({ class: 'control' },
+          StatusTag({ class: config.persistence ? 'is-success' : 'is-warning' }, 'Persistence')
+        ),
+        div({ class: 'control' },
+          StatusTag({ class: config.serviceWorker ? 'is-success' : 'is-warning' }, 'Service Worker')
         )
       )
     )

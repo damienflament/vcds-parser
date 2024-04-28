@@ -149,3 +149,16 @@ export const Notification = ({
       )
     )
 }
+
+/**
+ * A double tag to display a label on the left with a colored tag on the right.
+ *
+ * @param {object} param0
+ * @param {string} param0.class the status tag class
+ * @param  {...any} children the label tag children
+ */
+export const StatusTag = ({ class: cls }, ...children) =>
+  div({ class: 'tags has-addons' },
+    span({ class: 'tag' }, children),
+    span({ class: `tag ${cls}` })
+  )
