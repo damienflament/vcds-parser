@@ -99,7 +99,7 @@ const App = () => {
 
   van.derive(() => {
     if (isDirectoryOpen.val && state.file.val) {
-      loadFileContent(state.file.val, (c) => {
+      loadFileContent(state.file.val).then(c => {
         fileContent.val = c
 
         try {

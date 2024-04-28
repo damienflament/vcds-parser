@@ -54,23 +54,27 @@ export async function listDirectory (directory) {
 }
 
 /**
- * Loads the content of the given file into the given state.
+ * Loads the content of the given file.
  *
  * @param {FileSystemFileHandle} fileHandle the handle to the file to load content from
- * @param {(any) => any} onsuccess called with the loaded content as parameter
+ * @return {Promise<string>} the loaded content
  */
-export async function loadFileContent (fileHandle, onsuccess) {
-  const options = { mode: 'read' }
+export function loadFileContent (fileHandle) {
+  return new Promise((resolve, reject) =>
+    fileHandle.queryPermission({ mode: 'read' }).then(permission => {
+      if (permission !== 'granted') {
+        reject(new Error(`Permission to read file ${fileHandle.name} is ${permission}`))
+      }
 
-  fileHandle.queryPermission(options).then(permission => {
-    if (permission === 'granted') {
       fileHandle.getFile().then(file => {
         const reader = new FileReader()
 
-        reader.onload = (ev) => { onsuccess(ev.target.result) }
+        reader.onload = (ev) => {
+          resolve(ev.target.result)
+        }
 
         reader.readAsText(file)
       })
-    }
-  })
+    })
+  )
 }
