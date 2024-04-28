@@ -6,7 +6,7 @@
 import { DirectoryPicker, Menu, MenuItem, Navbar, Notification, NotificationArea, Section } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
-import { SyntaxError, parse } from './lib/parser.js'
+import { parse } from './lib/report.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
 import van from './lib/van.js'
@@ -99,35 +99,14 @@ const App = () => {
 
   van.derive(() => {
     if (isDirectoryOpen.val && state.file.val) {
-      loadFileContent(state.file.val).then(c => {
-        fileContent.val = c
+      loadFileContent(state.file.val).then(content => {
+        fileContent.val = content
 
         try {
-          const result = parse(c)
+          const result = parse(content)
           fileStructure.val = JSON.stringify(result, null, 4)
         } catch (e) {
-          if (e instanceof SyntaxError) {
-            const startLine = e.location.start.line
-            const startColumn = e.location.start.column
-            const endLine = e.location.end.line
-            const endColumn = e.location.end.column
-            const startOffset = e.location.start.offset
-            const endOffset = e.location.end.offset
-            const endDisplay = c.indexOf('\r', endOffset)
-
-            fileStructure.val = `${e.name}: ${e.message}
-              from line ${startLine} column ${startColumn}
-                to line ${endLine} column ${endColumn}\n` +
-              '\n' +
-              '[...]' + c.substring(startOffset - 100, endDisplay) + '\n' +
-              '|'.padStart(startColumn - 1)
-
-            if (endColumn - startColumn > 0) {
-              fileStructure.val += ' '.repeat(endColumn - startColumn) + '|'
-            }
-          } else {
-            throw e
-          }
+          fileStructure.val = e.toString()
         }
       })
     } else {
