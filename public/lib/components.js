@@ -69,7 +69,7 @@ export const DirectoryPicker = (
       }),
       span({ class: 'file-cta' },
         span({ class: 'file-icon' },
-          FontAwesome('upload')
+          FontAwesome('folder-open')
         ),
         span({ class: 'file-label' }, pickerLabel)
       ),
