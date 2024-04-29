@@ -162,3 +162,40 @@ export const StatusTag = ({ class: cls }, ...children) =>
     span({ class: 'tag' }, children),
     span({ class: `tag ${cls}` })
   )
+
+/**
+ * Two attached buttons.
+ *
+ * The left one is selected on load.
+ *
+ * @param {object} config
+ * @param {string} config.class the buttons container class
+ * @param {any} config.left the children of the left button
+ * @param {any} config.right the children of the right button
+ * @param {() => any} config.onclickRight called when the right button is clicked
+ * @param {() => any} config.onclickLeft called when the left button is clicked
+ */
+export const DualButton = ({
+  class: cls,
+  left,
+  right,
+  onclickLeft,
+  onclickRight
+}) => {
+  const isLeftSelected = van.state(true)
+
+  return div({ class: `buttons has-addons ${cls}` },
+    button(
+      {
+        class: () => `button ${isLeftSelected.val ? 'is-selected is-primary' : ''}`,
+        onclick: () => { onclickLeft(); (isLeftSelected.val = true) }
+      },
+      left),
+    button(
+      {
+        class: () => `button ${isLeftSelected.val ? '' : 'is-selected is-primary'}`,
+        onclick: () => { onclickRight(); (isLeftSelected.val = false) }
+      },
+      right)
+  )
+}

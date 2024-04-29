@@ -3,7 +3,7 @@
  * @module
  */
 
-import { DirectoryPicker, Menu, MenuItem, Navbar, Notification, NotificationArea, Section, StatusTag } from './lib/components.js'
+import { DirectoryPicker, DualButton, FontAwesome, Menu, MenuItem, Navbar, Notification, NotificationArea, Section, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { parse } from './lib/report.js'
@@ -93,21 +93,21 @@ const App = () => {
     }
   })
 
-  /** Selected file content */
-  const fileContent = van.state('')
+  /** Report source */
+  const reportSource = van.state('')
 
   van.derive(() => {
     if (isDirectoryOpen.val && state.file.val) {
       loadFileContent(state.file.val)
-        .then(c => { fileContent.val = c })
+        .then(c => { reportSource.val = c })
     }
   })
 
-  /** Selected file parsing */
+  /** Report */
   const report = van.derive(() => {
-    if (fileContent.val) {
+    if (reportSource.val) {
       try {
-        const result = parse(fileContent.val)
+        const result = parse(reportSource.val)
         return JSON.stringify(result, null, 4)
       } catch (e) {
         return e.toString()
@@ -117,10 +117,13 @@ const App = () => {
     }
   })
 
+  /** Viever */
+  const isViewingSource = van.state(false)
+
   /** Notification area */
   const notificationsArea = NotificationArea()
 
-  const { pre, div, footer, p, strong } = van.tags
+  const { pre, div, footer, p, strong, span } = van.tags
 
   return [
     Navbar({ logo: { src: '/assets/logo.png', alt: 'application logo' } }),
@@ -135,23 +138,34 @@ const App = () => {
         }
       }),
 
-      () => Menu({
-        label: 'Files'
-      }, directoryFiles.val.map(f =>
-        MenuItem({
-          isSelected: f.name === state.file.val?.name,
-          onclick: () => { state.file.val = f }
-        }, f.name)
-      )),
-
       div({ class: 'columns' },
-        div({ class: 'column' },
-          pre({
-          }, report)
+        div({ class: 'column is-one-fifth' },
+          () => Menu({
+            label: 'Files'
+          }, directoryFiles.val.map(f =>
+            MenuItem({
+              isSelected: f.name === state.file.val?.name,
+              onclick: () => { state.file.val = f }
+            }, f.name)
+          ))
         ),
         div({ class: 'column' },
-          pre({
-          }, fileContent)
+          DualButton({
+            class: 'is-right',
+            state: isViewingSource,
+            left: [
+              span({ class: 'icon' }, FontAwesome('toolbox')),
+              span('Report')
+            ],
+            onclickLeft: () => { isViewingSource.val = false },
+            right: [
+              span({ class: 'icon' }, FontAwesome('file-lines')),
+              span('Source')
+            ],
+            onclickRight: () => { isViewingSource.val = true }
+          }),
+          pre({ style: 'font-family: monospace; font-size: 16px;' },
+            () => { return isViewingSource.val ? reportSource.val : report.val })
         )
       )
     ),
