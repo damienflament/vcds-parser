@@ -1,4 +1,6 @@
-import * as peggy from './parser.js'
+import { parse as peggyParse } from './parser.js'
+
+export { SyntaxError } from './parser.js'
 
 /**
  * Describes the context of the given syntax error.
@@ -7,7 +9,7 @@ import * as peggy from './parser.js'
  * @param {peggy.SyntaxError} error the error to build context from
  * @returns {string} the context description
  */
-function errorContext (content, error) {
+function describeErrorContext (content, error) {
   const size = 100
 
   const startLine = error.location.start.line
@@ -39,24 +41,19 @@ function errorContext (content, error) {
 }
 
 /**
- * Build a data structure by parsing the given report content.
+ * Builds a data structure by parsing the given report content.
  *
  * @param {string} content the report content
  * @returns {object} the built data structure
  */
-export function parse (content) {
+export function buildFromContent (content) {
   try {
-    return peggy.parse(content)
+    return peggyParse(content)
   } catch (e) {
     if (e instanceof SyntaxError) {
-      e.message += errorContext(content, e)
+      e.message += describeErrorContext(content, e)
     }
 
     throw e
   }
 }
-
-/**
- * Thrown when the parser encounters an error.
- */
-export const SyntaxError = peggy.SyntaxError

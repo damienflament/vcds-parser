@@ -6,7 +6,7 @@
 import { DirectoryPicker, DualButton, FontAwesome, Menu, MenuItem, Navbar, Notification, NotificationArea, Section, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
-import { parse } from './lib/report.js'
+import { buildFromContent } from './lib/report.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
 import van from './lib/van.js'
@@ -107,7 +107,7 @@ const App = () => {
   const report = van.derive(() => {
     if (reportSource.val) {
       try {
-        const result = parse(reportSource.val)
+        const result = buildFromContent(reportSource.val)
         return JSON.stringify(result, null, 4)
       } catch (e) {
         return e.toString()
