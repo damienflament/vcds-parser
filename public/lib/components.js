@@ -8,7 +8,10 @@
 
 import van from './van.js'
 
-const { a, aside, button, div, i, img, label, li, p, span, ul } = van.tags
+export * from './components/menu.js'
+export * from './components/notification.js'
+
+const { button, div, i, img, label, span } = van.tags
 
 /**
  * A responsive horizontal navigation bar.
@@ -76,82 +79,6 @@ export const DirectoryPicker = (
       span({ class: 'file-name' }, name)
     )
   )
-
-/**
- * A simple menu.
- *
- * @param {object} config
- * @param {string} config.label the menu label
- * @param {[any]} items the menu items
- */
-export const Menu = (
-  {
-    label: menuLabel
-  }, ...items) =>
-  aside({ class: 'menu block' },
-    p({ class: 'menu-label' }, menuLabel),
-    ul({ class: 'menu-list' }, items)
-  )
-
-/**
- * To be used as a menu child..
- *
- * @param {object} config
- * @param {boolean} config.isSelected if true, the item is shown as selected
- * @param {() => any} config.onclick called when the item is clicked
- * @param {[any]} children the item children
- */
-export const MenuItem = (
-  {
-    isSelected,
-    onclick: callback
-  }, ...children) =>
-  li(a({
-    class: isSelected ? 'is-active' : '',
-    onclick: callback
-  }, children))
-
-/**
- * An area to display notifications.
- */
-export const NotificationArea = () => div({ class: 'block container' })
-
-/**
- * A notification.
- *
- * @param {object} config
- * @param {string} config.message the message to display
- * @param {string} config.label the button label
- * @param {() => any} config.onclick called when the button is clicked
- */
-export const Notification = (
-  {
-    message,
-    label: buttonLabel,
-    onclick: callback
-  }) => {
-  const removed = van.state(false)
-
-  return () => removed.val
-    ? null
-    : div({ class: 'notification' },
-      button({ class: 'delete', onclick: () => { removed.val = true } }),
-      div({ class: 'level' },
-        div({ class: 'level-left' },
-          div({ class: 'level-item' }, p(message)),
-          div({ class: 'level-item' },
-            button({
-              class: 'button is-primary',
-              onclick: () => {
-                callback()
-                removed.val = true
-              }
-            }, buttonLabel)
-          )
-        )
-      )
-    )
-}
 
 /**
  * A double tag to display a label on the left with a colored tag on the right.
