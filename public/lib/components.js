@@ -13,10 +13,10 @@ const { a, aside, button, div, i, img, label, li, p, span, ul } = van.tags
 /**
  * A responsive horizontal navigation bar.
  *
- * @param {object} param0
- * @param {object} param0.logo
- * @param {string} param0.logo.src the logo path
- * @param {string} param0.logo.alt the logo alternative description
+ * @param {object} config
+ * @param {object} config.logo
+ * @param {string} config.logo.src the logo path
+ * @param {string} config.logo.alt the logo alternative description
  */
 export const Navbar = ({ logo: { src, alt } }) =>
   div({ class: 'navbar' },
@@ -44,10 +44,10 @@ export const FontAwesome = name => i({ class: `fa-solid fa-${name}` })
 /**
  * A directory upload input using Javascript.
  *
- * @param {object} param0
- * @param {string} param0.label the input label
- * @param {string} param0.name the name of the selected directory
- * @param {(FileSystemDirectoryHandle) => any} param0.onsuccess called when a directory has been selected by the user
+ * @param {object} config
+ * @param {string} config.label the input label
+ * @param {string} config.name the name of the selected directory
+ * @param {(FileSystemDirectoryHandle) => any} config.onsuccess called when a directory has been selected by the user
  */
 export const DirectoryPicker = (
   {
@@ -80,8 +80,8 @@ export const DirectoryPicker = (
 /**
  * A simple menu.
  *
- * @param {object} param0
- * @param {string} param0.label the menu label
+ * @param {object} config
+ * @param {string} config.label the menu label
  * @param {[any]} items the menu items
  */
 export const Menu = (
@@ -94,12 +94,13 @@ export const Menu = (
   )
 
 /**
-   *
-   * @param {object} param0
-   * @param {boolean} param0.isSelected if true, the item is shown as selected
-   * @param {() => any} param0.onclick called when the item is clicked
-   * @param {[any]} children the item children (usually a text node)
-   */
+ * To be used as a menu child..
+ *
+ * @param {object} config
+ * @param {boolean} config.isSelected if true, the item is shown as selected
+ * @param {() => any} config.onclick called when the item is clicked
+ * @param {[any]} children the item children
+ */
 export const MenuItem = (
   {
     isSelected,
@@ -118,17 +119,19 @@ export const NotificationArea = () => div({ class: 'block container' })
 /**
  * A notification.
  *
- * @param {object} param0
- * @param {string} param0.message the message to display
- * @param {string} param0.label the button label
- * @param {() => any} param0.onclick called when the button is clicked
+ * @param {object} config
+ * @param {string} config.message the message to display
+ * @param {string} config.label the button label
+ * @param {() => any} config.onclick called when the button is clicked
  */
-export const Notification = ({
-  message,
-  label: buttonLabel,
-  onclick: callback
-}) => {
+export const Notification = (
+  {
+    message,
+    label: buttonLabel,
+    onclick: callback
+  }) => {
   const removed = van.state(false)
+
   return () => removed.val
     ? null
     : div({ class: 'notification' },
@@ -153,8 +156,8 @@ export const Notification = ({
 /**
  * A double tag to display a label on the left with a colored tag on the right.
  *
- * @param {object} param0
- * @param {string} param0.class the status tag class
+ * @param {object} config
+ * @param {string} config.class the status tag class
  * @param  {...any} children the label tag children
  */
 export const StatusTag = ({ class: cls }, ...children) =>
