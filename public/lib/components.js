@@ -8,6 +8,7 @@
 
 import van from './van.js'
 
+export * from './components/column.js'
 export * from './components/menu.js'
 export * from './components/notification.js'
 

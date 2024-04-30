@@ -3,7 +3,7 @@
  * @module
  */
 
-import { DirectoryPicker, DualButton, FontAwesome, Menu, MenuItem, Navbar, Notification, NotificationArea, Section, StatusTag } from './lib/components.js'
+import { Column, Columns, DirectoryPicker, DualButton, FontAwesome, Menu, MenuItem, Navbar, Notification, NotificationArea, Section, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { buildFromContent } from './lib/report.js'
@@ -138,8 +138,8 @@ const App = () => {
         }
       }),
 
-      div({ class: 'columns' },
-        div({ class: 'column is-one-fifth' },
+      Columns(
+        Column({ class: 'is-one-fifth' },
           () => Menu({
             label: 'Files'
           }, directoryFiles.val.map(f =>
@@ -149,7 +149,7 @@ const App = () => {
             }, f.name)
           ))
         ),
-        div({ class: 'column' },
+        Column(
           DualButton({
             class: 'is-right',
             state: isViewingSource,

@@ -13,6 +13,7 @@ export default {
     '/assets/style.css',
     '/config.js',
     '/index.html',
+    '/lib/components/column.js',
     '/lib/components/menu.js',
     '/lib/components/notification.js',
     '/lib/components.js',
