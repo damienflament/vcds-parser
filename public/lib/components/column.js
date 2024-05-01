@@ -30,7 +30,7 @@ const Columns = (...children) =>
 const Column = (...args) => {
   const [props, ...children] = van.args(...args)
 
-  return div({ class: van.classes(['column', props.class]) }, ...children)
+  return div({ class: van.classes('column', props.class) }, ...children)
 }
 
 export { Column, Columns }

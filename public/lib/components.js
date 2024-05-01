@@ -101,7 +101,7 @@ const StatusTag = (...args) => {
 
   return div({ class: 'tags has-addons' },
     span({ class: 'tag' }, children),
-    span({ class: van.classes(['tag', props.class]) })
+    span({ class: van.classes('tag', props.class) })
   )
 }
 
@@ -127,16 +127,16 @@ const DualButton = ({
 }) => {
   const isLeftSelected = van.state(true)
 
-  return div({ class: van.classes(['buttons has-addons', cls]) },
+  return div({ class: van.classes('buttons has-addons', cls) },
     button(
       {
-        class: () => van.classes(['button', isLeftSelected.val ? 'is-selected is-primary' : '']),
+        class: () => van.classes('button', isLeftSelected.val ? 'is-selected is-primary' : ''),
         onclick: () => { onclickLeft(); (isLeftSelected.val = true) }
       },
       left),
     button(
       {
-        class: () => van.classes(['button', isLeftSelected.val ? '' : 'is-selected is-primary']),
+        class: () => van.classes('button', isLeftSelected.val ? '' : 'is-selected is-primary'),
         onclick: () => { onclickRight(); (isLeftSelected.val = false) }
       },
       right)

@@ -40,20 +40,19 @@ const val = v => {
 const handler = h => h === undefined ? null : h
 
 /**
- * Ensures the given value is allowed by VanJS as a *class* property value.
+ * Ensures the given values are allowed by VanJS as a single *class* property
+ * value.
  *
- * If the value is an array, it is flattened, its elements are trimmed and the
- * whole is joined. Otherwize, it is treated by {@link van.val}.
+ * The given values are treated by {@link val} then filtered and joined.
  *
- * @param {any} c the class property value to work on
+ * @param {...any} classes the class property values to work on
  * @returns {string|null} the treated class property value
  */
-const classes = c =>
-  Array.isArray(c)
-    ? c.flat(Infinity)
-      .filter(v => v?.trim())
-      .join(' ')
-    : val(c)
+const classes = (...classes) => val(
+  classes.map(v => val(v))
+    .filter(v => v?.trim())
+    .join(' ')
+)
 
 /**
  * Ensures the first argument is an object containing properties.
