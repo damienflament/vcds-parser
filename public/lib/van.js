@@ -4,27 +4,41 @@ import van from '../vendor/van-1.5.0.debug.js'
  * Ensures the given value is allowed as a property value.
  *
  * If the value is a State, its actual value is returned. If it is a function,
- * its returned value is returned. Otherwize, the untouched value is returner.
+ * its returned value is returned. If it is undefined, null is returned.
+ * Otherwize, the untouched value is returned.
  *
  * @param {any} v the value work on
  * @returns the treated value
  */
 van.val = (v) => {
   const stateProto = Object.getPrototypeOf(van.state())
-  const protoOfV = Object.getPrototypeOf(v)
+  const protoOfV = Object.getPrototypeOf(v ?? 0)
 
   return protoOfV === stateProto
     ? v.val
     : protoOfV === Function.prototype
       ? v()
-      : v
+      : v === undefined
+        ? null
+        : v
 }
+
+/**
+ * Ensures the given handler is allower as an *on...* event handler.
+ *
+ * If the return value is undefined, null is returned. Otherwize, the untouched
+ * value is returned.
+ *
+ * @param {() => any} h the handler to work on
+ * @returns the treated handler
+ */
+van.handler = (h) => h === undefined ? null : h
 
 /**
  * Ensures the given value is allowed by VanJS as a *class* property value.
  *
  * If the value is an array, it is flattened, its elements are trimmed and the
- * whole is joined.
+ * whole is joined. Otherwize, it is treated by {@link van.val}.
  *
  * @param {any} c the class property value to work on
  * @returns the treated class property value
@@ -34,7 +48,7 @@ van.class = (c) =>
     ? c.flat(Infinity)
       .filter(v => v?.trim())
       .join(' ')
-    : c
+    : van.val(c)
 
 /**
  * Ensures the first argument is an object containing properties.

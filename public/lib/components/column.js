@@ -7,15 +7,22 @@ import van from '../van.js'
 
 const { div } = van.tags
 
+/** A container for colums. */
 export const Columns = (...children) =>
   div(
     { class: 'columns' },
     children
   )
 
+/**
+ * A column.
+ *
+ * @param {object} [props]
+ * @param  {string} props.class the column class
+ * @param {any} ...children
+ */
 export const Column = (...args) => {
   const [props, ...children] = van.args(...args)
-  const cls = props.class
 
-  return div({ class: van.class(['column', cls ?? '']) }, children)
+  return div({ class: van.class(['column', props.class]) }, ...children)
 }

@@ -23,7 +23,8 @@ export const NotificationArea = () => div({ class: 'block container' })
 
 export const Notification = (
   {
-    message, label: buttonLabel, onclick: callback
+    message, label:
+    buttonLabel, onclick: callback
   }) => {
   const removed = van.state(false)
 

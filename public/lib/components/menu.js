@@ -10,33 +10,34 @@ const { a, aside, li, p, ul } = van.tags
 /**
  * A simple menu.
  *
- * @param {object} config
- * @param {string} config.label the menu label
- * @param {[any]} items the menu items
+ * @param {object} [props]
+ * @param {string} props.label the menu label
+ * @param {...any} children the menu items
  */
-export const Menu = (
-  {
-    label: menuLabel
-  }, ...items) =>
-  aside({ class: 'menu block' },
-    p({ class: 'menu-label' }, menuLabel),
-    ul({ class: 'menu-list' }, items)
+export const Menu = (...args) => {
+  const [props, ...children] = van.args(...args)
+
+  return aside({ class: 'menu block' },
+    p({ class: 'menu-label' }, props.label),
+    ul({ class: 'menu-list' }, ...children)
   )
+}
 
 /**
- * To be used as a menu child..
+ * A menu item
  *
- * @param {object} config
- * @param {boolean} config.isSelected if true, the item is shown as selected
- * @param {() => any} config.onclick called when the item is clicked
- * @param {[any]} children the item children
+ * To be used as a menu child.
+ *
+ * @param {object} [props]
+ * @param {boolean} props.isSelected if true, the item is shown as selected
+ * @param {() => any} props.onclick called when the item is clicked
+ * @param {...any} children the item children
  */
-export const MenuItem = (
-  {
-    isSelected,
-    onclick: callback
-  }, ...children) =>
-  li(a({
-    class: isSelected ? 'is-active' : '',
-    onclick: callback
-  }, children))
+export const MenuItem = (...args) => {
+  const [props, ...children] = van.args(...args)
+
+  return li(a({
+    class: props.isSelected ? 'is-active' : '',
+    onclick: van.handler(props.onclick)
+  }, ...children))
+}
