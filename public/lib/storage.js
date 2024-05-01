@@ -6,11 +6,15 @@
 import van from './van.js'
 
 /**
- * A storage using an Indexed Database with a unique store.
+ * Event emited when the storage can be accessed
  *
- * @fires Storage#ready when the storage can be accessed
+ * @event ready
  */
-export class Storage extends EventTarget {
+
+/**
+ * A storage using an Indexed Database with a unique store.
+ */
+class Storage extends EventTarget {
   #DB_NAME = 'storage'
   #STORE_NAME = 'store'
 
@@ -22,7 +26,6 @@ export class Storage extends EventTarget {
    *
    * @param {IDBFactory} factory an IndexedDB factory
    * @param {string} name the name of the database
-   * @fires Storage#ready
    */
   #setupDatabase (factory) {
     const request = factory.open(this.#DB_NAME)
@@ -30,11 +33,6 @@ export class Storage extends EventTarget {
     request.onsuccess = ev => {
       this.#db = ev.target.result
 
-      /**
-       * Event emited when the storage can be accessed
-       *
-       * @event Storage#ready
-       */
       this.dispatchEvent(new Event('ready'))
     }
 
@@ -60,7 +58,7 @@ export class Storage extends EventTarget {
    * Creates a storage.
    *
    * @param {IDBFactory} factory an IndexedDB factory
-   * @fires Storage#ready
+   * @fires ready when the storage can be accessed
    */
   constructor (factory) {
     super()
@@ -103,8 +101,9 @@ export class Storage extends EventTarget {
  *
  * @param {object} state the state to persist
  * @param {Storage} storage the storage where to keep the state
+ * @listens ready
  */
-export function persist (state, storage) {
+const persist = (state, storage) => {
   storage.addEventListener('ready', () => {
     for (const name in state) {
       const stateItem = state[name]
@@ -120,4 +119,6 @@ export function persist (state, storage) {
       })
     }
   })
-};
+}
+
+export { Storage, persist }

@@ -21,8 +21,9 @@ const { button, div, i, img, label, span } = van.tags
  * @param {object} props.logo
  * @param {string} props.logo.src the logo path
  * @param {string} props.logo.alt the logo alternative description
+ * @returns HTMLElement
  */
-export const Navbar = ({ logo: { src, alt } }) =>
+const Navbar = ({ logo: { src, alt } }) =>
   div({ class: 'navbar' },
     div({ class: 'navbar-brand' },
       div({ class: 'navbar-item' },
@@ -37,16 +38,18 @@ export const Navbar = ({ logo: { src, alt } }) =>
 /**
  * A simple container to divide your page into sections.
  *
- * @param {...any} content then content wrapped by the container
+ * @param {...any} children the content wrapped by the container
+ * @returns HTMLElement
  */
-export const Section = (...content) => div({ class: 'section' }, ...content)
+const Section = (...content) => div({ class: 'section' }, ...content)
 
 /**
  * A Font Awesome icon.
  *
  * @param {string} name the name of the icon in the Font Awesome library
+ * @returns HTMLElement
  */
-export const FontAwesome = name => i({ class: `fa-solid fa-${van.val(name)}` })
+const FontAwesome = name => i({ class: `fa-solid fa-${van.val(name)}` })
 
 /**
  * A directory upload input using Javascript.
@@ -54,9 +57,10 @@ export const FontAwesome = name => i({ class: `fa-solid fa-${van.val(name)}` })
  * @param {object} props
  * @param {string} props.label the input label
  * @param {string} props.name the name of the selected directory
- * @param {(FileSystemDirectoryHandle) => any} config.onsuccess called when a directory has been selected by the user
+ * @param {(FileSystemDirectoryHandle) => any} props.onsuccess called when a directory has been selected by the user
+ * @returns HTMLElement
  */
-export const DirectoryPicker = (
+const DirectoryPicker = (
   {
     label: pickerLabel,
     name,
@@ -90,13 +94,14 @@ export const DirectoryPicker = (
  * @param {object} [props]
  * @param {string} props.class the status tag class
  * @param  {...any} children the label tag children
+ * @returns HTMLElement
  */
-export const StatusTag = (...args) => {
+const StatusTag = (...args) => {
   const [props, ...children] = van.args(...args)
 
   return div({ class: 'tags has-addons' },
     span({ class: 'tag' }, children),
-    span({ class: van.class(['tag', props.class]) })
+    span({ class: van.classes(['tag', props.class]) })
   )
 }
 
@@ -111,8 +116,9 @@ export const StatusTag = (...args) => {
  * @param {any} props.right the children of the right button
  * @param {() => any} props.onclickRight called when the right button is clicked
  * @param {() => any} props.onclickLeft called when the left button is clicked
+ * @returns HTMLElement
  */
-export const DualButton = ({
+const DualButton = ({
   class: cls,
   left,
   right,
@@ -121,18 +127,20 @@ export const DualButton = ({
 }) => {
   const isLeftSelected = van.state(true)
 
-  return div({ class: van.class(['buttons has-addons', cls]) },
+  return div({ class: van.classes(['buttons has-addons', cls]) },
     button(
       {
-        class: () => van.class(['button', isLeftSelected.val ? 'is-selected is-primary' : '']),
+        class: () => van.classes(['button', isLeftSelected.val ? 'is-selected is-primary' : '']),
         onclick: () => { onclickLeft(); (isLeftSelected.val = true) }
       },
       left),
     button(
       {
-        class: () => van.class(['button', isLeftSelected.val ? '' : 'is-selected is-primary']),
+        class: () => van.classes(['button', isLeftSelected.val ? '' : 'is-selected is-primary']),
         onclick: () => { onclickRight(); (isLeftSelected.val = false) }
       },
       right)
   )
 }
+
+export { DirectoryPicker, DualButton, FontAwesome, Navbar, Section, StatusTag }

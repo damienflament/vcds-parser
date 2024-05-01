@@ -9,22 +9,25 @@ const { button, div, p } = van.tags
 
 /**
  * An area to display notifications.
+ *
+ * @returns HTMLElement
  */
-export const NotificationArea = () => div({ class: 'block container' })
+const NotificationArea = () => div({ class: 'block container' })
 
 /**
  * A notification.
  *
- * @param {object} config
- * @param {string} config.message the message to display
- * @param {string} config.label the button label
- * @param {() => any} config.onclick called when the button is clicked
+ * @param {object} props
+ * @param {string} props.message the message to display
+ * @param {string} props.label the button label
+ * @param {() => any} props.onclick called when the button is clicked
+ * @returns HTMLElement
  */
-
-export const Notification = (
+const Notification = (
   {
-    message, label:
-    buttonLabel, onclick: callback
+    message,
+    label: buttonLabel,
+    onclick: callback
   }) => {
   const removed = van.state(false)
 
@@ -48,3 +51,5 @@ export const Notification = (
       )
     )
 }
+
+export { Notification, NotificationArea }

@@ -9,7 +9,7 @@
  * @param {string} string the string to convert
  * @returns the converted string
  */
+const camelToDashCase = string =>
+  string.replace(/[A-Z]/g, str => `-${str.toLowerCase()}`)
 
-export function camelToDashCase (string) {
-  return string.replace(/[A-Z]/g, str => `-${str.toLowerCase()}`)
-}
+export { camelToDashCase }

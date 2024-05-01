@@ -10,7 +10,7 @@
  *
  * @param {string} path the path to the file to register
  */
-export function registerServiceWorker (path) {
+const registerServiceWorker = path => {
   if (!('serviceWorker' in navigator)) {
     console.error('Service workers are not supported.')
     return
@@ -36,7 +36,7 @@ export function registerServiceWorker (path) {
   *
   * If not any Service Worker is registered, nothing is done.
   */
-export function unregisterServiceWorker () {
+const unregisterServiceWorker = () => {
   if (!('serviceWorker' in navigator)) {
     console.error('Service workers are not supported.')
     return
@@ -44,3 +44,5 @@ export function unregisterServiceWorker () {
   navigator.serviceWorker.getRegistration()
     .then(reg => reg?.unregister())
 }
+
+export { registerServiceWorker, unregisterServiceWorker }

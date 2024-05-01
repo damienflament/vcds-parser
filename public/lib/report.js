@@ -1,4 +1,9 @@
-import { parse as peggyParse } from './parser.js'
+/**
+ * VCDS reports related function.
+ * @module
+ */
+
+import { SyntaxError, parse } from './parser.js'
 
 export { SyntaxError } from './parser.js'
 
@@ -6,10 +11,10 @@ export { SyntaxError } from './parser.js'
  * Describes the context of the given syntax error.
  *
  * @param {string} content the parsed content
- * @param {peggy.SyntaxError} error the error to build context from
+ * @param {SyntaxError} error the error to build context from
  * @returns {string} the context description
  */
-function describeErrorContext (content, error) {
+const describeErrorContext = (content, error) => {
   const size = 100
 
   const startLine = error.location.start.line
@@ -45,10 +50,11 @@ function describeErrorContext (content, error) {
  *
  * @param {string} content the report content
  * @returns {object} the built data structure
+ * @throws {SyntaxError} when Peggy throws an error on parsing
  */
-export function buildFromContent (content) {
+const buildFromContent = content => {
   try {
-    return peggyParse(content)
+    return parse(content)
   } catch (e) {
     if (e instanceof SyntaxError) {
       e.message += describeErrorContext(content, e)
@@ -57,3 +63,5 @@ export function buildFromContent (content) {
     throw e
   }
 }
+
+export { buildFromContent }

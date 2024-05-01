@@ -1,3 +1,8 @@
+/**
+ * A modified VanJS.
+ * @module
+ */
+
 import van from '../vendor/van-1.5.0.debug.js'
 
 /**
@@ -8,9 +13,9 @@ import van from '../vendor/van-1.5.0.debug.js'
  * Otherwize, the untouched value is returned.
  *
  * @param {any} v the value work on
- * @returns the treated value
+ * @returns {any} the treated value
  */
-van.val = (v) => {
+const val = v => {
   const stateProto = Object.getPrototypeOf(van.state())
   const protoOfV = Object.getPrototypeOf(v ?? 0)
 
@@ -30,9 +35,9 @@ van.val = (v) => {
  * value is returned.
  *
  * @param {() => any} h the handler to work on
- * @returns the treated handler
+ * @returns {any} the treated handler
  */
-van.handler = (h) => h === undefined ? null : h
+const handler = h => h === undefined ? null : h
 
 /**
  * Ensures the given value is allowed by VanJS as a *class* property value.
@@ -41,14 +46,14 @@ van.handler = (h) => h === undefined ? null : h
  * whole is joined. Otherwize, it is treated by {@link van.val}.
  *
  * @param {any} c the class property value to work on
- * @returns the treated class property value
+ * @returns {string|null} the treated class property value
  */
-van.class = (c) =>
+const classes = c =>
   Array.isArray(c)
     ? c.flat(Infinity)
       .filter(v => v?.trim())
       .join(' ')
-    : van.val(c)
+    : val(c)
 
 /**
  * Ensures the first argument is an object containing properties.
@@ -60,17 +65,17 @@ van.class = (c) =>
  * @param  {...any} args the arguments to parse
  * @returns the properties and children
  */
-van.args = (...args) => {
+const args = (...args) => {
   const objProto = Object.getPrototypeOf({ isConnected: 1 })
   const firstProto = Object.getPrototypeOf(args[0] ?? 0)
 
   const props = firstProto === objProto ? args.shift() : {}
 
   if (Object.hasOwn(props, 'class')) {
-    props.class = van.class(props.class)
+    props.class = classes(props.class)
   }
 
   return [props, ...args]
 }
 
-export default van
+export default { val, handler, classes, args, ...van }

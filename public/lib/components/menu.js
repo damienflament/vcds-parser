@@ -13,8 +13,9 @@ const { a, aside, li, p, ul } = van.tags
  * @param {object} [props]
  * @param {string} props.label the menu label
  * @param {...any} children the menu items
+ * @returns HTMLElement
  */
-export const Menu = (...args) => {
+const Menu = (...args) => {
   const [props, ...children] = van.args(...args)
 
   return aside({ class: 'menu block' },
@@ -24,7 +25,7 @@ export const Menu = (...args) => {
 }
 
 /**
- * A menu item
+ * A menu item.
  *
  * To be used as a menu child.
  *
@@ -32,8 +33,9 @@ export const Menu = (...args) => {
  * @param {boolean} props.isSelected if true, the item is shown as selected
  * @param {() => any} props.onclick called when the item is clicked
  * @param {...any} children the item children
+ * @returns HTMLElement
  */
-export const MenuItem = (...args) => {
+const MenuItem = (...args) => {
   const [props, ...children] = van.args(...args)
 
   return li(a({
@@ -41,3 +43,5 @@ export const MenuItem = (...args) => {
     onclick: van.handler(props.onclick)
   }, ...children))
 }
+
+export { Menu, MenuItem }

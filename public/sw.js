@@ -2,9 +2,10 @@
 
 /**
  * Service Worker.
+ * @module
  */
 
-'use strict'
+'use strict' // Ensures strictness if it is not loaded as a module
 
 import config from './config.js'
 

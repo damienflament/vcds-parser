@@ -14,8 +14,8 @@
  * @param {FileSystemHandle} file the handle to the file to request the permission for
  * @returns {Promise<PermissionState>} the permission for the given file
  */
-export async function requestPermission (file) {
-  return file.queryPermission({ mode: 'read' }).then(p => p === 'prompt'
+const requestPermission = async (file) =>
+  file.queryPermission({ mode: 'read' }).then(p => p === 'prompt'
     // If the permission is 'prompt', it must be requested.
     ? file.requestPermission({ mode: 'read' })
       // If the permission is still 'prompt' after we prompted the user, he
@@ -33,15 +33,14 @@ export async function requestPermission (file) {
       })
     : p
   )
-}
 
 /**
  * Lists the files contained in the given directory.
  *
  * @param {FileSystemDirectoryHandle} directory the directory to list files from
- * @returns {Promise<[FileSystemFileHandle]>} an array containing the handles of the files contained in the directory
+ * @returns {Promise<array<FileSystemFileHandle>>} an array containing the handles of the files contained in the directory
  */
-export async function listDirectory (directory) {
+const listDirectory = async (directory) => {
   const files = []
 
   for await (const file of directory.values()) {
@@ -57,24 +56,24 @@ export async function listDirectory (directory) {
  * Loads the content of the given file.
  *
  * @param {FileSystemFileHandle} fileHandle the handle to the file to load content from
- * @return {Promise<string>} the loaded content
+ * @returns {Promise<string>} the loaded content
  */
-export function loadFileContent (fileHandle) {
-  return new Promise((resolve, reject) =>
-    fileHandle.queryPermission({ mode: 'read' }).then(permission => {
-      if (permission !== 'granted') {
-        reject(new Error(`Permission to read file ${fileHandle.name} is ${permission}`))
+const loadFileContent = (fileHandle) => new Promise((resolve, reject) =>
+  fileHandle.queryPermission({ mode: 'read' }).then(permission => {
+    if (permission !== 'granted') {
+      reject(new Error(`Permission to read file ${fileHandle.name} is ${permission}`))
+    }
+
+    fileHandle.getFile().then(file => {
+      const reader = new FileReader()
+
+      reader.onload = (ev) => {
+        resolve(ev.target.result)
       }
 
-      fileHandle.getFile().then(file => {
-        const reader = new FileReader()
-
-        reader.onload = (ev) => {
-          resolve(ev.target.result)
-        }
-
-        reader.readAsText(file)
-      })
+      reader.readAsText(file)
     })
-  )
-}
+  })
+)
+
+export { listDirectory, loadFileContent, requestPermission }
