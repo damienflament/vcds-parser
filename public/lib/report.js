@@ -7,6 +7,11 @@ import { SyntaxError, parse } from './parser.js'
 
 export { SyntaxError } from './parser.js'
 
+const showControlCharacters = string =>
+  string.replaceAll('\r', '␍')
+    .replaceAll('\n', '␊\n')
+    .replaceAll(' ', '␣')
+
 /**
  * Describes the context of the given syntax error.
  *
@@ -22,27 +27,28 @@ const describeErrorContext = (content, error) => {
   const endLine = error.location.end.line
   const endCol = error.location.end.column
   const length = error.location.end.offset - error.location.start.offset
-  const displayStart = error.location.start.offset - size
+  const displayStart = content.indexOf('\n', error.location.start.offset - size) + 1
   const lineEnd = content.indexOf('\n', error.location.end.offset)
   const displayEnd = content.indexOf('\n', lineEnd + size)
 
-  let message = `
+  const contextBefore = content.substring(displayStart, lineEnd)
+  const contextAfter = content.substring(lineEnd + 1, displayEnd)
+  const finger = ' '.repeat(startCol - 1) + '👆'.repeat(length)
+
+  return `
   from line ${startLine} column ${startCol}
     to line ${endLine} column ${endCol}
 
   Context:
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯` + '\n'
-
-  if (displayStart > 0) { message += '[...]' }
-
-  message += content.substring(displayStart, lineEnd) + '\n' +
-  ' '.repeat(startCol - 1) +
-  '👆'.repeat(length)
-
-  message += '\n' + content.substring(lineEnd + 1, displayEnd) + `
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+${contextBefore}
+${finger}
+${contextAfter}
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+${showControlCharacters(contextBefore)}␊
+${finger}
+${showControlCharacters(contextAfter)}␊
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯`
-
-  return message
 }
 
 /**
