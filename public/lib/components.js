@@ -44,6 +44,32 @@ const Navbar = ({ logo: { src, alt } }) =>
 const Section = (...content) => div({ class: 'section' }, ...content)
 
 /**
+ * An horizontal level.
+ *
+ * @param {object} props
+ * @param {[any]|any} props.left the children on the left side
+ * @param {[any]|any} props.right the children on the right side
+ * @returns HTMLElement
+ */
+const Level = (
+  {
+    left = [],
+    right = []
+  }) =>
+  div({ class: 'level' },
+    div({ class: 'level-left' },
+      Array.of(left)
+        .flat()
+        .map(ch => div({ class: 'level-item' }, ch))
+    ),
+    div({ class: 'level-right' },
+      Array.of(right)
+        .flat()
+        .map(ch => div({ class: 'level-item' }, ch))
+    )
+  )
+
+/**
  * A Font Awesome icon.
  *
  * @param {string} name the name of the icon in the Font Awesome library
@@ -120,14 +146,13 @@ const StatusTag = (...args) => {
  * @returns HTMLElement
  */
 const DualButton = ({
-  class: cls,
   left,
   right,
   onclickLeft,
   onclickRight,
   isLeftSelected
 }) => {
-  return div({ class: van.classes('buttons has-addons', cls) },
+  return div({ class: van.classes('buttons has-addons') },
     button(
       {
         class: () => van.classes('button', van.val(isLeftSelected) ? 'is-selected is-primary' : ''),
@@ -143,4 +168,4 @@ const DualButton = ({
   )
 }
 
-export { DirectoryPicker, DualButton, FontAwesome, Navbar, Section, StatusTag }
+export { DirectoryPicker, DualButton, FontAwesome, Level, Navbar, Section, StatusTag }

@@ -3,7 +3,7 @@
  * @module
  */
 
-import { Column, Columns, DirectoryPicker, DualButton, FontAwesome, Menu, MenuItem, Navbar, Notification, NotificationArea, Section, StatusTag } from './lib/components.js'
+import { Column, Columns, DirectoryPicker, DualButton, FontAwesome, Level, Menu, MenuItem, Navbar, Notification, NotificationArea, Section, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { buildFromContent } from './lib/report.js'
@@ -148,23 +148,27 @@ const App = () => {
           ))
         ),
         Column(
-          DualButton({
-            class: 'is-right',
-            left: [
-              span({ class: 'icon' }, FontAwesome('toolbox')),
-              span('Report')
-            ],
-            onclickLeft: () => { state.isViewingSource.val = false },
-            right: [
-              span({ class: 'icon' }, FontAwesome('file-lines')),
-              span('Source')
-            ],
-            onclickRight: () => { state.isViewingSource.val = true },
-            isLeftSelected: () => (!state.isViewingSource.val)
+          Level({
+            right:
+              DualButton({
+                left: [
+                  span({ class: 'icon' }, FontAwesome('toolbox')),
+                  span('Report')
+                ],
+                onclickLeft: () => { state.isViewingSource.val = false },
+                right: [
+                  span({ class: 'icon' }, FontAwesome('file-lines')),
+                  span('Source')
+                ],
+                onclickRight: () => { state.isViewingSource.val = true },
+                isLeftSelected: () => (!state.isViewingSource.val)
+              })
           }),
-          pre({ style: 'font-family: monospace; font-size: 16px;' },
-            () => { return state.isViewingSource.val ? reportSource.val : report.val })
-        )
+          () => {
+            return state.isViewingSource.val
+              ? pre(reportSource.val)
+              : report.val
+          })
       )
     ),
 
