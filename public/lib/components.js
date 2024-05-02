@@ -116,6 +116,7 @@ const StatusTag = (...args) => {
  * @param {any} props.right the children of the right button
  * @param {() => any} props.onclickRight called when the right button is clicked
  * @param {() => any} props.onclickLeft called when the left button is clicked
+ * @param {boolean} props.isLeftSelected true if the left button is selected, false otherwize
  * @returns HTMLElement
  */
 const DualButton = ({
@@ -123,21 +124,20 @@ const DualButton = ({
   left,
   right,
   onclickLeft,
-  onclickRight
+  onclickRight,
+  isLeftSelected
 }) => {
-  const isLeftSelected = van.state(true)
-
   return div({ class: van.classes('buttons has-addons', cls) },
     button(
       {
-        class: () => van.classes('button', isLeftSelected.val ? 'is-selected is-primary' : ''),
-        onclick: () => { onclickLeft(); (isLeftSelected.val = true) }
+        class: () => van.classes('button', van.val(isLeftSelected) ? 'is-selected is-primary' : ''),
+        onclick: onclickLeft
       },
       left),
     button(
       {
-        class: () => van.classes('button', isLeftSelected.val ? '' : 'is-selected is-primary'),
-        onclick: () => { onclickRight(); (isLeftSelected.val = false) }
+        class: () => van.classes('button', van.val(isLeftSelected) ? '' : 'is-selected is-primary'),
+        onclick: onclickRight
       },
       right)
   )

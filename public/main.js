@@ -30,7 +30,8 @@ const App = () => {
   /** Persisted state */
   const state = {
     directory: van.state(null),
-    file: van.state(null)
+    file: van.state(null),
+    isViewingSource: van.state(false)
   }
 
   if (config.persistence) {
@@ -117,9 +118,6 @@ const App = () => {
     }
   })
 
-  /** Viever */
-  const isViewingSource = van.state(false)
-
   /** Notification area */
   const notificationsArea = NotificationArea()
 
@@ -152,20 +150,20 @@ const App = () => {
         Column(
           DualButton({
             class: 'is-right',
-            state: isViewingSource,
             left: [
               span({ class: 'icon' }, FontAwesome('toolbox')),
               span('Report')
             ],
-            onclickLeft: () => { isViewingSource.val = false },
+            onclickLeft: () => { state.isViewingSource.val = false },
             right: [
               span({ class: 'icon' }, FontAwesome('file-lines')),
               span('Source')
             ],
-            onclickRight: () => { isViewingSource.val = true }
+            onclickRight: () => { state.isViewingSource.val = true },
+            isLeftSelected: () => (!state.isViewingSource.val)
           }),
           pre({ style: 'font-family: monospace; font-size: 16px;' },
-            () => { return isViewingSource.val ? reportSource.val : report.val })
+            () => { return state.isViewingSource.val ? reportSource.val : report.val })
         )
       )
     ),
