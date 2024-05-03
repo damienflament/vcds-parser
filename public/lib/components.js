@@ -123,10 +123,10 @@ const DirectoryPicker = (
  * @returns HTMLElement
  */
 const StatusTag = (...args) => {
-  const [props, ...children] = van.args(...args)
+  const [props, children] = van.args(args)
 
   return div({ class: 'tags has-addons' },
-    span({ class: 'tag' }, children),
+    span({ class: 'tag' }, ...children),
     span({ class: van.classes('tag', props.class) })
   )
 }

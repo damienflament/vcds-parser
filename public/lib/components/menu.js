@@ -16,7 +16,7 @@ const { a, aside, li, p, ul } = van.tags
  * @returns HTMLElement
  */
 const Menu = (...args) => {
-  const [props, ...children] = van.args(...args)
+  const [props, children] = van.args(args)
 
   return aside({ class: 'menu block' },
     p({ class: 'menu-label' }, props.label),
@@ -36,7 +36,7 @@ const Menu = (...args) => {
  * @returns HTMLElement
  */
 const MenuItem = (...args) => {
-  const [props, ...children] = van.args(...args)
+  const [props, children] = van.args(args)
 
   return li(a({
     class: props.isSelected ? 'is-active' : '',

@@ -28,7 +28,7 @@ const Columns = (...children) =>
  * @returns HTMLElement
  */
 const Column = (...args) => {
-  const [props, ...children] = van.args(...args)
+  const [props, children] = van.args(args)
 
   return div({ class: van.classes('column', props.class) }, ...children)
 }

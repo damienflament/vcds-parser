@@ -55,16 +55,31 @@ const classes = (...classes) => val(
 )
 
 /**
- * Ensures the first argument is an object containing properties.
+ * Handles the components parameters.
  *
- * If the first argument is not a object for properties, an empty object is
- * created. Otherwize, the property *class* is treated with the
- * {@link van.class} function.
+ * If the first argument is not a properties object, an empty object is created.
+ * Otherwize, the property *class* is treated with the {@link van.class}
+ * function.
  *
- * @param  {...any} args the arguments to parse
- * @returns the properties and children
+ * An array whose the first element is the properties object and the second the
+ * children is returned.
+ *
+ * @example
+ *
+ * import van from './van.js'
+ *
+ * const { div } = van.tags
+ *
+ * const MyComponent = (...args) => {
+ *   const [props, children] = van.args(args)
+ *
+ *   return div({ class: props.class }, ...children)
+ * }
+ *
+ * @param  {[any]} args the arguments to parse
+ * @returns {[any]} the properties and children
  */
-const args = (...args) => {
+const args = (args) => {
   const objProto = Object.getPrototypeOf({ isConnected: 1 })
   const firstProto = Object.getPrototypeOf(args[0] ?? 0)
 
@@ -74,7 +89,7 @@ const args = (...args) => {
     props.class = classes(props.class)
   }
 
-  return [props, ...args]
+  return [props, args]
 }
 
 export default { val, handler, classes, args, ...van }
