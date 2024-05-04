@@ -22,7 +22,7 @@ const { button, div, i, img, label, span } = van.tags
  * @param {object} props.logo
  * @param {string} props.logo.src the logo path
  * @param {string} props.logo.alt the logo alternative description
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const Navbar = ({ logo: { src, alt } }) =>
   div({ class: 'navbar' },
@@ -40,7 +40,7 @@ const Navbar = ({ logo: { src, alt } }) =>
  * A simple container to divide your page into sections.
  *
  * @param {...any} children the content wrapped by the container
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const Section = (...content) => div({ class: 'section' }, ...content)
 
@@ -50,7 +50,7 @@ const Section = (...content) => div({ class: 'section' }, ...content)
  * @param {object} props
  * @param {[any]|any} props.left the children on the left side
  * @param {[any]|any} props.right the children on the right side
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const Level = (
   {
@@ -74,7 +74,7 @@ const Level = (
  * A Font Awesome icon.
  *
  * @param {string} name the name of the icon in the Font Awesome library
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const FontAwesome = name => i({ class: `fa-solid fa-${van.val(name)}` })
 
@@ -85,7 +85,7 @@ const FontAwesome = name => i({ class: `fa-solid fa-${van.val(name)}` })
  * @param {string} props.label the input label
  * @param {string} props.name the name of the selected directory
  * @param {(FileSystemDirectoryHandle) => any} props.onsuccess called when a directory has been selected by the user
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const DirectoryPicker = (
   {
@@ -121,7 +121,7 @@ const DirectoryPicker = (
  * @param {object} [props]
  * @param {string} props.class the status tag class
  * @param  {...any} children the label tag children
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const StatusTag = (...args) => {
   const [props, children] = van.args(args)
@@ -150,7 +150,7 @@ const Tag = (...args) => {
  * @param {() => any} props.onclickRight called when the right button is clicked
  * @param {() => any} props.onclickLeft called when the left button is clicked
  * @param {boolean} props.isLeftSelected true if the left button is selected, false otherwize
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const DualButton = ({
   left,

@@ -13,7 +13,7 @@ const { a, aside, li, p, ul } = van.tags
  * @param {object} [props]
  * @param {string} props.label the menu label
  * @param {...any} children the menu items
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const Menu = (...args) => {
   const [props, children] = van.args(args)
@@ -33,7 +33,7 @@ const Menu = (...args) => {
  * @param {boolean} props.isSelected if true, the item is shown as selected
  * @param {() => any} props.onclick called when the item is clicked
  * @param {...any} children the item children
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const MenuItem = (...args) => {
   const [props, children] = van.args(args)

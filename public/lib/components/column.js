@@ -11,7 +11,7 @@ const { div } = van.tags
  * A container for colums.
  *
  * @param {...any} children the container children
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const Columns = (...children) =>
   div(
@@ -25,7 +25,7 @@ const Columns = (...children) =>
  * @param {object} [props]
  * @param  {string} props.class the column class
  * @param {...any} children the column children
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const Column = (...args) => {
   const [props, children] = van.args(args)

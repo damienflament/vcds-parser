@@ -10,7 +10,7 @@ const { button, div, p } = van.tags
 /**
  * An area to display notifications.
  *
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const NotificationArea = () => div({ class: 'block container' })
 
@@ -21,7 +21,7 @@ const NotificationArea = () => div({ class: 'block container' })
  * @param {string} props.message the message to display
  * @param {string} props.label the button label
  * @param {() => any} props.onclick called when the button is clicked
- * @returns HTMLElement
+ * @returns {HTMLElement}
  */
 const Notification = (
   {
