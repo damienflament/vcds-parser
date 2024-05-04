@@ -13,7 +13,7 @@ export default {
     '/assets/style.css',
     '/config.js',
     '/index.html',
-    '/lib/components/column.js',
+    '/lib/bulma.js',
     '/lib/components/menu.js',
     '/lib/components/notification.js',
     '/lib/components/report.js',

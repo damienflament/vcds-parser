@@ -6,14 +6,16 @@
  * @module
  */
 
+import bulma from './bulma.js'
 import van from './van.js'
 
-export * from './components/column.js'
 export * from './components/menu.js'
 export * from './components/notification.js'
 export * from './components/report.js'
 
-const { button, div, i, img, label, span } = van.tags
+const { i, img, label, span } = van.tags
+
+const { Button, Buttons, File, FileCta, FileIcon, FileName, Navbar, NavbarBrand, NavbarItem, Tag, Tags } = bulma.elements
 
 /**
  * A responsive horizontal navigation bar.
@@ -24,49 +26,10 @@ const { button, div, i, img, label, span } = van.tags
  * @param {string} props.logo.alt the logo alternative description
  * @returns {HTMLElement}
  */
-const Navbar = ({ logo: { src, alt } }) =>
-  div({ class: 'navbar' },
-    div({ class: 'navbar-brand' },
-      div({ class: 'navbar-item' },
-        img({
-          src: van.val(src),
-          alt: van.val(alt)
-        })
-      )
-    )
-  )
-
-/**
- * A simple container to divide your page into sections.
- *
- * @param {...any} children the content wrapped by the container
- * @returns {HTMLElement}
- */
-const Section = (...content) => div({ class: 'section' }, ...content)
-
-/**
- * An horizontal level.
- *
- * @param {object} props
- * @param {[any]|any} props.left the children on the left side
- * @param {[any]|any} props.right the children on the right side
- * @returns {HTMLElement}
- */
-const Level = (
-  {
-    left = [],
-    right = []
-  }) =>
-  div({ class: 'level' },
-    div({ class: 'level-left' },
-      Array.of(left)
-        .flat()
-        .map(ch => div({ class: 'level-item' }, ch))
-    ),
-    div({ class: 'level-right' },
-      Array.of(right)
-        .flat()
-        .map(ch => div({ class: 'level-item' }, ch))
+const NavbarComponent = ({ logo: { src, alt } }) =>
+  Navbar(
+    NavbarBrand(
+      NavbarItem(img({ src: van.val(src), alt: van.val(alt) }))
     )
   )
 
@@ -93,25 +56,25 @@ const DirectoryPicker = (
     name,
     onsuccess: callback
   }) =>
-  div({ class: 'file has-name is-fullwidth' },
-    label({ class: 'file-label' },
-      button({
+  File({ class: 'has-name is-fullwidth' },
+    label(
+      {
+        class: 'file-label',
         onclick: () => window.showDirectoryPicker()
           .then(d => callback(d))
           .catch(e => {
             if (e instanceof DOMException && e.name === 'AbortError') {
-              // The user aborted the directory picker.
-              ;
+              ; // The user aborted the directory picker.
+            } else {
+              throw e
             }
           })
-      }),
-      span({ class: 'file-cta' },
-        span({ class: 'file-icon' },
-          FontAwesome('folder-open')
-        ),
+      },
+      FileCta(
+        FileIcon(FontAwesome('folder-open')),
         span({ class: 'file-label' }, pickerLabel)
       ),
-      span({ class: 'file-name' }, name)
+      FileName(name)
     )
   )
 
@@ -126,16 +89,10 @@ const DirectoryPicker = (
 const StatusTag = (...args) => {
   const [props, children] = van.args(args)
 
-  return div({ class: 'tags has-addons' },
-    span({ class: 'tag' }, ...children),
-    span({ class: van.classes('tag', props.class) })
+  return Tags({ class: 'has-addons' },
+    Tag(...children),
+    Tag({ class: props.class })
   )
-}
-
-const Tag = (...args) => {
-  const [props, children] = van.args(args)
-
-  return div({ class: van.classes('tag', props.class) }, ...children)
 }
 
 /**
@@ -158,21 +115,19 @@ const DualButton = ({
   onclickLeft,
   onclickRight,
   isLeftSelected
-}) => {
-  return div({ class: van.classes('buttons has-addons') },
-    button(
-      {
-        class: () => van.classes('button', van.val(isLeftSelected) ? 'is-selected is-primary' : ''),
-        onclick: onclickLeft
-      },
-      left),
-    button(
-      {
-        class: () => van.classes('button', van.val(isLeftSelected) ? '' : 'is-selected is-primary'),
-        onclick: onclickRight
-      },
-      right)
-  )
-}
+}) => Buttons({ class: 'has-addons' },
+  Button(
+    {
+      class: () => van.val(isLeftSelected) ? 'is-selected is-primary' : '',
+      onclick: onclickLeft
+    }, left),
 
-export { DirectoryPicker, DualButton, FontAwesome, Level, Navbar, Section, StatusTag, Tag }
+  Button(
+    {
+      class: () => van.val(isLeftSelected) ? '' : 'is-selected is-primary',
+      onclick: onclickRight
+    },
+    right)
+)
+
+export { DirectoryPicker, DualButton, FontAwesome, NavbarComponent as Navbar, StatusTag }

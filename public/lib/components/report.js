@@ -1,7 +1,10 @@
-import { FontAwesome, Tag } from '../components.js'
+import { FontAwesome } from '../components.js'
+
+import bulma from '../bulma.js'
 import van from '../van.js'
 
-const { div, pre, p, header, button } = van.tags
+const { div, pre, p } = van.tags
+const { Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Tag } = bulma.elements
 
 const stringify = d => JSON.stringify(d, null, 4)
 
@@ -18,17 +21,17 @@ const Module = (module) => {
   const opened = van.state(false)
   const hasFaults = module.faults.length > 0
 
-  return div({ class: 'card' },
-    header({ class: 'card-header is-clickable', onclick: () => { opened.val = !opened.val } },
-      p({ class: 'card-header-title' },
+  return Card(
+    CardHeader({ class: 'is-clickable', onclick: () => { opened.val = !opened.val } },
+      CardHeaderTitle(
         Tag({ class: hasFaults ? 'is-danger' : 'is-success' }, module.address),
         p({ class: 'ml-3' }, module.name)
       ),
-      button({ class: 'card-header-icon' },
+      CardHeaderIcon(
         () => FontAwesome(opened.val ? 'angle-up' : 'angle-down')
       )
     ),
-    div({ class: 'card-content' },
+    CardContent(
       () => pre({ class: opened.val ? '' : 'is-sr-only' }, stringify(module))
     )
   )

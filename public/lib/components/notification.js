@@ -3,9 +3,11 @@
  * @module
  */
 
+import bulma from '../bulma.js'
 import van from '../van.js'
 
-const { button, div, p } = van.tags
+const { div, p } = van.tags
+const { Button, Delete, Level, LevelLeft, LevelItem, Notification } = bulma.elements
 
 /**
  * An area to display notifications.
@@ -23,7 +25,7 @@ const NotificationArea = () => div({ class: 'block container' })
  * @param {() => any} props.onclick called when the button is clicked
  * @returns {HTMLElement}
  */
-const Notification = (
+const NotificationComponent = (
   {
     message,
     label: buttonLabel,
@@ -33,14 +35,14 @@ const Notification = (
 
   return () => removed.val
     ? null
-    : div({ class: 'notification' },
-      button({ class: 'delete', onclick: () => { removed.val = true } }),
-      div({ class: 'level' },
-        div({ class: 'level-left' },
-          div({ class: 'level-item' }, p(message)),
-          div({ class: 'level-item' },
-            button({
-              class: 'button is-primary',
+    : Notification(
+      Delete({ onclick: () => { removed.val = true } }),
+      Level(
+        LevelLeft(
+          LevelItem(p(message)),
+          LevelItem(
+            Button({
+              class: 'is-primary',
               onclick: () => {
                 callback()
                 removed.val = true
@@ -52,4 +54,4 @@ const Notification = (
     )
 }
 
-export { Notification, NotificationArea }
+export { NotificationComponent as Notification, NotificationArea }

@@ -3,7 +3,8 @@
  * @module
  */
 
-import { Column, Columns, DirectoryPicker, DualButton, FontAwesome, Level, Menu, MenuItem, Navbar, Notification, NotificationArea, Report, Section, StatusTag } from './lib/components.js'
+import bulma from './lib/bulma.js'
+import { DirectoryPicker, DualButton, FontAwesome, Menu, MenuItem, Navbar, Notification, NotificationArea, Report, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { SyntaxError, buildFromContent } from './lib/report.js'
@@ -120,10 +121,12 @@ const App = () => {
   /** Notification area */
   const notificationsArea = NotificationArea()
 
-  const { pre, div, footer, p, strong, span } = van.tags
+  const { pre, div, p, strong, span } = van.tags
+  const { Columns, Column, Content, Control, Field, Footer, Icon, Level, LevelLeft, LevelRight, Section } = bulma.elements
 
   return [
     Navbar({ logo: { src: '/assets/logo.png', alt: 'application logo' } }),
+
     Section(
       notificationsArea,
       DirectoryPicker({
@@ -134,7 +137,6 @@ const App = () => {
           state.file.val = null
         }
       }),
-
       Columns(
         Column({ class: 'is-one-fifth' },
           () => Menu({
@@ -147,22 +149,24 @@ const App = () => {
           ))
         ),
         Column(
-          Level({
-            right:
+          Level(
+            LevelLeft(),
+            LevelRight(
               DualButton({
                 left: [
-                  span({ class: 'icon' }, FontAwesome('toolbox')),
+                  Icon(FontAwesome('toolbox')),
                   span('Report')
                 ],
                 onclickLeft: () => { state.isViewingSource.val = false },
                 right: [
-                  span({ class: 'icon' }, FontAwesome('file-lines')),
+                  Icon(FontAwesome('file-lines')),
                   span('Source')
                 ],
                 onclickRight: () => { state.isViewingSource.val = true },
                 isLeftSelected: () => (!state.isViewingSource.val)
               })
-          }),
+            )
+          ),
           pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, () => reportSource.val),
           () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
             () => report.val
@@ -175,15 +179,15 @@ const App = () => {
       )
     ),
 
-    footer({ class: 'footer' },
-      div({ class: 'content has-text-centered' },
+    Footer(
+      Content({ class: 'has-text-centered' },
         p(strong('VCDS Parser'), ' by Damien Flament.')
       ),
-      div({ class: 'field is-grouped is-grouped-centered' },
-        div({ class: 'control' },
+      Field({ class: 'is-grouped is-grouped-centered' },
+        Control(
           StatusTag({ class: config.persistence ? 'is-success' : 'is-warning' }, 'Persistence')
         ),
-        div({ class: 'control' },
+        Control(
           StatusTag({ class: config.serviceWorker ? 'is-success' : 'is-warning' }, 'Service Worker')
         )
       )
