@@ -80,16 +80,13 @@ const classes = (...classes) => val(
  * @returns {[any]} the properties and children
  */
 const args = (args) => {
+  const children = [...args] // Working on a copy because we will use shift()
   const objProto = Object.getPrototypeOf({ isConnected: 1 })
-  const firstProto = Object.getPrototypeOf(args[0] ?? 0)
+  const firstProto = Object.getPrototypeOf(children[0] ?? 0)
 
-  const props = firstProto === objProto ? args.shift() : {}
+  const props = firstProto === objProto ? children.shift() : {}
 
-  if (Object.hasOwn(props, 'class')) {
-    props.class = classes(props.class)
-  }
-
-  return [props, args]
+  return [props, children]
 }
 
 export default { val, handler, classes, args, ...van }
