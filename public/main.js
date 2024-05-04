@@ -3,10 +3,10 @@
  * @module
  */
 
-import { Column, Columns, DirectoryPicker, DualButton, FontAwesome, Level, Menu, MenuItem, Navbar, Notification, NotificationArea, Section, StatusTag } from './lib/components.js'
+import { Column, Columns, DirectoryPicker, DualButton, FontAwesome, Level, Menu, MenuItem, Navbar, Notification, NotificationArea, Report, Section, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
-import { buildFromContent } from './lib/report.js'
+import { SyntaxError, buildFromContent } from './lib/report.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
 import van from './lib/van.js'
@@ -108,10 +108,9 @@ const App = () => {
   const report = van.derive(() => {
     if (reportSource.val) {
       try {
-        const result = buildFromContent(reportSource.val)
-        return JSON.stringify(result, null, 4)
+        return buildFromContent(reportSource.val)
       } catch (e) {
-        return e.toString()
+        return e
       }
     } else {
       return ''
@@ -164,11 +163,15 @@ const App = () => {
                 isLeftSelected: () => (!state.isViewingSource.val)
               })
           }),
-          () => {
-            return state.isViewingSource.val
-              ? pre(reportSource.val)
-              : report.val
-          })
+          pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, () => reportSource.val),
+          () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
+            () => report.val
+              ? report.val instanceof SyntaxError
+                ? pre(report.val.toString())
+                : Report({ data: report.val })
+              : ''
+          )
+        )
       )
     ),
 

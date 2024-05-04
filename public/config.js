@@ -16,6 +16,7 @@ export default {
     '/lib/components/column.js',
     '/lib/components/menu.js',
     '/lib/components/notification.js',
+    '/lib/components/report.js',
     '/lib/components.js',
     '/lib/configuration.js',
     '/lib/filesystem.js',

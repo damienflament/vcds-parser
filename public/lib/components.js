@@ -11,6 +11,7 @@ import van from './van.js'
 export * from './components/column.js'
 export * from './components/menu.js'
 export * from './components/notification.js'
+export * from './components/report.js'
 
 const { button, div, i, img, label, span } = van.tags
 
@@ -131,6 +132,12 @@ const StatusTag = (...args) => {
   )
 }
 
+const Tag = (...args) => {
+  const [props, children] = van.args(args)
+
+  return div({ class: van.classes('tag', props.class) }, ...children)
+}
+
 /**
  * Two attached buttons.
  *
@@ -168,4 +175,4 @@ const DualButton = ({
   )
 }
 
-export { DirectoryPicker, DualButton, FontAwesome, Level, Navbar, Section, StatusTag }
+export { DirectoryPicker, DualButton, FontAwesome, Level, Navbar, Section, StatusTag, Tag }
