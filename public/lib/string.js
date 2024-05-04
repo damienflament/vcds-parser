@@ -10,6 +10,10 @@
  * @returns the converted string
  */
 const camelToDashCase = string =>
-  string.replace(/[A-Z]/g, str => `-${str.toLowerCase()}`)
+  string.replace(
+    /[A-Z]/g,
+    (match, offset) =>
+      (offset > 0 ? '-' : '') + match.toLowerCase()
+  )
 
 export { camelToDashCase }
