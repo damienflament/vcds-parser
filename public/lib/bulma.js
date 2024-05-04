@@ -13,16 +13,33 @@ const { button, div, footer, header, p, span } = van.tags
 
 const elementsTags = {
   Button: button,
+  Buttons: div,
+  Card: div,
   CardHeader: header,
   CardHeaderTitle: p,
   CardHeaderIcon: button,
+  CardContent: div,
+  Column: div,
+  Columns: div,
+  Content: div,
+  Control: div,
   Delete: button,
-  Footer: footer,
+  Field: div,
+  File: div,
   FileCta: span,
   FileIcon: span,
   FileName: span,
+  Footer: footer,
   Icon: span,
-  Tag: span
+  Level: div,
+  LevelLeft: div,
+  LevelRight: div,
+  Navbar: div,
+  NavbarBrand: div,
+  NavbarItem: div,
+  Section: div,
+  Tag: span,
+  Tags: div
 }
 
 /**
@@ -33,9 +50,13 @@ const elementsTags = {
  */
 const buildElementTag = (name) => (...args) => {
   const [props, children] = van.args(args)
-
-  const tag = elementsTags[name] ?? div
   const elementClassName = camelToDashCase(name)
+  let tag = elementsTags[name]
+
+  if (tag === undefined) {
+    console.log(`No tag defined for Bulma element: ${name}. Using default "div".`)
+    tag = div
+  }
 
   // Take care of function as class value
   if (props.class instanceof Function) {

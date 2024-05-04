@@ -46,13 +46,11 @@ const handler = h => h === undefined ? null : h
  * The given values are treated by {@link val} then filtered and joined.
  *
  * @param {...any} classes the class property values to work on
- * @returns {string|null} the treated class property value
+ * @returns {string} the treated class property value
  */
-const classes = (...classes) => val(
-  classes.map(v => val(v))
-    .filter(v => v?.trim())
-    .join(' ')
-)
+const classes = (...classes) => classes.map(v => val(v))
+  .filter(v => v?.trim())
+  .join(' ')
 
 /**
  * Handles the components parameters.
