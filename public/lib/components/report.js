@@ -20,6 +20,26 @@ const ReportParseError = error => {
   )
 }
 
+const ModuleReadError = (module, error) => {
+  const { name, message, stack } = error
+
+  return Message(
+    MessageHeader(
+      p({ class: 'is-flex is-align-items-center' },
+        Tag(module.address),
+        p({ class: 'ml-3' }, 'Failed to read module data')
+      )
+    ),
+    MessageBody({ class: 'content' },
+      p('This error is ', strong('NOT related to the vehicle'), '. This is a problem with ', strong('VCDS Parser'), '.'),
+      Spoiler(
+        p(strong(name), `: ${message}`),
+        pre(stack)
+      )
+    )
+  )
+}
+
 const Report = data => {
   const { modules } = van.val(data)
 
@@ -30,21 +50,7 @@ const Report = data => {
       try {
         return Module(module)
       } catch (e) {
-        return Message({ class: '' },
-          MessageHeader(
-            p({ class: 'is-flex is-align-items-center' },
-              Tag(module.address),
-              p({ class: 'ml-3' }, 'Failed to read module data')
-            )
-          ),
-          MessageBody({ class: 'content' },
-            p('This error is ', strong('NOT related to the vehicle'), '. This is a problem with ', strong('VCDS Parser'), '.'),
-            Spoiler(
-              p(strong(e.name), `: ${e.message}`),
-              pre(e.stack)
-            )
-          )
-        )
+        return ModuleReadError(module, e)
       }
     })
   )
