@@ -9,7 +9,7 @@ const { Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Tag } = 
 const stringify = d => JSON.stringify(d, null, 4)
 
 const Report = ({ data }) => {
-  const { modules } = data
+  const { modules } = van.val(data)
 
   return div(
     Object.values(modules).map(m => () => Module(m)),

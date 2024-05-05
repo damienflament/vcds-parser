@@ -9,11 +9,10 @@
 import bulma from './bulma.js'
 import van from './van.js'
 
-export * from './components/menu.js'
 export * from './components/notification.js'
 export * from './components/report.js'
 
-const { i, img, label, span } = van.tags
+const { a, i, img, label, li, span } = van.tags
 
 const { Button, Buttons, File, FileCta, FileIcon, FileName, Navbar, NavbarBrand, NavbarItem, Tag, Tags } = bulma.elements
 
@@ -130,4 +129,24 @@ const DualButton = ({
     right)
 )
 
-export { DirectoryPicker, DualButton, FontAwesome, NavbarComponent as Navbar, StatusTag }
+/**
+ * A menu item.
+ *
+ * To be used as a menu child.
+ *
+ * @param {object} [props]
+ * @param {boolean} props.isSelected if true, the item is shown as selected
+ * @param {() => any} props.onclick called when the item is clicked
+ * @param {...any} children the item children
+ * @returns {HTMLElement}
+ */
+const MenuItem = (...args) => {
+  const [props, children] = van.args(args)
+
+  return li(a({
+    class: van.val(props.isSelected) ? 'is-active' : '',
+    onclick: van.handler(props.onclick)
+  }, ...children))
+}
+
+export { DirectoryPicker, DualButton, FontAwesome, MenuItem, NavbarComponent as Navbar, StatusTag }

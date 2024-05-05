@@ -4,7 +4,7 @@
  */
 
 import bulma from './lib/bulma.js'
-import { DirectoryPicker, DualButton, FontAwesome, Menu, MenuItem, Navbar, Notification, NotificationArea, Report, StatusTag } from './lib/components.js'
+import { DirectoryPicker, DualButton, FontAwesome, MenuItem, Navbar, Notification, NotificationArea, Report, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { SyntaxError, buildFromContent } from './lib/report.js'
@@ -122,7 +122,7 @@ const App = () => {
   const notificationsArea = NotificationArea()
 
   const { pre, div, p, strong, span } = van.tags
-  const { Columns, Column, Content, Control, Field, Footer, Icon, Level, LevelLeft, LevelRight, Section } = bulma.elements
+  const { Columns, Column, Content, Control, Field, Footer, Icon, Level, LevelLeft, LevelRight, Menu, MenuLabel, MenuList, Section } = bulma.elements
 
   return [
     Navbar({ logo: { src: '/assets/logo.png', alt: 'application logo' } }),
@@ -139,14 +139,17 @@ const App = () => {
       }),
       Columns(
         Column({ class: 'is-one-fifth' },
-          () => Menu({
-            label: 'Files'
-          }, directoryFiles.val.map(f =>
-            MenuItem({
-              isSelected: f.name === state.file.val?.name,
-              onclick: () => { state.file.val = f }
-            }, f.name)
-          ))
+          Menu(
+            MenuLabel('Files'),
+            () => MenuList(
+              directoryFiles.val.map(f =>
+                MenuItem({
+                  isSelected: f.name === state.file.val?.name,
+                  onclick: () => { state.file.val = f }
+                }, f.name)
+              )
+            )
+          )
         ),
         Column(
           Level(
@@ -163,16 +166,16 @@ const App = () => {
                   span('Source')
                 ],
                 onclickRight: () => { state.isViewingSource.val = true },
-                isLeftSelected: () => (!state.isViewingSource.val)
+                isLeftSelected: () => !state.isViewingSource.val
               })
             )
           ),
-          pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, () => reportSource.val),
+          pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, reportSource),
           () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
             () => report.val
               ? report.val instanceof SyntaxError
-                ? pre(report.val.toString())
-                : Report({ data: report.val })
+                ? pre(() => report.val.toString())
+                : Report({ data: report })
               : ''
           )
         )

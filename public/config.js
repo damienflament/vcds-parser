@@ -14,7 +14,6 @@ export default {
     '/config.js',
     '/index.html',
     '/lib/bulma.js',
-    '/lib/components/menu.js',
     '/lib/components/notification.js',
     '/lib/components/report.js',
     '/lib/components.js',
