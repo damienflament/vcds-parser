@@ -174,8 +174,8 @@ const App = () => {
           () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
             () => report.val
               ? report.val instanceof SyntaxError
-                ? ReportParseError({ error: report })
-                : Report({ data: report })
+                ? ReportParseError(report)
+                : Report(report)
               : ''
           )
         )

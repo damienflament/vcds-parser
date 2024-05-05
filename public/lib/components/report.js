@@ -8,7 +8,7 @@ const { Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Message,
 
 const stringify = d => JSON.stringify(d, null, 4)
 
-const ReportParseError = ({ error }) => {
+const ReportParseError = error => {
   const { name, message, stack } = van.val(error)
 
   return Message({ class: 'is-danger' },
@@ -20,7 +20,7 @@ const ReportParseError = ({ error }) => {
   )
 }
 
-const Report = ({ data }) => {
+const Report = data => {
   const { modules } = van.val(data)
 
   return div(
@@ -42,7 +42,7 @@ const Report = ({ data }) => {
   )
 }
 
-const Module = (module) => {
+const Module = module => {
   const opened = van.state(false)
   const hasFaults = module.faults.length > 0
 
