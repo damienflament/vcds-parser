@@ -11,11 +11,14 @@ const stringify = d => JSON.stringify(d, null, 4)
 const ReportParseError = error => {
   const { name, message, stack } = van.val(error)
 
-  return Message({ class: 'is-danger' },
-    MessageHeader(p('Failed to parse report.')),
+  return Message(
+    MessageHeader(p('Failed to parse report')),
     MessageBody({ class: 'content' },
-      p(`${name}: ${message}`),
-      pre(stack)
+      p('This error is ', strong('NOT related to the vehicle'), '. This is a problem with ', strong('VCDS Parser'), '.'),
+      Spoiler(
+        p(strong(name), `: ${message}`),
+        pre(stack)
+      )
     )
   )
 }

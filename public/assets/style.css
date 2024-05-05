@@ -1,8 +1,8 @@
 :root {
-    --theme-color: #00427b;
-    --background-color: #aaaaab;
+  --theme-color: #00427b;
+  --background-color: #aaaaab;
 }
 
 .navbar {
-    background-color: var(--theme-color);
+  background-color: var(--theme-color);
 }
