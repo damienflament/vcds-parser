@@ -4,7 +4,7 @@
  */
 
 import bulma from './lib/bulma.js'
-import { DirectoryPicker, DualButton, FontAwesome, MenuItem, Navbar, Notification, NotificationArea, Report, StatusTag } from './lib/components.js'
+import { DirectoryPicker, DualButton, FontAwesome, MenuItem, Navbar, Notification, NotificationArea, Report, ReportParseError, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { SyntaxError, buildFromContent } from './lib/report.js'
@@ -174,7 +174,7 @@ const App = () => {
           () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
             () => report.val
               ? report.val instanceof SyntaxError
-                ? pre(() => report.val.toString())
+                ? ReportParseError({ error: report })
                 : Report({ data: report })
               : ''
           )

@@ -63,7 +63,7 @@ const buildFromContent = content => {
     return parse(content)
   } catch (e) {
     if (e instanceof SyntaxError) {
-      e.message += describeErrorContext(content, e)
+      e.stack = describeErrorContext(content, e)
     }
 
     throw e
