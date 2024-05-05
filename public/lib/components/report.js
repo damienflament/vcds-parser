@@ -19,6 +19,9 @@ const Report = ({ data }) => {
 
 const Module = (module) => {
   const opened = van.state(false)
+
+  if (module.address === '00') return // Ignore special module 00 for now
+
   const hasFaults = module.faults.length > 0
 
   return Card(
