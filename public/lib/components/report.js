@@ -1,9 +1,9 @@
-import { FontAwesome } from '../components.js'
+import { FontAwesome, Spoiler } from '../components.js'
 
 import bulma from '../bulma.js'
 import van from '../van.js'
 
-const { div, pre, p } = van.tags
+const { div, pre, p, strong } = van.tags
 const { Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Message, MessageHeader, MessageBody, Tag } = bulma.elements
 
 const stringify = d => JSON.stringify(d, null, 4)
@@ -30,11 +30,19 @@ const Report = data => {
       try {
         return Module(module)
       } catch (e) {
-        return Message({ class: 'is-danger' },
-          MessageHeader(p(`${module.address}: failed to read module data`)),
+        return Message({ class: '' },
+          MessageHeader(
+            p({ class: 'is-flex is-align-items-center' },
+              Tag(module.address),
+              p({ class: 'ml-3' }, 'Failed to read module data')
+            )
+          ),
           MessageBody({ class: 'content' },
-            p(`${e.name}: ${e.message}`),
-            pre(e.stack)
+            p('This error is ', strong('NOT related to the vehicle'), '. This is a problem with ', strong('VCDS Parser'), '.'),
+            Spoiler(
+              p(strong(e.name), `: ${e.message}`),
+              pre(e.stack)
+            )
           )
         )
       }

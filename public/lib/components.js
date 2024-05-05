@@ -12,9 +12,9 @@ import van from './van.js'
 export * from './components/notification.js'
 export * from './components/report.js'
 
-const { a, i, img, label, li, span } = van.tags
+const { a, div, i, img, label, li, span } = van.tags
 
-const { Button, Buttons, File, FileCta, FileIcon, FileName, Navbar, NavbarBrand, NavbarItem, Tag, Tags } = bulma.elements
+const { Button, Buttons, File, FileCta, FileIcon, FileName, Icon, IconText, Navbar, NavbarBrand, NavbarItem, Tag, Tags } = bulma.elements
 
 /**
  * A responsive horizontal navigation bar.
@@ -149,4 +149,32 @@ const MenuItem = (...args) => {
   }, ...children))
 }
 
-export { DirectoryPicker, DualButton, FontAwesome, MenuItem, NavbarComponent as Navbar, StatusTag }
+/**
+ * A spoiler.
+ *
+ * Hides its content. Has an arrow to show it.
+ *
+ * @param  {...any} children the spoiler children
+ * @returns {HTMLElement}
+ */
+const Spoiler = (...children) => {
+  const isClosed = van.state(true)
+
+  return div(
+    div({ class: 'is-flex is-justify-content-end mb-2' },
+      IconText(
+        {
+          class: 'is-flex-direction-row-reverse is-clickable',
+          onclick: () => { isClosed.val = !isClosed.val }
+        },
+        Icon(() => FontAwesome(isClosed.val ? 'angle-down' : 'angle-up')),
+        span(() => isClosed.val ? 'Show more...' : 'Show less...')
+      )
+    ),
+    div({ class: () => isClosed.val ? 'is-sr-only' : '' },
+      ...children
+    )
+  )
+}
+
+export { DirectoryPicker, DualButton, FontAwesome, MenuItem, NavbarComponent as Navbar, Spoiler, StatusTag }

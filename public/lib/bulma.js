@@ -31,6 +31,7 @@ const elementsTags = {
   FileName: span,
   Footer: footer,
   Icon: span,
+  IconText: span,
   Level: div,
   LevelLeft: div,
   LevelRight: div,
