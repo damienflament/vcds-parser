@@ -37,7 +37,8 @@ const ModuleReadError = (module, error) => {
       p('This error is ', strong('NOT related to the vehicle'), '. This is a problem with ', strong('VCDS Parser'), '.'),
       Spoiler(
         p(strong(name), `: ${message}`),
-        pre(stack)
+        pre(stack),
+        pre(JSON.stringify(module, null, 4))
       )
     )
   )
