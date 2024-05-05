@@ -50,7 +50,9 @@ report
 
     for (const m of modulesStatus) {
       const address = m['address']
-      modules[address] = Object.assign(m, hashedModuleInfos[address])
+      const index = Number.parseInt(address, 16)
+
+      modules[index] = Object.assign(m, hashedModuleInfos[address])
     }
 
     return {
