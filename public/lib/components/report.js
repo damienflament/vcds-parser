@@ -4,7 +4,7 @@ import bulma from '../bulma.js'
 import van from '../van.js'
 
 const { div, pre, p } = van.tags
-const { Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Tag } = bulma.elements
+const { Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Message, MessageHeader, MessageBody, Tag } = bulma.elements
 
 const stringify = d => JSON.stringify(d, null, 4)
 
@@ -12,16 +12,26 @@ const Report = ({ data }) => {
   const { modules } = van.val(data)
 
   return div(
-    Object.values(modules).map(m => () => Module(m)),
-    pre(stringify(data))
+    Object.values(modules).map(module => () => {
+      if (module.address === '00') return // Ignore special module 00 for now
+
+      try {
+        return Module(module)
+      } catch (e) {
+        return Message({ class: 'is-danger' },
+          MessageHeader(p(`${module.address}: failed to read module data`)),
+          MessageBody({ class: 'content' },
+            p(`${e.name}: ${e.message}`),
+            pre(e.stack)
+          )
+        )
+      }
+    })
   )
 }
 
 const Module = (module) => {
   const opened = van.state(false)
-
-  if (module.address === '00') return // Ignore special module 00 for now
-
   const hasFaults = module.faults.length > 0
 
   return Card(

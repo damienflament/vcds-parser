@@ -9,7 +9,7 @@
 import { camelToDashCase } from './string.js'
 import van from './van.js'
 
-const { aside, button, div, footer, header, p, span, ul } = van.tags
+const { article, aside, button, div, footer, header, p, span, ul } = van.tags
 
 const elementsTags = {
   Button: button,
@@ -37,6 +37,9 @@ const elementsTags = {
   Menu: aside,
   MenuLabel: p,
   MenuList: ul,
+  Message: article,
+  MessageHeader: div,
+  MessageBody: div,
   Navbar: div,
   NavbarBrand: div,
   NavbarItem: div,
