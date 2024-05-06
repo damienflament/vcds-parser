@@ -20,24 +20,24 @@ const showControlCharacters = string =>
  * @returns {string} the context description
  */
 const describeErrorContext = (content, error) => {
+  const { location } = error
   const size = 100
 
-  const startLine = error.location.start.line
-  const startCol = error.location.start.column
-  const endLine = error.location.end.line
-  const endCol = error.location.end.column
-  const length = error.location.end.offset - error.location.start.offset
-  const displayStart = content.indexOf('\n', error.location.start.offset - size) + 1
-  const lineEnd = content.indexOf('\n', error.location.end.offset)
+  const startLine = location.start.line
+  const startCol = location.start.column
+  const endLine = location.end.line
+  const endCol = location.end.column
+  const length = location.end.offset - location.start.offset
+  const displayStart = content.indexOf('\n', location.start.offset - size) + 1
+  const lineEnd = content.indexOf('\n', location.end.offset)
   const displayEnd = content.indexOf('\n', lineEnd + size)
 
   const contextBefore = content.substring(displayStart, lineEnd)
   const contextAfter = content.substring(lineEnd + 1, displayEnd)
   const finger = ' '.repeat(startCol - 1) + '👆'.repeat(length)
 
-  return `
-  from line ${startLine} column ${startCol}
-    to line ${endLine} column ${endCol}
+  return `from line ${startLine} column ${startCol}
+  to line ${endLine} column ${endCol}
 
   Context:
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
