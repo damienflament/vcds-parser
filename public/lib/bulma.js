@@ -35,6 +35,7 @@ const elementsTags = {
   Level: div,
   LevelLeft: div,
   LevelRight: div,
+  LevelItem: div,
   Menu: aside,
   MenuLabel: p,
   MenuList: ul,
@@ -44,6 +45,7 @@ const elementsTags = {
   Navbar: div,
   NavbarBrand: div,
   NavbarItem: div,
+  Notification: div,
   Section: div,
   Tag: span,
   Tags: div
