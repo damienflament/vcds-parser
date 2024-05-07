@@ -52,7 +52,7 @@ const Report = data => {
       if (module.address === '00') return // Ignore special module 00 for now
 
       try {
-        return Module(module)
+        return ModuleComponent(module)
       } catch (e) {
         return ModuleReadError(module, e)
       }
@@ -60,14 +60,18 @@ const Report = data => {
   )
 }
 
-const Module = module => {
+/**
+ *
+ * @param {import('../report.js').Module} module the module to show
+ * @returns {HTMLElement}
+ */
+const ModuleComponent = module => {
   const opened = van.state(false)
-  const hasFaults = module.faults.length > 0
 
   return Card(
     CardHeader({ class: 'is-clickable', onclick: () => { opened.val = !opened.val } },
       CardHeaderTitle(
-        Tag({ class: hasFaults ? 'is-danger' : 'is-success' }, module.address),
+        Tag({ class: module.isFaulty ? 'is-danger' : 'is-success' }, module.address),
         p({ class: 'ml-3' }, module.name)
       ),
       CardHeaderIcon(

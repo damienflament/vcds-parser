@@ -1,73 +1,207 @@
 /**
- * VCDS reports related function.
+ * VCDS report.
  * @module
  */
 
-import { SyntaxError, parse } from './parser.js'
+class Report {
+  /** @type {string} */ softwareVersion = undefined
+  /** @type {string} */ softwarePlatform = undefined
+  /** @type {string} */ dataVersion = undefined
+  /** @type {string} */ dataVersionDate = undefined
 
-export { SyntaxError } from './parser.js'
+  /** @type {Date} */ date = undefined
+  /** @type {string?} */ shop = null
 
-const showControlCharacters = string =>
-  string.replaceAll('\r', '␍')
-    .replaceAll('\n', '␊\n')
-    .replaceAll(' ', '␣')
+  /** @type {string} */ vin = undefined
+  /** @type {string?} */ licensePlate = null
+  /** @type {string} */ chassis = undefined
+  /** @type {Mileage} */ mileage = undefined
 
-/**
- * Describes the context of the given syntax error.
- *
- * @param {string} content the parsed content
- * @param {SyntaxError} error the error to build context from
- * @returns {string} the context description
- */
-const describeErrorContext = (content, error) => {
-  const { location } = error
-  const size = 100
+  constructor () {
+    Object.preventExtensions(this)
+  }
 
-  const startLine = location.start.line
-  const startCol = location.start.column
-  const endLine = location.end.line
-  const endCol = location.end.column
-  const length = location.end.offset - location.start.offset
-  const displayStart = content.indexOf('\n', location.start.offset - size) + 1
-  const lineEnd = content.indexOf('\n', location.end.offset)
-  const displayEnd = content.indexOf('\n', lineEnd + size)
+  /** @type {[Module]} */ #modules = []
 
-  const contextBefore = content.substring(displayStart, lineEnd)
-  const contextAfter = content.substring(lineEnd + 1, displayEnd)
-  const finger = ' '.repeat(startCol - 1) + '👆'.repeat(length)
+  get modules () { return this.#modules }
 
-  return `from line ${startLine} column ${startCol}
-  to line ${endLine} column ${endCol}
+  /**
+   * Adds a module to the report.
+   * @param {Module} module
+   */
+  addModule (module) {
+    this.#modules[module.decimalAddress] = module
+  }
 
-  Context:
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-${contextBefore}
-${finger}
-${contextAfter}
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-${showControlCharacters(contextBefore)}␊
-${finger}
-${showControlCharacters(contextAfter)}␊
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯`
-}
-
-/**
- * Builds a data structure by parsing the given report content.
- *
- * @param {string} content the report content
- * @returns {object} the built data structure
- * @throws {SyntaxError} when Peggy throws an error on parsing
- */
-const buildFromContent = content => {
-  try {
-    return parse(content)
-  } catch (e) {
-    if (e instanceof SyntaxError) {
-      e.stack = describeErrorContext(content, e)
-    }
-
-    throw e
+  /**
+   * Retrieves a module by its address.
+   * @param {string} address the module address
+   * @returns {Module}
+   */
+  getModule (address) {
+    return this.#modules[Module.decimalAddress(address)]
   }
 }
 
-export { buildFromContent }
+class Mileage {
+  static #KM_TO_MILES = 0.62137119223733
+
+  km = null
+  miles = null
+
+  constructor (km, miles) {
+    this.km = km
+    this.miles = miles
+
+    Object.preventExtensions(this)
+  }
+
+  static fromKm (value) {
+    return new Mileage(value, Math.trunc(value * Mileage.#KM_TO_MILES))
+  }
+
+  static fromMiles (value) {
+    return new Mileage(Math.trunc(value / Mileage.#KM_TO_MILES), value)
+  }
+}
+class Module {
+  /** @type {string} */ address = undefined
+  /** @type {boolean} */ isReachable = undefined
+  /** @type {string} */ name = undefined
+  /** @type {ModuleStatus} */ status = undefined
+
+  /** @type {ModuleInfo?} */ info = null
+
+  constructor (address) {
+    this.address = address
+
+    Object.preventExtensions(this)
+  }
+
+  /**
+   * Return the decimal form of the given module address.
+   *
+   * @param {string} address the module address
+   * @returns {integer}
+   */
+  static decimalAddress (address) {
+    return Number.parseInt(address)
+  }
+
+  /**
+   * The module decimal address.
+  *
+  * @type {integer}
+  */
+  get decimalAddress () {
+    return Module.decimalAddress(this.address)
+  }
+
+  /**
+   * Has the module any fault ?
+   *
+   * @type {boolean}
+   */
+  get isFaulty () {
+    return Number.parseInt(this.status.flags, 2) !== 0
+  }
+
+  /** @type {[Subsystem]} */ #subsystems = []
+
+  get subsystems () { return this.#subsystems }
+
+  /**
+   * Adds a subsystem to the module.
+   * @param {Subsystem} subsystem
+   */
+  addSubsystem (subsystem) {
+    this.#subsystems[subsystem.index - 1] = subsystem
+  }
+
+  /** @type {[Fault]} */ #faults = []
+
+  get faults () { return this.faults }
+
+  /**
+   * Adds a fault to the module.
+   * @param {Fault} fault
+   */
+  addFault (fault) {
+    this.#faults.push(fault)
+  }
+}
+
+class ModuleStatus {
+  flags = undefined
+  description = undefined
+
+  constructor (flags) {
+    this.flags = flags
+
+    Object.preventExtensions(this)
+  }
+}
+
+class ModuleInfo {
+  /** @type {string} */ labelsFile = undefined
+  /** @type {string} */ partNumber = undefined
+  /** @type {string} */ component = undefined
+  /** @type {string} */ revision = undefined
+  /** @type {string} */ serial = undefined
+  /** @type {string} */ coding = undefined
+  /** @type {string} */ codingWsc = undefined
+  /** @type {string} */ vcid = undefined
+  /** @type {string} */ vinid = undefined
+  /** @type {string} */ readiness = undefined
+
+  constructor () {
+    Object.preventExtensions(this)
+  }
+}
+
+class Subsystem {
+  /** @type {integer} */ index = undefined
+  /** @type {string} */ partNumber = undefined
+  /** @type {string} */ component = undefined
+
+  /** @type {string?} */ labelsFile = null
+  /** @type {string?} */ coding = null
+  /** @type {string?} */ codingWsc = null
+
+  constructor () {
+    Object.preventExtensions(this)
+  }
+}
+
+class Fault {
+  /** @type {string} */ code = undefined
+  /** @type {string} */ subject = undefined
+
+  /** @type {string?} */ errorCode = null
+
+  /** @type {string} */ descriptionCode = undefined
+  /** @type {string} */ description = undefined
+
+  /** @type {FreezeFrame?} */ freezeFrame = null
+
+  constructor (code) {
+    this.code = code
+
+    Object.preventExtensions(this)
+  }
+}
+
+class FreezeFrame {
+  /** @type {string} */ status = undefined
+  /** @type {integer} */ priority = undefined
+  /** @type {integer} */ frequency = undefined
+  /** @type {integer} */ resetCounter = undefined
+  /** @type {integer} */ mileage = undefined
+  /** @type {string} */ timeIndication = undefined
+
+  constructor () {
+    Object.preventExtensions(this)
+  }
+}
+
+export { Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, Report, Subsystem }

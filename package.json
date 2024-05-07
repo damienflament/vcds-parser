@@ -25,8 +25,8 @@
     "lint": "npx standard | npx snazzy",
     "configure": "node scripts/configure.mjs",
     "version": "npm run configure && git add -A public/",
-    "parser": "npx peggy -o public/lib/parser.js --format es resources/vcds.pegjs",
-    "parser-dev": "npx peggy -o public/lib/parser.js --format es resources/vcds.pegjs --watch"
+    "parser": "npx peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs",
+    "parser-dev": "npx peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs --watch"
   },
   "devDependencies": {
     "fs-extra": "^11.2.0",
@@ -38,7 +38,7 @@
   "standard": {
     "ignore": [
       "**/vendor/",
-      "public/lib/parser.js"
+      "public/lib/generated-parser.js"
     ],
     "globals": [
       "FileReader"

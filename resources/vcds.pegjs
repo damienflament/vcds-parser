@@ -1,5 +1,7 @@
 /* Peggy grammar to parse VSCD scan reports. */
 {{
+  import { Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, Report, Subsystem } from './report.js'
+
   function string(str) {
     str = str.trim()
 
@@ -13,10 +15,17 @@
   function integer(str) {
     return parseInt(str)
   }
+
 }}
+
+{
+  const r = new Report()
+  let m = null
+}
 
 start
   = report
+  { return r }
 
 report
   = date:datetime eol
@@ -40,42 +49,15 @@ report
     'End' '-'+ '(Elapsed Time:' _ duration:$( minutes ':' seconds ) ')' '-'+ '\r\n'
 
   {
-    const hashedModuleInfos = {}
-
-    for (const m of moduleInfos) {
-      hashedModuleInfos[m['address']] = m
-    }
-
-    const modules = {}
-
-    for (const m of modulesStatus) {
-      const address = m['address']
-      const index = Number.parseInt(address, 16)
-
-      modules[index] = Object.assign(m, hashedModuleInfos[address])
-    }
-
-    return {
-      report: {
-        date,
-        shop,
-      },
-      software: {
-        version,
-        platform,
-        data: {
-          date: dataDate,
-          version: dataVersion
-        }
-      },
-      vehicule: {
-        vin,
-        licensePlate: string(licensePlate),
-        chassis,
-        mileage
-      },
-      modules
-    }
+    r.date = date
+    r.softwareVersion = version
+    r.softwarePlatform = platform
+    r.dataVersionDate = dataDate
+    r.dataVersion = dataVersion
+    r.shop = shop
+    r.vin = vin
+    r.licensePlate = licensePlate
+    r.chassis = chassis
   }
 
 datetime
@@ -99,11 +81,11 @@ seconds 'seconds'
   = $[0-5][0-9]
 
 versionSpecifier 'a version specifier'
-  = $( num+ '.' num+ '.' num+ '.' num+ )
+  = $( dec+ '.' dec+ '.' dec+ '.' dec+ )
 dataVersionDate 'a VCDS data version date'
-  = $num|8|
+  = $dec|8|
 dataVersionSpecifier 'a VCDS data version specifier'
-  = $( 'DS' num|3| '.' num )
+  = $( 'DS' dec|3| '.' dec )
 
 vin 'a VIN (Vehicule Identification Number)'
   = $uppnum|17|
@@ -112,94 +94,113 @@ licensePlate 'a license plate number'
 chassis 'a VAG chassis code'
   = @$uppnum|2| _ '(' uppnum+ ')'
 mileage 'a mileage value in km and miles'
-  = km:$num+ 'km' '-' miles:$num+ 'miles'
-  { return { km: integer(km), miles: integer(miles) } }
+  = km:$dec+ 'km' '-' miles:$dec+ 'miles'
+  {
+    r.mileage = new Mileage(km, miles)
+  }
 
 moduleStatus
-  = address:moduleAddress '-' name:$[^-]+ '--' _ 'Status:' _ statusDescription:$[^01]+ status:$bin|4| eol
+  = address:moduleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$[^01]+ flags:$bin|4| eol
   {
-    return {
-      address,
-      name: string(name),
-      status: {
-        flags: status,
-        description: string(statusDescription)
-      }
-    }
+    m = new Module(address)
+    m.name = string(name)
+
+    m.status = new ModuleStatus(flags)
+    m.status.description = string(description)
+
+    r.addModule(m)
   }
-moduleAddress 'a module address' = $hexa|2|
+moduleAddress 'a module address' = $dec|2|
 
 moduleInfo
   = dashLine
     'Address' _ address:moduleAddress ':'
-      [^:]+ // ignore module name
-      ':'
-      '.'?  // this dot '.' just after the colon ':' may be a bug
-      _ labels:$rol eol
-    _|3| partNumber:(
-        'Part No:' _ @partNumber
-        /
-        'Part No' _ 'SW:' _ software:partNumber _+ 'HW:' _ hardware:( partNumber / 'Hardware No' ) rol // 'Hardware No' value may be a bug
-        { return { software, hardware } }
-      ) eol
-    _|3| 'Component:' _ component:$rol eol
-    revision:( _|3| 'Revision:' _ @$w _+ )?
-      serial:( 'Serial number:' _ @$w eol )?
-    coding:( _|3| 'Coding:' _ @codingValue eol )?
-    _|3| 'Shop #:' _ 'WSC' _ codingWsc:shopWsc eol
-    _|3| 'VCID:' _ vcid:vcid eol
-    vinid:( _|3| 'VINID:' _ @vinid eol )?
-    l
-    subsystems:subsystem*
-    faults:faultsSection
-    readiness:( 'Readiness:' _ @readiness eol )?
-    l
-  {
-    return {
-      address,
-      labelsFile: labels,
-      partNumber,
-      component: string(component),
-      revision,
-      serial,
-      coding : {
-        value: coding,
-        wsc: codingWsc
-      },
-      vcid,
-      vinid,
-      subsystems,
-      faults,
-      readiness
-    }
-  }
+      infos:(
+          [^\r]+ // ignore module name
+          eol
+          'Cannot be reached' eol
+          { r.getModule(address).isReachable = false }
+      /
+          [^:]+ // ignore module name
+          ':'
+          '.'? // this dot '.' just after the colon ':' may be a bug
+          _ labels:$rol
+          eol
 
-partNumber 'a part number' = $( uppnum|3| _ num|3| _ num|3| (_ upp)? )
+        _|3| partNumber:(
+            'Part No:' _ @partNumber
+            /
+            'Part No' _ 'SW:' _ software:partNumber _+ 'HW:' _ hardware:( partNumber / 'Hardware No' ) rol // 'Hardware No' value may be a bug
+            { return { software, hardware } }
+          ) eol
+        _|3| 'Component:' _ component:$rol eol
+        revision:( _|3| 'Revision:' _ @$w _+ )?
+          serial:( 'Serial number:' _ @$w eol )?
+        coding:( _|3| 'Coding:' _ @codingValue eol )?
+        _|3| 'Shop #:' _ 'WSC' _ codingWsc:shopWsc eol
+        _|3| 'VCID:' _ vcid:vcid eol
+        vinid:( _|3| 'VINID:' _ @vinid eol )?
+        l
+        subsystems:subsystem*
+        faults:faultsSection
+        readiness:( 'Readiness:' _ @readiness eol )?
+        {
+          m = r.getModule(address)
+
+          m.isReachable = true
+
+          m.info = new ModuleInfo()
+          m.info.labelsFile = labels
+          m.info.partNumber = partNumber
+          m.info.component = string(component)
+          m.info.revision = revision
+          m.info.serial = serial
+          m.info.coding = coding
+          m.info.codingWsc = codingWsc
+          m.info.vcid = vcid
+          m.info.vinid = vinid
+          m.info.readiness = readiness
+
+          for (const s of subsystems) {
+            m.addSubsystem(s)
+          }
+
+          for (const f of faults) {
+            m.addFault(f)
+          }
+        }
+      )
+    l
+  { return { address, ...infos } }
+
+
+
+partNumber 'a part number' = $( uppnum|3| _ dec|3| _ dec|3| (_ upp)? )
 codingValue 'a coding value' = $hexa+
-shopWsc 'a shop WSC' = $( shortShopWsc _ num|3| _ num|5| )
-shortShopWsc 'a short shop WSC' = $num|5|
+shopWsc 'a shop WSC' = $( shortShopWsc _ dec|3| _ dec|5| )
+shortShopWsc 'a short shop WSC' = $dec|5|
 vcid 'a VCID' = $( hexa|18| '-' hexa|4| )
 vinid 'a VINID' = $hexa|34|
 readiness 'readiness flags' = $( bin|4| _ bin|4| )
 
 subsystem
-  = _|3| 'Subsystem' _ index:$num+ _ '-' _ 'Part No:' _ partNumber:partNumber labels:( _+ 'Labels:' _ @$rol )? eol
+  = _|3| 'Subsystem' _ index:$dec+ _ '-' _ 'Part No:' _ partNumber:partNumber labels:( _+ 'Labels:' _ @$rol )? eol
     _|3| 'Component:' _ component:$rol eol
     coding:( _|3| 'Coding:' _ @codingValue eol )?
     wsc:( _|3| 'Shop #: WSC' _ @shortShopWsc rol eol )?
     ( [A-Z0-9 ]i+ eol )? // ignore this line as it contains the same info as above
     l
   {
-    return {
-      index: integer(index),
-      partNumber,
-      component: string(component),
-      labelsFile: labels,
-      coding: {
-        value: coding,
-        wsc: wsc
-      }
-    }
+    const s = new Subsystem()
+
+    s.index = integer(index)
+    s.partNumber = partNumber
+    s.component = string(component)
+    s.labelsFile = labels
+    s.coding = coding
+    s.codingWsc = wsc
+
+    return s
   }
 
 faultsSection
@@ -217,45 +218,52 @@ fault
     _|12| errorCode:(@errorCode _ '-' _)? descriptionCode:faultDescCode _ '-' _ description:$rol eol
     freezeFrame:(freezeFrame)?
   {
-    return {
-      code,
-      subject: string(subject),
-      errorCode,
-      descriptionCode,
-      description: string(description),
-      freezeFrame
-    }
+    const f = new Fault(code)
+
+    f.subject = string(subject)
+    f.errorCode = errorCode
+    f.descriptionCode = descriptionCode
+    f.description = description
+    f.freezeFrame = freezeFrame
+
+    return f
   }
 
-errorCode 'error code' = $( 'P'? num|4| )
-faultCode 'fault code' = $num|5|
-faultDescCode 'fault description code' = $num|3|
+errorCode 'error code' = $( 'P'? dec|4| )
+faultCode 'fault code' = $dec|5|
+faultDescCode 'fault description code' = $dec|3|
 
 freezeFrame
   = _|13| 'Freeze Frame:' eol
     _|20| 'Fault Status:' _ status:$bin|8| eol
-    _|20| 'Fault Priority:' _ priority:num eol
-    _|20| 'Fault Frequency:' _ frequency:$num+ eol
-    _|20| 'Reset counter:' _ resetCounter:$num+ eol
-    _|20| 'Mileage:' _ mileage:$num+ _ mileageUnit:( 'km' / 'miles' ) eol
-    _|20| 'Time Indication:' _ timeIndication:$num eol
+    _|20| 'Fault Priority:' _ priority:dec eol
+    _|20| 'Fault Frequency:' _ frequency:$dec+ eol
+    _|20| 'Reset counter:' _ resetCounter:$dec+ eol
+    _|20| 'Mileage:' _ value:$dec+
+      _ mileage:(
+        'km' { return Mileage.fromKm(integer(value)) }
+      /
+        'miles' { return Mileage.fromMiles(integer(value)) }
+      ) eol
+    _|20| 'Time Indication:' _ timeIndication:$dec eol
 l
   {
-    return {
-      status,
-      priority: integer(priority),
-      frequency: integer(frequency),
-      resetCounter: integer(resetCounter),
-      mileage: integer(mileage),
-      mileageUnit,
-      timeIndication
-    }
+    const ff = new FreezeFrame()
+
+    ff.status = status
+    ff.priority = integer(priority)
+    ff.frequency = integer(frequency)
+    ff.resetCounter = integer(resetCounter)
+    ff.timeIndication = timeIndication
+    ff.mileage = mileage
+
+    return ff
   }
 
 
 dashLine 'a dash line' = '-'+ eol
 
-num 'a numeric character' = [0-9]
+dec 'a decimal character' = [0-9]
 hexa 'an hexadecimal character' = [0-9A-F]
 bin 'a binary character' = [01]
 upp 'an uppercase alphabetic character' = [A-Z]
