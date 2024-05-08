@@ -1,6 +1,6 @@
 /* Peggy grammar to parse VSCD scan reports. */
 {{
-  import { Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, Report, Subsystem } from './report.js'
+  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, Report, Subsystem } from './report.js'
 
   function string(str) {
     str = str.trim()
@@ -25,7 +25,10 @@
 
 start
   = report
-  { return r }
+  {
+    r.commit()
+    return r
+  }
 
 report
   = date:datetime eol
@@ -36,33 +39,46 @@ report
     l
     'Dealer/Shop Name:' _ shop:$rol eol
     l
-    'VIN:' _ vin:vin _+ 'License Plate:' _ licensePlate:licensePlate eol
+    'VIN:' _ vin:vin _+ 'License Plate:' _ licensePlate:( $licensePlate )? eol
     l+
     'Chassis Type:' _ chassis:chassis eol
     'Scan:' rol eol // ignore module addresses list
     l
     'VIN:' _ vin _+ 'Mileage:' _ mileage:mileage eol
     l
-    modulesStatus:moduleStatus+
+    moduleStatus+
     l+
-    moduleInfos:moduleInfo+
-    'End' '-'+ '(Elapsed Time:' _ duration:$( minutes ':' seconds ) ')' '-'+ '\r\n'
+    moduleInfo+
+    'End' '-'+ '(Elapsed Time:' _ duration:duration ')' '-'+ '\r\n'
 
   {
     r.date = date
+    r.duration = duration
     r.softwareVersion = version
     r.softwarePlatform = platform
     r.dataVersionDate = dataDate
     r.dataVersion = dataVersion
     r.shop = shop
     r.vin = vin
+    r.mileage = mileage
     r.licensePlate = licensePlate
     r.chassis = chassis
   }
 
 datetime
   = dayName ',' day ',' monthName ',' year ',' hours ':' minutes ':' seconds ':00009'
-  { return new Date(text()) }
+  {
+    const d = new Date(text())
+    Object.freeze(d)
+    return d
+  }
+duration
+  = minutes:$minutes ':' seconds:$seconds
+  {
+    const d = new Duration(integer(minutes), integer(seconds))
+    d.commit()
+    return d
+  }
 dayName 'the name of a week day'
   = 'Monday' / 'Tuesday' / 'Wednesday' / 'Thursday' / 'Friday' / 'Saturday' /
     'Sunday'
@@ -90,23 +106,27 @@ dataVersionSpecifier 'a VCDS data version specifier'
 vin 'a VIN (Vehicule Identification Number)'
   = $uppnum|17|
 licensePlate 'a license plate number'
-  = $[A-Z0-9-]*
+  = $[A-Z0-9-]+
 chassis 'a VAG chassis code'
   = @$uppnum|2| _ '(' uppnum+ ')'
 mileage 'a mileage value in km and miles'
   = km:$dec+ 'km' '-' miles:$dec+ 'miles'
   {
-    r.mileage = new Mileage(km, miles)
+    const m = new Mileage(km, miles)
+    m.commit()
+    return m
   }
 
 moduleStatus
   = address:moduleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$[^01]+ flags:$bin|4| eol
   {
-    m = new Module(address)
+    m = new Module()
+    m.address = address
     m.name = string(name)
 
     m.status = new ModuleStatus(flags)
     m.status.description = string(description)
+    m.status.commit()
 
     r.addModule(m)
   }
@@ -119,7 +139,13 @@ moduleInfo
           [^\r]+ // ignore module name
           eol
           'Cannot be reached' eol
-          { r.getModule(address).isReachable = false }
+          {
+            const m = r.getModule(address)
+
+            m.isReachable = false
+
+            m.commit()
+          }
       /
           [^:]+ // ignore module name
           ':'
@@ -145,11 +171,12 @@ moduleInfo
         faults:faultsSection
         readiness:( 'Readiness:' _ @readiness eol )?
         {
-          m = r.getModule(address)
+          const m = r.getModule(address)
 
           m.isReachable = true
 
           m.info = new ModuleInfo()
+
           m.info.labelsFile = labels
           m.info.partNumber = partNumber
           m.info.component = string(component)
@@ -161,6 +188,8 @@ moduleInfo
           m.info.vinid = vinid
           m.info.readiness = readiness
 
+          m.info.commit()
+
           for (const s of subsystems) {
             m.addSubsystem(s)
           }
@@ -168,12 +197,11 @@ moduleInfo
           for (const f of faults) {
             m.addFault(f)
           }
+
+          m.commit()
         }
       )
     l
-  { return { address, ...infos } }
-
-
 
 partNumber 'a part number' = $( uppnum|3| _ dec|3| _ dec|3| (_ upp)? )
 codingValue 'a coding value' = $hexa+
@@ -200,6 +228,8 @@ subsystem
     s.coding = coding
     s.codingWsc = wsc
 
+    s.commit()
+
     return s
   }
 
@@ -218,13 +248,16 @@ fault
     _|12| errorCode:(@errorCode _ '-' _)? descriptionCode:faultDescCode _ '-' _ description:$rol eol
     freezeFrame:(freezeFrame)?
   {
-    const f = new Fault(code)
+    const f = new Fault()
 
+    f.code = code
     f.subject = string(subject)
     f.errorCode = errorCode
     f.descriptionCode = descriptionCode
     f.description = description
     f.freezeFrame = freezeFrame
+
+    f.commit()
 
     return f
   }
@@ -255,7 +288,11 @@ l
     ff.frequency = integer(frequency)
     ff.resetCounter = integer(resetCounter)
     ff.timeIndication = timeIndication
+
+    mileage.commit()
     ff.mileage = mileage
+
+    ff.commit()
 
     return ff
   }
