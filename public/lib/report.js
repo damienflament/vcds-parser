@@ -32,20 +32,20 @@ class Committable {
  * A VCDS report.
  */
 class Report extends Committable {
-  /** @type {string} */ softwareVersion = undefined
-  /** @type {string} */ softwarePlatform = undefined
-  /** @type {string} */ dataVersion = undefined
-  /** @type {string} */ dataVersionDate = undefined
+  /** @type {string} */ softwareVersion
+  /** @type {string} */ softwarePlatform
+  /** @type {string} */ dataVersion
+  /** @type {string} */ dataVersionDate
 
-  /** @type {Date} */ date = undefined
-  /** @type {Duration} */ duration = undefined
+  /** @type {Date} */ date
+  /** @type {Duration} */ duration
   /** @type {string?} */ shop = null
 
-  /** @type {string} */ vin = undefined
+  /** @type {string} */ vin
   /** @type {string?} */ licensePlate = null
-  /** @type {string} */ chassis = undefined
-  /** @type {string} */ type = undefined
-  /** @type {Mileage} */ mileage = undefined
+  /** @type {string} */ chassis
+  /** @type {string} */ type
+  /** @type {Mileage} */ mileage
 
   constructor () {
     super()
@@ -73,8 +73,8 @@ class Report extends Committable {
 }
 
 class Duration extends Committable {
-  /** @type {integer} */ minutes = undefined
-  /** @type {integer} */ seconds = undefined
+  /** @type {integer} */ minutes
+  /** @type {integer} */ seconds
 
   constructor (minutes, seconds) {
     super()
@@ -112,8 +112,8 @@ class Mileage extends Committable {
     return new Mileage(Math.trunc(value / Mileage.#KM_TO_MILES), value)
   }
 
-  /** @type {integer} */ km = undefined
-  /** @type {integer} */ miles = undefined
+  /** @type {integer} */ km
+  /** @type {integer} */ miles
 
   /**
    * @param {integer} km a distance in kilometers
@@ -141,10 +141,10 @@ class Module extends Committable {
     return Number.parseInt(address)
   }
 
-  /** @type {string} */ address = undefined
-  /** @type {boolean} */ isReachable = undefined
-  /** @type {string} */ name = undefined
-  /** @type {ModuleStatus} */ status = undefined
+  /** @type {string} */ address
+  /** @type {boolean} */ isReachable
+  /** @type {string} */ name
+  /** @type {ModuleStatus} */ status
 
   /** @type {ModuleInfo?} */ info = null
 
@@ -188,8 +188,8 @@ class Module extends Committable {
  * The status of a module.
  */
 class ModuleStatus extends Committable {
-  /** @type {string} */ flags = undefined
-  /** @type {string} */ description = undefined
+  /** @type {string} */ flags
+  /** @type {string} */ description
 
   /**
    * @param {string} flags
@@ -208,16 +208,16 @@ class ModuleStatus extends Committable {
  * Stored in a separate object because unavailable when a module is unreachable.
  */
 class ModuleInfo extends Committable {
-  /** @type {string} */ labelsFile = undefined
-  /** @type {string} */ partNumber = undefined
-  /** @type {string} */ component = undefined
-  /** @type {string} */ revision = undefined
-  /** @type {string} */ serial = undefined
-  /** @type {string} */ coding = undefined
-  /** @type {string} */ codingWsc = undefined
-  /** @type {string} */ vcid = undefined
-  /** @type {string} */ vinid = undefined
-  /** @type {string} */ readiness = undefined
+  /** @type {string} */ labelsFile
+  /** @type {string} */ partNumber
+  /** @type {string} */ component
+  /** @type {string} */ revision
+  /** @type {string} */ serial
+  /** @type {string} */ coding
+  /** @type {string} */ codingWsc
+  /** @type {string} */ vcid
+  /** @type {string} */ vinid
+  /** @type {string} */ readiness
 
   constructor () {
     super()
@@ -229,9 +229,9 @@ class ModuleInfo extends Committable {
  * A module subsystem.
  */
 class Subsystem extends Committable {
-  /** @type {integer} */ index = undefined
-  /** @type {string} */ partNumber = undefined
-  /** @type {string} */ component = undefined
+  /** @type {integer} */ index
+  /** @type {string} */ partNumber
+  /** @type {string} */ component
 
   /** @type {string?} */ labelsFile = null
   /** @type {string?} */ coding = null
@@ -247,13 +247,13 @@ class Subsystem extends Committable {
  * A fault related to a control module.
  */
 class Fault extends Committable {
-  /** @type {string} */ code = undefined
-  /** @type {string} */ subject = undefined
+  /** @type {string} */ code
+  /** @type {string} */ subject
 
   /** @type {string?} */ errorCode = null
 
-  /** @type {string} */ descriptionCode = undefined
-  /** @type {string} */ description = undefined
+  /** @type {string} */ descriptionCode
+  /** @type {string} */ description
 
   /** @type {FreezeFrame?} */ freezeFrame = null
 
@@ -267,12 +267,12 @@ class Fault extends Committable {
  * Information collected when a fault occurs.
  */
 class FreezeFrame extends Committable {
-  /** @type {string} */ status = undefined
-  /** @type {integer} */ priority = undefined
-  /** @type {integer} */ frequency = undefined
-  /** @type {integer} */ resetCounter = undefined
-  /** @type {integer} */ mileage = undefined
-  /** @type {string} */ timeIndication = undefined
+  /** @type {string} */ status
+  /** @type {integer} */ priority
+  /** @type {integer} */ frequency
+  /** @type {integer} */ resetCounter
+  /** @type {integer} */ mileage
+  /** @type {string} */ timeIndication
 
   constructor () {
     super()
