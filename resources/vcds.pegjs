@@ -257,7 +257,7 @@ moduleInfo
 
 */
 partNumber 'a part number'
-  = type:partType _ group:partGroup subgroup:partSubgroup _ number:partSpecNumber modificationCode:(_ @partModifCode)?
+  = type:type _ group:partGroup subgroup:partSubgroup _ number:partSpecNumber modificationCode:(_ @partModifCode)?
   {
     const pn = new PartNumber()
 
@@ -271,7 +271,6 @@ partNumber 'a part number'
 
     return pn
   }
-partType 'the system type number of a part number' = $uppnum|3|
 partGroup 'the main group of a part number' = dec
 partSubgroup 'the subgroup of a part number' = $dec|2|
 partSpecNumber 'the specific number of a part' = $dec|3|
