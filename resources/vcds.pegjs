@@ -41,7 +41,7 @@ report
     l
     'VIN:' _ vin:vin _+ 'License Plate:' _ licensePlate:( $licensePlate )? eol
     l+
-    'Chassis Type:' _ chassis:chassis eol
+    'Chassis Type:' _ chassis:chassis _ '(' type:type ')' eol
     'Scan:' rol eol // ignore module addresses list
     l
     'VIN:' _ vin _+ 'Mileage:' _ mileage:mileage eol
@@ -63,6 +63,7 @@ report
     r.mileage = mileage
     r.licensePlate = licensePlate
     r.chassis = chassis
+    r.type = type
   }
 
 datetime
@@ -108,7 +109,9 @@ vin 'a VIN (Vehicule Identification Number)'
 licensePlate 'a license plate number'
   = $[A-Z0-9-]+
 chassis 'a VAG chassis code'
-  = @$uppnum|2| _ '(' uppnum+ ')'
+  = @$uppnum|2|
+type 'a VAG vehicle, engine or transmission type code'
+  = @$uppnum|3|
 mileage 'a mileage value in km and miles'
   = km:$dec+ 'km' '-' miles:$dec+ 'miles'
   {

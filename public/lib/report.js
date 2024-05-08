@@ -44,7 +44,13 @@ class Report extends Committable {
   /** @type {string} */ vin = undefined
   /** @type {string?} */ licensePlate = null
   /** @type {string} */ chassis = undefined
+  /** @type {string} */ type = undefined
   /** @type {Mileage} */ mileage = undefined
+
+  constructor () {
+    super()
+    Object.seal(this)
+  }
 
   /** @type {[Module]} */ modules = []
 
@@ -72,6 +78,7 @@ class Duration extends Committable {
 
   constructor (minutes, seconds) {
     super()
+    Object.seal(this)
 
     this.minutes = minutes
     this.seconds = seconds
@@ -114,6 +121,7 @@ class Mileage extends Committable {
    */
   constructor (km, miles) {
     super()
+    Object.seal(this)
 
     this.km = km
     this.miles = miles
@@ -139,6 +147,11 @@ class Module extends Committable {
   /** @type {ModuleStatus} */ status = undefined
 
   /** @type {ModuleInfo?} */ info = null
+
+  constructor () {
+    super()
+    Object.seal(this)
+  }
 
   /** @type {integer} */
   get decimalAddress () {
@@ -183,6 +196,7 @@ class ModuleStatus extends Committable {
    */
   constructor (flags) {
     super()
+    Object.seal(this)
 
     this.flags = flags
   }
@@ -204,6 +218,11 @@ class ModuleInfo extends Committable {
   /** @type {string} */ vcid = undefined
   /** @type {string} */ vinid = undefined
   /** @type {string} */ readiness = undefined
+
+  constructor () {
+    super()
+    Object.seal(this)
+  }
 }
 
 /**
@@ -217,6 +236,11 @@ class Subsystem extends Committable {
   /** @type {string?} */ labelsFile = null
   /** @type {string?} */ coding = null
   /** @type {string?} */ codingWsc = null
+
+  constructor () {
+    super()
+    Object.seal(this)
+  }
 }
 
 /**
@@ -232,6 +256,11 @@ class Fault extends Committable {
   /** @type {string} */ description = undefined
 
   /** @type {FreezeFrame?} */ freezeFrame = null
+
+  constructor () {
+    super()
+    Object.seal(this)
+  }
 }
 
 /**
@@ -244,6 +273,11 @@ class FreezeFrame extends Committable {
   /** @type {integer} */ resetCounter = undefined
   /** @type {integer} */ mileage = undefined
   /** @type {string} */ timeIndication = undefined
+
+  constructor () {
+    super()
+    Object.seal(this)
+  }
 }
 
 export { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, Report, Subsystem }
