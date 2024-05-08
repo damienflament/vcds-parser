@@ -32,15 +32,11 @@ class Committable {
  * A VCDS report.
  */
 class Report extends Committable {
-  /** @type {string} */ softwareVersion
-  /** @type {string} */ softwarePlatform
-  /** @type {string} */ dataVersion
-  /** @type {string} */ dataVersionDate
-
   /** @type {Date} */ date
   /** @type {Duration} */ duration
   /** @type {string?} */ shop = null
 
+  /** @type {Software} */ software
   /** @type {Vehicle} */ vehicle
 
   constructor () {
@@ -82,6 +78,21 @@ class Duration extends Committable {
 }
 
 /**
+ * VCDS version and platform information.
+ */
+class Software extends Committable {
+  /** @type {string} */ version
+  /** @type {string} */ platform
+  /** @type {string} */ dataVersion
+  /** @type {string} */ dataDate
+
+  constructor () {
+    super()
+    Object.seal(this)
+  }
+}
+
+/**
  * A vehicle information.
  */
 class Vehicle extends Committable {
@@ -91,7 +102,7 @@ class Vehicle extends Committable {
   /** @type {string} */ type
   /** @type {Mileage} */ mileage
 
-  constructor (km, miles) {
+  constructor () {
     super()
     Object.seal(this)
   }
@@ -319,4 +330,4 @@ class FreezeFrame extends Committable {
   }
 }
 
-export { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Subsystem, Vehicle }
+export { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Software, Subsystem, Vehicle }

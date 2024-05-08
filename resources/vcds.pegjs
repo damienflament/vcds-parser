@@ -1,6 +1,6 @@
 /* Peggy grammar to parse VSCD scan reports. */
 {{
-  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Subsystem, Vehicle } from './report.js'
+  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Software, Subsystem, Vehicle } from './report.js'
 
   function string(str) {
     str = str.trim()
@@ -54,11 +54,16 @@ report
   {
     r.date = date
     r.duration = duration
-    r.softwareVersion = version
-    r.softwarePlatform = platform
-    r.dataVersionDate = dataDate
-    r.dataVersion = dataVersion
     r.shop = shop
+
+    const s = new Software()
+    s.version = version
+    s.platform = platform
+    s.dataVersion = dataVersion
+    s.dataDate = dataDate
+    s.commit()
+
+    r.software = s
 
     const v = new Vehicle()
     v.vin = vin

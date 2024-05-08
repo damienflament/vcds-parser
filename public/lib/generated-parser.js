@@ -4,7 +4,7 @@
 
 
 
-  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Subsystem, Vehicle } from './report.js'
+  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Software, Subsystem, Vehicle } from './report.js'
 
   function string(str) {
     str = str.trim()
@@ -437,11 +437,16 @@ function peg$parse(input, options) {
   var peg$f1 = function(date, version, platform, dataDate, dataVersion, shop, vin, licensePlate, chassis, type, mileage, duration) {
     r.date = date
     r.duration = duration
-    r.softwareVersion = version
-    r.softwarePlatform = platform
-    r.dataVersionDate = dataDate
-    r.dataVersion = dataVersion
     r.shop = shop
+
+    const s = new Software()
+    s.version = version
+    s.platform = platform
+    s.dataVersion = dataVersion
+    s.dataDate = dataDate
+    s.commit()
+
+    r.software = s
 
     const v = new Vehicle()
     v.vin = vin
