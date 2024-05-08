@@ -4,7 +4,7 @@ import bulma from '../bulma.js'
 import van from '../van.js'
 
 const { div, pre, p, strong } = van.tags
-const { Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Message, MessageHeader, MessageBody, Tag } = bulma.elements
+const { Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Icon, Message, MessageHeader, MessageBody, Tag } = bulma.elements
 
 const stringify = d => JSON.stringify(d, null, 4)
 
@@ -71,8 +71,9 @@ const ModuleComponent = module => {
   return Card(
     CardHeader({ class: 'is-clickable', onclick: () => { opened.val = !opened.val } },
       CardHeaderTitle(
-        Tag({ class: module.isFaulty ? 'is-danger' : 'is-success' }, module.address),
-        p({ class: 'ml-3' }, module.name)
+        Tag({ class: [module.isFaulty ? 'is-danger' : 'is-success', 'mr-2'] }, module.address),
+        p({ class: 'is-flex-grow-1' }, module.name),
+        Icon({ class: module.isReachable ? '' : 'has-text-danger' }, FontAwesome('plug'))
       ),
       CardHeaderIcon(
         () => FontAwesome(opened.val ? 'angle-up' : 'angle-down')
