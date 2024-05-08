@@ -67,13 +67,23 @@ const buildElementTag = (name) => (...args) => {
     tag = div
   }
 
-  // Take care of function as class value
-  if (props.class instanceof Function) {
-    const previousFunction = props.class
+  switch (true) {
+    // Take care of function as class value
+    case props.class instanceof Function: {
+      const _class = props.class
 
-    props.class = () => van.classes(elementClassName, previousFunction())
-  } else {
-    props.class = van.classes(elementClassName, props.class ?? '')
+      props.class = () => van.classes(elementClassName, _class())
+      break
+    }
+
+    // Take care of classes array
+    case props.class instanceof Array:
+      props.class = van.classes(elementClassName, ...props.class)
+      break
+
+    default:
+      props.class = van.classes(elementClassName, props.class ?? '')
+      break
   }
 
   return tag(props, ...children)
