@@ -1,6 +1,6 @@
 /* Peggy grammar to parse VSCD scan reports. */
 {{
-  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, Report, Subsystem } from './report.js'
+  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Subsystem } from './report.js'
 
   function string(str) {
     str = str.trim()
@@ -159,7 +159,7 @@ moduleInfo
         _|3| partNumber:(
             'Part No:' _ @partNumber
             /
-            'Part No' _ 'SW:' _ software:partNumber _+ 'HW:' _ hardware:( partNumber / 'Hardware No' ) rol // 'Hardware No' value may be a bug
+            'Part No' _ 'SW:' _ software:partNumber _+ 'HW:' _ hardware:( partNumber / 'Hardware No' { return null } ) rol // 'Hardware No' value may be a bug
             { return { software, hardware } }
           ) eol
         _|3| 'Component:' _ component:$rol eol
@@ -206,7 +206,67 @@ moduleInfo
       )
     l
 
-partNumber 'a part number' = $( uppnum|3| _ dec|3| _ dec|3| (_ upp)? )
+
+/*
+  Part Number
+  ===========
+
+  see https://blog.europaparts.com/audi-vw-part-numbers-demystified/
+
+  Main group
+  ----------
+
+  1   Engine
+  2   Gas Tank, Lines, Exhaust, Heater
+  3   Transmission
+  4   Front Axle, Differential, Steering
+  5   Rear Suspension
+  6   Wheels and Brakes
+  7   Hand and Foot Levers/Pedals, Safety Covers
+  8   Body Parts and Interior Trim
+  9   Electrical and Electrical Systems
+  0  Accessories (Jacks, Tools, Stickers, and Radio Equipment)
+
+  Subgroup
+  --------
+
+  98  repair kit
+
+  Specific number
+  ---------------
+
+  0XX   major assembly
+
+  XXy   y is even:  left side
+        y is odd:   right side
+
+  Modification code
+  -----------------
+
+  X   re-manufactured part
+
+*/
+partNumber 'a part number'
+  = type:partType _ group:partGroup subgroup:partSubgroup _ number:partSpecNumber modificationCode:(_ @partModifCode)?
+  {
+    const pn = new PartNumber()
+
+    pn.type = type
+    pn.group = group
+    pn.subgroup = subgroup
+    pn.number = number
+    pn.modification = modificationCode
+
+    pn.commit()
+
+    return pn
+  }
+partType 'the system type number of a part number' = $uppnum|3|
+partGroup 'the main group of a part number' = dec
+partSubgroup 'the subgroup of a part number' = $dec|2|
+partSpecNumber 'the specific number of a part' = $dec|3|
+partModifCode 'the modification code of a part number' = upp
+
 codingValue 'a coding value' = $hexa+
 shopWsc 'a shop WSC' = $( shortShopWsc _ dec|3| _ dec|5| )
 shortShopWsc 'a short shop WSC' = $dec|5|

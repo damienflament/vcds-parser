@@ -209,7 +209,7 @@ class ModuleStatus extends Committable {
  */
 class ModuleInfo extends Committable {
   /** @type {string} */ labelsFile
-  /** @type {string} */ partNumber
+  /** @type {PartNumber} */ partNumber
   /** @type {string} */ component
   /** @type {string} */ revision
   /** @type {string} */ serial
@@ -222,6 +222,33 @@ class ModuleInfo extends Committable {
   constructor () {
     super()
     Object.seal(this)
+  }
+}
+
+/**
+ * A VAG part number.
+ *
+ * @see https://blog.europaparts.com/audi-vw-part-numbers-demystified/
+ */
+class PartNumber extends Committable {
+  /** @type {string} */ type
+  /** @type {integer} */ group
+  /** @type {integer} */ subgroup
+  /** @type {integer} */ number
+  /** @type {string} */ modification
+
+  constructor () {
+    super()
+    Object.seal(this)
+  }
+
+  toString () {
+    return [
+      this.type,
+      this.group + this.subgroup,
+      this.number,
+      this.modification
+    ].join(' ')
   }
 }
 
@@ -280,4 +307,4 @@ class FreezeFrame extends Committable {
   }
 }
 
-export { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, Report, Subsystem }
+export { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Subsystem }
