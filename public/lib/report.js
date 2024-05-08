@@ -41,11 +41,7 @@ class Report extends Committable {
   /** @type {Duration} */ duration
   /** @type {string?} */ shop = null
 
-  /** @type {string} */ vin
-  /** @type {string?} */ licensePlate = null
-  /** @type {string} */ chassis
-  /** @type {string} */ type
-  /** @type {Mileage} */ mileage
+  /** @type {Vehicle} */ vehicle
 
   constructor () {
     super()
@@ -82,6 +78,22 @@ class Duration extends Committable {
 
     this.minutes = minutes
     this.seconds = seconds
+  }
+}
+
+/**
+ * A vehicle information.
+ */
+class Vehicle extends Committable {
+  /** @type {string} */ vin
+  /** @type {string?} */ licensePlate = null
+  /** @type {string} */ chassis
+  /** @type {string} */ type
+  /** @type {Mileage} */ mileage
+
+  constructor (km, miles) {
+    super()
+    Object.seal(this)
   }
 }
 
@@ -235,7 +247,7 @@ class PartNumber extends Committable {
   /** @type {integer} */ group
   /** @type {integer} */ subgroup
   /** @type {integer} */ number
-  /** @type {string} */ modification
+  /** @type {string} */ modification = null
 
   constructor () {
     super()
@@ -307,4 +319,4 @@ class FreezeFrame extends Committable {
   }
 }
 
-export { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Subsystem }
+export { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Subsystem, Vehicle }
