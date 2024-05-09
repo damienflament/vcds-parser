@@ -16,6 +16,10 @@
     return parseInt(str)
   }
 
+  function binary(str) {
+    return parseInt(str, 2)
+  }
+
 }}
 
 {
@@ -137,7 +141,8 @@ moduleStatus
     m.address = address
     m.name = string(name)
 
-    m.status = new ModuleStatus(flags)
+    m.status = new ModuleStatus()
+    m.status.flags = binary(flags)
     m.status.description = string(description)
     m.status.commit()
 

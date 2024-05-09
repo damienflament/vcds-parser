@@ -183,7 +183,7 @@ class Module extends Committable {
 
   /** @type {boolean} */
   get isFaulty () {
-    return Number.parseInt(this.status.flags, 2) !== 0
+    return !this.status.isWorking()
   }
 
   /** @type {[Subsystem]} */ subsystems = []
@@ -211,17 +211,21 @@ class Module extends Committable {
  * The status of a module.
  */
 class ModuleStatus extends Committable {
-  /** @type {string} */ flags
+  /** @type {integer} */ flags
   /** @type {string} */ description
 
-  /**
-   * @param {string} flags
-   */
-  constructor (flags) {
+  static OK = 0b0000 // OK
+  static MALFUNCTION = 0b0010 // Malfunction
+  static UNREACHABLE = 0b1100 // Cannot be reached
+  static COM_ERROR = 0b1000 // Sporadic communication error
+
+  constructor () {
     super()
     Object.seal(this)
+  }
 
-    this.flags = flags
+  isWorking () {
+    return this.flags === ModuleStatus.OK
   }
 }
 
