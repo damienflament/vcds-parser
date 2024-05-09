@@ -7,7 +7,7 @@ import bulma from '../bulma.js'
 import van from '../van.js'
 
 const { div, p } = van.tags
-const { Button, Delete, Level, LevelLeft, LevelItem, Notification } = bulma.elements
+const { Button, Content, Delete, Notification } = bulma.elements
 
 /**
  * An area to display notifications.
@@ -37,19 +37,15 @@ const NotificationComponent = (
     ? null
     : Notification(
       Delete({ onclick: () => { removed.val = true } }),
-      Level(
-        LevelLeft(
-          LevelItem(p(message)),
-          LevelItem(
-            Button({
-              class: 'is-primary',
-              onclick: () => {
-                callback()
-                removed.val = true
-              }
-            }, buttonLabel)
-          )
-        )
+      Content({ class: 'is-flex is-align-items-baseline' },
+        p(message),
+        Button({
+          class: 'is-primary mx-3',
+          onclick: () => {
+            callback()
+            removed.val = true
+          }
+        }, buttonLabel)
       )
     )
 }
