@@ -56,12 +56,11 @@ const generate = async (schemaPath, validatorPath) =>
     .then(() => {
       console.log('  done.')
     })
+    .catch(e => {
+      console.error(e)
+    })
 
-try {
-  await generate(SCHEMA, VALIDATOR)
-} catch (e) {
-  console.error(e)
-}
+await generate(SCHEMA, VALIDATOR)
 
 if (watching) {
   console.log('> Watching for changes on schema')
@@ -71,10 +70,6 @@ if (watching) {
   for await (const ev of watcher) {
     console.log(`  Changes occur on schema ${ev.filename}`)
 
-    try {
-      generate(SCHEMA, VALIDATOR)
-    } catch (e) {
-      console.error(e)
-    }
+    generate(SCHEMA, VALIDATOR)
   }
 }
