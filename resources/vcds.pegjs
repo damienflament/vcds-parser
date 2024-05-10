@@ -160,7 +160,8 @@ moduleInfo
           eol
 
         _|3| partNumber:(
-            'Part No:' _ @partNumber
+            'Part No:' _ hardware:partNumber
+            { return { software: null, hardware } }
             /
             'Part No' _ 'SW:' _ software:partNumber _+ 'HW:' _ hardware:( partNumber / 'Hardware No' { return null } ) rol // 'Hardware No' value may be a bug
             { return { software, hardware } }
