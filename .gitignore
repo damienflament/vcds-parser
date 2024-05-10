@@ -1,4 +1,3 @@
 /node_modules/
 
-/public/lib/generated-parser.js
-/public/lib/generated-validator.js
+/public/generated/

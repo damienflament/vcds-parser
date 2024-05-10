@@ -3,8 +3,8 @@
  * @module
  */
 
-import { SyntaxError, parse as _parse } from './generated-parser.js'
-import { validate } from './generated-validator.js'
+import { SyntaxError, parse as _parse } from '../generated/parser.js'
+import { validate } from '../generated/validator.js'
 
 const showControlCharacters = string =>
   string.replaceAll('\r', '␍')
@@ -75,5 +75,4 @@ const parse = content => {
   }
 }
 
-export { SyntaxError } from './generated-parser.js'
-export { parse }
+export { SyntaxError, parse }

@@ -1,6 +1,6 @@
 /* Peggy grammar to parse VSCD scan reports. */
 {{
-  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Software, Subsystem, Vehicle } from './report.js'
+  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Software, Subsystem, Vehicle } from '../lib/report.js'
 
   function string(str) {
     str = str.trim()

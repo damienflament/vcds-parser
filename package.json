@@ -22,10 +22,10 @@
     "lint": "yarn standard | yarn snazzy",
     "configure": "node scripts/configure.mjs",
     "version": "yarn configure && git add -A public/",
-    "parser": "yarn peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs",
-    "parser-dev": "yarn peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs --watch",
-    "validator": "node scripts/generate-validator.mjs",
-    "validator-dev": "node scripts/generate-validator.mjs --dev --watch"
+    "generate-parser": "yarn peggy -o public/generated/parser.js --format es resources/vcds.pegjs",
+    "watch-parser": "yarn peggy -o public/generated/parser.js --format es resources/vcds.pegjs --watch",
+    "generate-validator": "node scripts/generate-validator.mjs",
+    "watch-validator": "node scripts/generate-validator.mjs --dev --watch"
   },
   "devDependencies": {
     "ajv": "^8.13.0",
@@ -38,8 +38,8 @@
   "standard": {
     "ignore": [
       "**/vendor/",
-      "public/lib/generated-parser.js",
-      "public/lib/generated-validator.js"
+      "public/generated/parser.js",
+      "public/generated/validator.js"
     ],
     "globals": [
       "FileReader"
