@@ -14,19 +14,16 @@
     "email": "damien.flament@gmx.com"
   },
   "license": "ISC",
-  "browser": "app/index.html",
-  "directories": {
-    "lib": "lib"
-  },
+  "browser": "public/index.html",
   "scripts": {
     "start": "caddy start",
     "stop": "caddy stop",
     "serve": "caddy run",
-    "lint": "npx standard | npx snazzy",
+    "lint": "yarn standard | yarn snazzy",
     "configure": "node scripts/configure.mjs",
-    "version": "npm run configure && git add -A public/",
-    "parser": "npx peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs",
-    "parser-dev": "npx peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs --watch",
+    "version": "yarn configure && git add -A public/",
+    "parser": "yarn peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs",
+    "parser-dev": "yarn peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs --watch",
     "validator": "node scripts/generate-validator.mjs",
     "validator-dev": "node scripts/generate-validator.mjs --dev --watch"
   },
