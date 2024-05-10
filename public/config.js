@@ -20,6 +20,7 @@ export default {
     '/lib/configuration.js',
     '/lib/filesystem.js',
     '/lib/generated-parser.js',
+    '/lib/generated-validator.js',
     '/lib/parser.js',
     '/lib/report.js',
     '/lib/serviceworker.js',

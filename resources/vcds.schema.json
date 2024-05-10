@@ -1,0 +1,405 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "/vcds/report",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "date": {
+            "type": "string"
+        },
+        "duration": {
+            "$ref": "#/definitions/duration"
+        },
+        "shop": {
+            "type": [
+                "string",
+                "null"
+            ],
+            "minLength": 1
+        },
+        "software": {
+            "$ref": "#/definitions/software"
+        },
+        "vehicle": {
+            "$ref": "#/definitions/vehicle"
+        },
+        "modules": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/module"
+            },
+            "uniqueItems": true
+        }
+    },
+    "required": [
+        "date",
+        "duration",
+        "shop",
+        "software",
+        "vehicle",
+        "modules"
+    ],
+    "definitions": {
+        "duration": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "minutes": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 59
+                },
+                "seconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 59
+                }
+            },
+            "required": [
+                "minutes",
+                "seconds"
+            ]
+        },
+        "mileage": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "km": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "miles": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "km",
+                "miles"
+            ]
+        },
+        "software": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "version": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "platform": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "dataVersion": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "dataDate": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            },
+            "required": [
+                "version",
+                "platform",
+                "dataVersion",
+                "dataDate"
+            ]
+        },
+        "vehicle": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "vin": {
+                    "$comment": "a VIN of 17 characters",
+                    "type": "string",
+                    "minLength": 17,
+                    "maxLength": 17
+                },
+                "licensePlate": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "minLength": 1
+                },
+                "chassis": {
+                    "$comment": "a vehicule chassis type, like '8P'",
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 3
+                },
+                "type": {
+                    "$comment": "a system type, like '1K0'",
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 3
+                },
+                "mileage": {
+                    "$ref": "#/definitions/mileage"
+                }
+            },
+            "required": [
+                "vin",
+                "licensePlate",
+                "chassis",
+                "type",
+                "mileage"
+            ]
+        },
+        "module": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "address": {
+                    "$comment": "hexadecimal value on 2 bytes, but ordered natural as a string",
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 2
+                },
+                "isReachable": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "status": {
+                    "$ref": "#/definitions/status"
+                },
+                "info": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "$ref": "#/definitions/info"
+                },
+                "subsystems": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/subsystem"
+                    },
+                    "uniqueItems": true
+                },
+                "faults": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fault"
+                    },
+                    "uniqueItems": true
+                }
+            },
+            "required": [
+                "address",
+                "isReachable",
+                "name",
+                "status",
+                "info",
+                "subsystems",
+                "faults"
+            ]
+        },
+        "status": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "flags": {
+                    "$comment": "4 bits",
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 15
+                },
+                "description": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            },
+            "required": [
+                "flags",
+                "description"
+            ]
+        },
+        "info": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "labelsFile": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "partNumber": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "component": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "revision": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "serial": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "coding": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "codingWsc": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "vcid": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "vinid": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "readiness": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            },
+            "required": [
+                "labelsFile",
+                "partNumber",
+                "component",
+                "revision",
+                "serial",
+                "coding",
+                "codingWsc",
+                "vcid",
+                "vinid",
+                "readiness"
+            ]
+        },
+        "subsystem": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "index": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "partNumber": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "component": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "labelsFile": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "minLength": 1
+                },
+                "coding": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "minLength": 1
+                },
+                "codingWsc": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "minLength": 1
+                }
+            },
+            "required": [
+                "index",
+                "partNumber",
+                "component",
+                "labelsFile",
+                "coding",
+                "codingWsc"
+            ]
+        },
+        "fault": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "subject": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "errorCode": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "minLength": 1
+                },
+                "descriptionCode": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "description": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "freezeFrame": {
+                    "$ref": "#/definitions/freezeFrame"
+                }
+            },
+            "required": [
+                "code",
+                "subject",
+                "errorCode",
+                "descriptionCode",
+                "description",
+                "freezeFrame"
+            ]
+        },
+        "freezeFrame": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "priority": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "frequency": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "resetCounter": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "mileage": {
+                    "$ref": "#/definitions/mileage"
+                },
+                "timeIndication": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "status",
+                "priority",
+                "frequency",
+                "resetCounter",
+                "mileage",
+                "timeIndication"
+            ]
+        }
+    }
+}

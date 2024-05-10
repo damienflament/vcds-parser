@@ -22,14 +22,14 @@ const jsonOptions = { spaces: 2 }
 
 fs.readJson(PACKAGE).then(info => {
   fs.readJson(MANIFEST).then(manifest => {
-    console.log('Updating manifest...')
+    console.log('> Updating manifest')
 
     manifest.description = info.description
 
     return fs.writeJson(MANIFEST, manifest, jsonOptions)
   })
 
-  console.log('Generating config...')
+  console.log('> Generating config')
 
   const config = {
     version: info.version,

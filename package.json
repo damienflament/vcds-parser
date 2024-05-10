@@ -26,9 +26,12 @@
     "configure": "node scripts/configure.mjs",
     "version": "npm run configure && git add -A public/",
     "parser": "npx peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs",
-    "parser-dev": "npx peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs --watch"
+    "parser-dev": "npx peggy -o public/lib/generated-parser.js --format es resources/vcds.pegjs --watch",
+    "validator": "node scripts/generate-validator.mjs",
+    "validator-dev": "node scripts/generate-validator.mjs --dev --watch"
   },
   "devDependencies": {
+    "ajv": "^8.13.0",
     "fs-extra": "^11.2.0",
     "klaw-sync": "^6.0.0",
     "peggy": "^4.0.2",
@@ -38,7 +41,8 @@
   "standard": {
     "ignore": [
       "**/vendor/",
-      "public/lib/generated-parser.js"
+      "public/lib/generated-parser.js",
+      "public/lib/generated-validator.js"
     ],
     "globals": [
       "FileReader"
