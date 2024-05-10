@@ -120,7 +120,7 @@ type 'a VAG vehicle, engine or transmission type code'
   = @$uppnum|3|
 mileage 'a mileage value in km and miles'
   = km:$dec+ 'km' '-' miles:$dec+ 'miles'
-  { return { km, miles } }
+  { return { km: integer(km), miles: integer(miles) } }
 
 moduleStatus
   = address:moduleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$[^01]+ flags:$bin|4| eol
