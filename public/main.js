@@ -10,6 +10,7 @@ import { listDirectory, loadFileContent, requestPermission } from './lib/filesys
 import { parse } from './lib/parser.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
+import { validate } from './lib/validator.js'
 import van from './lib/van.js'
 
 /** Application configuration */
@@ -109,7 +110,8 @@ const App = () => {
   const report = van.derive(() => {
     if (reportSource.val) {
       try {
-        return parse(reportSource.val)
+        const data = parse(reportSource.val)
+        validate(data)
       } catch (e) {
         return e
       }

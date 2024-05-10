@@ -1,10 +1,9 @@
 /**
- * VCDS reports parser.
+ * VCDS report parsing.
  * @module
  */
 
 import { SyntaxError, parse as _parse } from '../generated/parser.js'
-import validate from '../generated/validator.js'
 
 const showControlCharacters = string =>
   string.replaceAll('\r', '␍')
@@ -51,24 +50,15 @@ ${showControlCharacters(contextAfter)}␊
 }
 
 /**
- * Parse the given report content.
+ * Parses the given report content.
  *
- * @param {string} content the report content
+ * @param {string} content
  * @returns {import('./report.js').Report} the built report
  * @throws {SyntaxError} when Peggy throws an error on parsing
  */
 const parse = content => {
   try {
-    const data = _parse(content)
-
-    if (validate(data)) {
-      console.log('Data validated')
-    } else {
-      console.log('Failed to validate data')
-      console.log(validate.errors)
-    }
-
-    return data
+    return _parse(content)
   } catch (e) {
     if (e instanceof SyntaxError) {
       e.stack = describeErrorContext(content, e)

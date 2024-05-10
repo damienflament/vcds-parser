@@ -26,6 +26,7 @@ export default {
     '/lib/serviceworker.js',
     '/lib/storage.js',
     '/lib/string.js',
+    '/lib/validator.js',
     '/lib/van.js',
     '/main.js',
     '/sw.js',
