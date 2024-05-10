@@ -1,7 +1,5 @@
 /* Peggy grammar to parse VSCD scan reports. */
 {{
-  import { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Software, Subsystem, Vehicle } from '../lib/report.js'
-
   function string(str) {
     str = str.trim()
 
@@ -23,16 +21,10 @@
 }}
 
 {
-  const r = new Report()
-  let m = null
 }
 
 start
   = report
-  {
-    r.commit()
-    return r
-  }
 
 report
   = date:datetime eol
@@ -50,50 +42,50 @@ report
     l
     'VIN:' _ vin _+ 'Mileage:' _ mileage:mileage eol
     l
-    moduleStatus+
+    modules:moduleStatus+
     l+
-    moduleInfo+
+    modulesInfos:moduleInfo+
     'End' '-'+ '(Elapsed Time:' _ duration:duration ')' '-'+ '\r\n'
 
   {
-    r.date = date
-    r.duration = duration
-    r.shop = shop
+    const mappedInfos = new Map()
 
-    const s = new Software()
-    s.version = version
-    s.platform = platform
-    s.dataVersion = dataVersion
-    s.dataDate = dataDate
-    s.commit()
+    modulesInfos.forEach(infos => {
+      mappedInfos.set(infos.address, infos)
+    });
 
-    r.software = s
+    modules = modules.map(module => Object.assign(
+      module,
+      mappedInfos.get(module.address)
+    ))
 
-    const v = new Vehicle()
-    v.vin = vin
-    v.mileage = mileage
-    v.licensePlate = licensePlate
-    v.chassis = chassis
-    v.type = type
-    v.commit()
-
-    r.vehicle = v
+    return {
+      date,
+      duration,
+      shop,
+      software: {
+        version,
+        platform,
+        dataVersion,
+        dataDate
+      },
+      vehicle: {
+        vin,
+        licensePlate,
+        chassis,
+        type,
+        mileage
+      },
+      modules
+    }
   }
 
 datetime
   = dayName ',' day ',' monthName ',' year ',' hours ':' minutes ':' seconds ':00009'
-  {
-    const d = new Date(text())
-    Object.freeze(d)
-    return d
-  }
+  { return new Date(text()) }
 duration
   = minutes:$minutes ':' seconds:$seconds
-  {
-    const d = new Duration(integer(minutes), integer(seconds))
-    d.commit()
-    return d
-  }
+  { return { minutes: integer(minutes), seconds: integer(seconds) } }
 dayName 'the name of a week day'
   = 'Monday' / 'Tuesday' / 'Wednesday' / 'Thursday' / 'Friday' / 'Saturday' /
     'Sunday'
@@ -128,47 +120,43 @@ type 'a VAG vehicle, engine or transmission type code'
   = @$uppnum|3|
 mileage 'a mileage value in km and miles'
   = km:$dec+ 'km' '-' miles:$dec+ 'miles'
-  {
-    const m = new Mileage(km, miles)
-    m.commit()
-    return m
-  }
+  { return { km, miles } }
 
 moduleStatus
   = address:moduleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$[^01]+ flags:$bin|4| eol
   {
-    m = new Module()
-    m.address = address
-    m.name = string(name)
-
-    m.status = new ModuleStatus()
-    m.status.flags = binary(flags)
-    m.status.description = string(description)
-    m.status.commit()
-
-    r.addModule(m)
+    return {
+      address,
+      name: string(name),
+      status: {
+        flags: binary(flags),
+        description: string(description)
+      }
+    }
   }
 moduleAddress 'a module address' = $dec|2|
 
 moduleInfo
   = dashLine
     'Address' _ address:moduleAddress ':'
-      infos:(
+      info:(
           [^\r]+ // ignore module name
           eol
           'Cannot be reached' eol
           {
-            const m = r.getModule(address)
-
-            m.isReachable = false
-
-            m.commit()
+            return {
+              address,
+              isReachable: false,
+              info: null,
+              subsystems: [],
+              faults: []
+            }
           }
       /
           [^:]+ // ignore module name
           ':'
           '.'? // this dot '.' just after the colon ':' may be a bug
-          _ labels:$rol
+          _ labelsFile:$rol
           eol
 
         _|3| partNumber:(
@@ -189,37 +177,28 @@ moduleInfo
         faults:faultsSection
         readiness:( 'Readiness:' _ @readiness eol )?
         {
-          const m = r.getModule(address)
-
-          m.isReachable = true
-
-          m.info = new ModuleInfo()
-
-          m.info.labelsFile = labels
-          m.info.partNumber = partNumber
-          m.info.component = string(component)
-          m.info.revision = revision
-          m.info.serial = serial
-          m.info.coding = coding
-          m.info.codingWsc = codingWsc
-          m.info.vcid = vcid
-          m.info.vinid = vinid
-          m.info.readiness = readiness
-
-          m.info.commit()
-
-          for (const s of subsystems) {
-            m.addSubsystem(s)
+          return {
+            address,
+            isReachable: true,
+            info: {
+              labelsFile,
+              partNumber,
+              component: string(component),
+              revision,
+              serial,
+              coding,
+              codingWsc,
+              vcid,
+              vinid,
+              readiness
+            },
+            subsystems,
+            faults
           }
-
-          for (const f of faults) {
-            m.addFault(f)
-          }
-
-          m.commit()
         }
       )
     l
+    { return info }
 
 
 /*
@@ -263,19 +242,7 @@ moduleInfo
 */
 partNumber 'a part number'
   = type:type _ group:partGroup subgroup:partSubgroup _ number:partSpecNumber modificationCode:(_ @partModifCode)?
-  {
-    const pn = new PartNumber()
-
-    pn.type = type
-    pn.group = group
-    pn.subgroup = subgroup
-    pn.number = number
-    pn.modification = modificationCode
-
-    pn.commit()
-
-    return pn
-  }
+  { return text() }
 partGroup 'the main group of a part number' = dec
 partSubgroup 'the subgroup of a part number' = $dec|2|
 partSpecNumber 'the specific number of a part' = $dec|3|
@@ -289,25 +256,21 @@ vinid 'a VINID' = $hexa|34|
 readiness 'readiness flags' = $( bin|4| _ bin|4| )
 
 subsystem
-  = _|3| 'Subsystem' _ index:$dec+ _ '-' _ 'Part No:' _ partNumber:partNumber labels:( _+ 'Labels:' _ @$rol )? eol
+  = _|3| 'Subsystem' _ index:$dec+ _ '-' _ 'Part No:' _ partNumber:partNumber labelsFile:( _+ 'Labels:' _ @$rol )? eol
     _|3| 'Component:' _ component:$rol eol
     coding:( _|3| 'Coding:' _ @codingValue eol )?
-    wsc:( _|3| 'Shop #: WSC' _ @shortShopWsc rol eol )?
+    codingWsc:( _|3| 'Shop #: WSC' _ @shortShopWsc rol eol )?
     ( [A-Z0-9 ]i+ eol )? // ignore this line as it contains the same info as above
     l
   {
-    const s = new Subsystem()
-
-    s.index = integer(index)
-    s.partNumber = partNumber
-    s.component = string(component)
-    s.labelsFile = labels
-    s.coding = coding
-    s.codingWsc = wsc
-
-    s.commit()
-
-    return s
+    return {
+      index: integer(index),
+      partNumber,
+      component: string(component),
+      labelsFile,
+      coding,
+      codingWsc
+    }
   }
 
 faultsSection
@@ -325,18 +288,14 @@ fault
     _|12| errorCode:(@errorCode _ '-' _)? descriptionCode:faultDescCode _ '-' _ description:$rol eol
     freezeFrame:(freezeFrame)?
   {
-    const f = new Fault()
-
-    f.code = code
-    f.subject = string(subject)
-    f.errorCode = errorCode
-    f.descriptionCode = descriptionCode
-    f.description = description
-    f.freezeFrame = freezeFrame
-
-    f.commit()
-
-    return f
+    return {
+      code,
+      subject: string(subject),
+      errorCode,
+      descriptionCode,
+      description,
+      freezeFrame
+    }
   }
 
 errorCode 'error code' = $( 'P'? dec|4| )
@@ -351,27 +310,21 @@ freezeFrame
     _|20| 'Reset counter:' _ resetCounter:$dec+ eol
     _|20| 'Mileage:' _ value:$dec+
       _ mileage:(
-        'km' { return Mileage.fromKm(integer(value)) }
+        'km' { return { km: integer(value) } }
       /
-        'miles' { return Mileage.fromMiles(integer(value)) }
+        'miles' { return { miles: integer(value) } }
       ) eol
     _|20| 'Time Indication:' _ timeIndication:$dec eol
 l
   {
-    const ff = new FreezeFrame()
-
-    ff.status = status
-    ff.priority = integer(priority)
-    ff.frequency = integer(frequency)
-    ff.resetCounter = integer(resetCounter)
-    ff.timeIndication = timeIndication
-
-    mileage.commit()
-    ff.mileage = mileage
-
-    ff.commit()
-
-    return ff
+    return {
+      status,
+      priority: integer(priority),
+      frequency: integer(frequency),
+      resetCounter: integer(resetCounter),
+      mileage,
+      timeIndication: integer(timeIndication)
+    }
   }
 
 

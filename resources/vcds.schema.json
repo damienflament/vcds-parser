@@ -352,6 +352,10 @@
                     "minLength": 1
                 },
                 "freezeFrame": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
                     "$ref": "#/definitions/freezeFrame"
                 }
             },
