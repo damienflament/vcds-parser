@@ -20,12 +20,12 @@
     "stop": "caddy stop",
     "serve": "caddy run",
     "lint": "yarn standard | yarn snazzy",
-    "configure": "node scripts/configure.mjs",
+    "configure": "yarn node scripts/configure.mjs",
     "version": "yarn configure && git add -A public/",
     "generate-parser": "yarn peggy -o public/generated/parser.js --format es resources/vcds.pegjs",
     "watch-parser": "yarn peggy -o public/generated/parser.js --format es resources/vcds.pegjs --watch",
-    "generate-validator": "node scripts/generate-validator.mjs",
-    "watch-validator": "node scripts/generate-validator.mjs --dev --watch"
+    "generate-validator": "yarn node scripts/generate-validator.mjs",
+    "watch-validator": "yarn node scripts/generate-validator.mjs --dev --watch"
   },
   "devDependencies": {
     "ajv": "^8.13.0",
