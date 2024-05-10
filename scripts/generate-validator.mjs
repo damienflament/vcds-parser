@@ -26,6 +26,8 @@ const generate = async (schemaPath, validatorPath) =>
     .then(schema => {
       const ajv = new Ajv({
         strict: true,
+        allErrors: true,
+        verbose: true,
         code: {
           source: true
         }

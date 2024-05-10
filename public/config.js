@@ -21,6 +21,7 @@ export default {
     '/lib/components.js',
     '/lib/configuration.js',
     '/lib/filesystem.js',
+    '/lib/object.js',
     '/lib/parser.js',
     '/lib/report.js',
     '/lib/serviceworker.js',

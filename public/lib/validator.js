@@ -4,6 +4,8 @@
  */
 
 import _validation from '../generated/validator.js'
+import { typeOf } from './object.js'
+import { stringify } from './string.js'
 
 class ValidationError extends Error {
   name = 'ValidationError'
@@ -12,10 +14,14 @@ class ValidationError extends Error {
     super()
 
     const formattedErrors = errors
-      .map(({ schemaPath, instancePath, message }) =>
-`from schema ${schemaPath}:
-  ${instancePath} ${message}`
+      .map(({ schemaPath, instancePath, message, data }) =>
+`> ${instancePath} ${message}
+  on ${typeOf(data)}:
+${stringify(data, 2, 4)}
+  (from schema ${schemaPath})
+  `
       )
+      .join('\n')
 
     this.message = `${errors[0].instancePath} ${errors[0].message}`
     this.stack = formattedErrors
