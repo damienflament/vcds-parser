@@ -228,8 +228,28 @@
                     "minLength": 1
                 },
                 "partNumber": {
-                    "type": "string",
-                    "minLength": 1
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "software": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "minLength": 1
+                        },
+                        "hardware": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "minLength": 1
+                        }
+                    },
+                    "required": [
+                        "software",
+                        "hardware"
+                    ]
                 },
                 "component": {
                     "type": "string",
