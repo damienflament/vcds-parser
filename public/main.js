@@ -112,6 +112,8 @@ const App = () => {
       try {
         const data = parse(reportSource.val)
         validate(data)
+
+        return data
       } catch (e) {
         return e
       }
