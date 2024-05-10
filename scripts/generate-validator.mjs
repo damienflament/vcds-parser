@@ -10,28 +10,24 @@
 
 import Ajv from 'ajv'
 import standaloneCode from 'ajv/dist/standalone/index.js'
+import * as esbuild from 'esbuild'
 import fs from 'fs-extra'
 import { watch } from 'fs/promises'
-import { dirname, resolve } from 'path'
-import standard from 'standard'
+import { basename, dirname, resolve } from 'path'
 
 const args = process.argv.slice(2)
-const development = args.includes('--dev')
 const watching = args.includes('--watch')
 
 const SCHEMA = resolve(import.meta.dirname, '../resources/vcds.schema.json')
 const VALIDATOR = resolve(import.meta.dirname, '../public/generated/validator.js')
 
-const generate = async (schemaPath, validatorPath, development) =>
+const generate = async (schemaPath, validatorPath) =>
   fs.readJson(schemaPath)
     .then(schema => {
       const ajv = new Ajv({
         strict: true,
         code: {
-          source: true,
-          esm: true,
-          lines: development,
-          optimize: development ? 0 : 1
+          source: true
         }
       })
 
@@ -41,26 +37,25 @@ const generate = async (schemaPath, validatorPath, development) =>
       return standaloneCode(ajv, validator)
     })
     .then(code => {
-      if (development) {
-        console.log('> Formatting validator for development')
-
-        return standard.lintText(code, { fix: true })
-          .then(res => res[0].output)
-      } else {
-        return code
-      }
-    })
-    .then(code => {
-      console.log('> Generating validator')
-
-      return fs.ensureDir(dirname(validatorPath))
-        .then(() => fs.writeFile(validatorPath, code))
+      console.log('> Bundling validator for browser')
+      return esbuild.build({
+        stdin: {
+          contents: code,
+          resolveDir: dirname(validatorPath),
+          sourcefile: basename(validatorPath),
+          loader: 'js'
+        },
+        bundle: true,
+        format: 'esm',
+        outfile: validatorPath,
+        allowOverwrite: true
+      })
     })
     .then(() => {
-      console.log('> Bundling validator for browser')
+      console.log('  done.')
     })
 
-await generate(SCHEMA, VALIDATOR, development)
+await generate(SCHEMA, VALIDATOR)
 
 if (watching) {
   console.log('> Watching for changes on schema')
@@ -70,6 +65,6 @@ if (watching) {
   for await (const ev of watcher) {
     console.log(`  Changes occur on schema ${ev.filename}`)
 
-    generate(SCHEMA, VALIDATOR, development)
+    generate(SCHEMA, VALIDATOR)
   }
 }

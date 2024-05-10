@@ -4,7 +4,7 @@
  */
 
 import { SyntaxError, parse as _parse } from '../generated/parser.js'
-import { validate } from '../generated/validator.js'
+import validate from '../generated/validator.js'
 
 const showControlCharacters = string =>
   string.replaceAll('\r', '␍')
@@ -65,7 +65,10 @@ const parse = content => {
       console.log('Data validated')
     } else {
       console.log('Failed to validate data')
+      console.log(validate.errors)
     }
+
+    return data
   } catch (e) {
     if (e instanceof SyntaxError) {
       e.stack = describeErrorContext(content, e)
