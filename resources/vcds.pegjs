@@ -18,6 +18,12 @@
     return parseInt(str, 2)
   }
 
+  const KM_TO_MILES = 0.62137119223733
+
+  const milesFromKm = value => Math.trunc(value * KM_TO_MILES)
+
+  const kmFromMiles = value => Math.trunc(value / KM_TO_MILES)
+
 }}
 
 {
@@ -311,9 +317,9 @@ freezeFrame
     _|20| 'Reset counter:' _ resetCounter:$dec+ eol
     _|20| 'Mileage:' _ value:$dec+
       _ mileage:(
-        'km' { return { km: integer(value) } }
+        'km' { return { km: integer(value), miles: milesFromKm(value) } }
       /
-        'miles' { return { miles: integer(value) } }
+        'miles' { return { miles: integer(value), km: kmFromMiles(value) } }
       ) eol
     _|20| 'Time Indication:' _ timeIndication:$dec eol
 l
