@@ -256,15 +256,24 @@
                     "minLength": 1
                 },
                 "revision": {
-                    "type": "string",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "minLength": 1
                 },
                 "serial": {
-                    "type": "string",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "minLength": 1
                 },
                 "coding": {
-                    "type": "string",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "minLength": 1
                 },
                 "codingWsc": {
@@ -276,11 +285,17 @@
                     "minLength": 1
                 },
                 "vinid": {
-                    "type": "string",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "minLength": 1
                 },
                 "readiness": {
-                    "type": "string",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "minLength": 1
                 }
             },
