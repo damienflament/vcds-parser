@@ -168,11 +168,14 @@
                     "$ref": "#/definitions/status"
                 },
                 "info": {
-                    "type": [
-                        "object",
-                        "null"
-                    ],
-                    "$ref": "#/definitions/info"
+                    "anyOf": [
+                        {
+                            "type": "null"
+                        },
+                        {
+                            "$ref": "#/definitions/info"
+                        }
+                    ]
                 },
                 "subsystems": {
                     "type": "array",
