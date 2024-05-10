@@ -60,10 +60,12 @@ report
       mappedInfos.set(infos.address, infos)
     });
 
-    modules = modules.map(module => Object.assign(
-      module,
-      mappedInfos.get(module.address)
-    ))
+    modules = modules
+      .filter(module => module.address !== '00') // Remove special module 00 for now
+      .map(module => Object.assign(
+        module,
+        mappedInfos.get(module.address)
+      ))
 
     return {
       date,

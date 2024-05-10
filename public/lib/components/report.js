@@ -49,8 +49,6 @@ const Report = data => {
 
   return div(
     Object.values(modules).map(module => () => {
-      if (module.address === '00') return // Ignore special module 00 for now
-
       try {
         return ModuleComponent(module)
       } catch (e) {
