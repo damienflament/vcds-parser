@@ -32,15 +32,15 @@ ${stringify(data, 2, 4)}
  * Validates the given report data against the schema.
  *
  * @param {string} data
- * @return {boolean} true if the validation succeeds
+ * @return {PRomise<boolean>} true if the validation succeeds
  * @throws {ValidationError} when the validation fails
  */
-const validate = data => {
+const validate = data => new Promise((resolve, reject) => {
   if (!_validation(data)) {
-    throw new ValidationError(_validation.errors)
+    reject(new ValidationError(_validation.errors))
   }
 
-  return true
-}
+  resolve(data)
+})
 
 export { ValidationError, validate }

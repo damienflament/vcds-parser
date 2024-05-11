@@ -75,27 +75,31 @@ const App = () => {
           listDirectory(directory)
             .then((files) => {
               reports.val = []
-              isDirectoryOpen.val = true
 
               files.forEach(f => {
+                const report = sealed({
+                  filename: f.name,
+                  content: null,
+                  data: null,
+                  error: null
+                })
+
                 loadFileContent(f)
                   .then(c => {
-                    const report = {
-                      filename: f.name,
-                      content: c,
-                      data: null,
-                      error: null
-                    }
+                    report.content = c
 
-                    try {
-                      report.data = parse(c, f.name)
-                      validate(report.data)
-                    } catch (e) {
-                      report.error = e
-                    }
+                    return parse(c, f.name)
+                  })
+                  .then(d => {
+                    report.data = d
 
+                    validate(d)
+                  })
+                  .catch(e => { report.error = e })
+                  .finally(() => {
                     reports.val = reports.val.concat([report])
                     state.report.val ??= reports.val[0]
+                    isDirectoryOpen.val = true
                   })
               })
             })
@@ -134,7 +138,7 @@ const App = () => {
         name: directoryName,
         onsuccess: d => {
           state.directory.val = d
-          state.filename.val = null
+          state.report.val = null
         }
       }),
       Columns(

@@ -69,19 +69,19 @@ ${showControlCharacters(contextAfter)}␊
  * Parses the given report content.
  *
  * @param {string} content
- * @returns {Report} the built report
+ * @returns {Promise<Report>} the built report
  * @throws {ParsingError} when Peggy throws an error on parsing
  */
-const parse = (content, filename) => {
+const parse = (content, filename) => new Promise((resolve, reject) => {
   try {
-    return _parse(content, { filename })
+    resolve(_parse(content, { filename }))
   } catch (e) {
     if (e instanceof SyntaxError) {
-      throw new ParsingError(content, e)
+      reject((new ParsingError(content, e)))
     }
 
     throw e
   }
-}
+})
 
 export { ParsingError, parse }
