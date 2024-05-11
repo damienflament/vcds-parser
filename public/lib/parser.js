@@ -72,9 +72,9 @@ ${showControlCharacters(contextAfter)}␊
  * @returns {Report} the built report
  * @throws {ParsingError} when Peggy throws an error on parsing
  */
-const parse = content => {
+const parse = (content, filename) => {
   try {
-    return _parse(content)
+    return _parse(content, { filename })
   } catch (e) {
     if (e instanceof SyntaxError) {
       throw new ParsingError(content, e)

@@ -7,6 +7,7 @@ import bulma from './lib/bulma.js'
 import { DirectoryPicker, DualButton, FontAwesome, MenuItem, Navbar, Notification, NotificationArea, Report, ReportParseError, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
+import { frozen, sealed } from './lib/object.js'
 import { parse } from './lib/parser.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
@@ -14,10 +15,10 @@ import { validate } from './lib/validator.js'
 import van from './lib/van.js'
 
 /** Application configuration */
-const config = {
+const config = sealed({
   serviceWorker: true,
   persistence: true
-}
+})
 
 configureFromUrl(config, window.location.href)
 
@@ -30,11 +31,11 @@ if (config.serviceWorker) {
 
 const App = () => {
   /** Persisted state */
-  const state = {
+  const state = frozen({
     directory: van.state(null),
-    file: van.state(null),
+    report: van.state(null),
     isViewingSource: van.state(false)
-  }
+  })
 
   if (config.persistence) {
     const storage = new Storage(window.indexedDB)
@@ -50,15 +51,15 @@ const App = () => {
    */
   const isDirectoryOpen = van.state(false)
 
-  /** Current directory label */
+  /** Working directory label */
   const directoryName = van.derive(() =>
     isDirectoryOpen.val
       ? state.directory.val.name
       : 'Open a directory...'
   )
 
-  /** Current directory files */
-  const directoryFiles = van.state([])
+  /** Reports located in the working directory */
+  const reports = van.state([])
 
   /**
    * Opens the given directory.
@@ -73,9 +74,30 @@ const App = () => {
         case 'granted':
           listDirectory(directory)
             .then((files) => {
-              directoryFiles.val = files
+              reports.val = []
               isDirectoryOpen.val = true
-              state.file.val ??= files[0] ?? null
+
+              files.forEach(f => {
+                loadFileContent(f)
+                  .then(c => {
+                    const report = {
+                      filename: f.name,
+                      content: c,
+                      data: null,
+                      error: null
+                    }
+
+                    try {
+                      report.data = parse(c, f.name)
+                      validate(report.data)
+                    } catch (e) {
+                      report.error = e
+                    }
+
+                    reports.val = reports.val.concat([report])
+                    state.report.val ??= reports.val[0]
+                  })
+              })
             })
           break
 
@@ -96,32 +118,6 @@ const App = () => {
     }
   })
 
-  /** Report source */
-  const reportSource = van.state('')
-
-  van.derive(() => {
-    if (isDirectoryOpen.val && state.file.val) {
-      loadFileContent(state.file.val)
-        .then(c => { reportSource.val = c })
-    }
-  })
-
-  /** Report */
-  const report = van.derive(() => {
-    if (reportSource.val) {
-      try {
-        const data = parse(reportSource.val)
-        validate(data)
-
-        return data
-      } catch (e) {
-        return e
-      }
-    } else {
-      return ''
-    }
-  })
-
   /** Notification area */
   const notificationsArea = NotificationArea()
 
@@ -138,7 +134,7 @@ const App = () => {
         name: directoryName,
         onsuccess: d => {
           state.directory.val = d
-          state.file.val = null
+          state.filename.val = null
         }
       }),
       Columns(
@@ -146,11 +142,13 @@ const App = () => {
           Menu(
             MenuLabel('Files'),
             () => MenuList(
-              directoryFiles.val.map(f =>
+              reports.val.map((r) =>
                 MenuItem({
-                  isSelected: f.name === state.file.val?.name,
-                  onclick: () => { state.file.val = f }
-                }, f.name)
+                  isSelected: () => r.filename === state.report.val.filename,
+                  onclick: () => {
+                    state.report.val = r
+                  }
+                }, r.filename)
               )
             )
           )
@@ -174,12 +172,12 @@ const App = () => {
               })
             )
           ),
-          pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, reportSource),
+          pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, () => isDirectoryOpen.val && state.report.val ? state.report.val.content : ''),
           () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
-            () => report.val
-              ? report.val instanceof Error
-                ? ReportParseError(report)
-                : Report(report)
+            () => isDirectoryOpen.val && state.report.val
+              ? state.report.val.error
+                ? ReportParseError(state.report.val.error)
+                : Report(state.report.val.data)
               : ''
           )
         )
