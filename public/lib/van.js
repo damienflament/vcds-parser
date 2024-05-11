@@ -77,7 +77,7 @@ const classes = (...classes) => classes.map(v => val(v))
  * @param  {[any]} args the arguments to parse
  * @returns {[any]} the properties and children
  */
-const args = (args) => {
+const args = args => {
   const children = [...args] // Working on a copy because we will use shift()
   const objProto = Object.getPrototypeOf({ isConnected: 1 })
   const firstProto = Object.getPrototypeOf(children[0] ?? 0)
@@ -87,4 +87,15 @@ const args = (args) => {
   return [props, children]
 }
 
-export default { val, handler, classes, args, ...van }
+/**
+ * Logs to the console the given state on change.
+ *
+ * If provided, the label is prepended to the value.
+ *
+ * @param {State} s the state to log
+ * @param {string?} l the label to display
+ * @returns
+ */
+const log = (s, l = null) => van.derive(() => console.log(l ? `${l}:` : '', s.val))
+
+export default { val, handler, classes, args, log, ...van }
