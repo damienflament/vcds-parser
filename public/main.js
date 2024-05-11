@@ -93,7 +93,7 @@ const App = () => {
                   .then(d => {
                     report.data = d
 
-                    validate(d)
+                    return validate(d)
                   })
                   .catch(e => { report.error = e })
                   .finally(() => {
