@@ -5,6 +5,22 @@
 
 import { SyntaxError, parse as _parse } from '../generated/parser.js'
 
+class ParsingError extends Error {
+  name = 'ParsingError'
+
+  /**
+   * @param {string} content
+   * @param {SyntaxError} error
+   */
+  constructor (content, cause) {
+    super()
+
+    this.message = cause.message
+    this.stack = describeErrorContext(content, cause)
+    this.cause = cause
+  }
+}
+
 const showControlCharacters = string =>
   string.replaceAll('\r', '␍')
     .replaceAll('\n', '␊\n')
@@ -38,34 +54,34 @@ const describeErrorContext = (content, error) => {
   to line ${endLine} column ${endCol}
 
   Context:
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ${contextBefore}
 ${finger}
 ${contextAfter}
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ${showControlCharacters(contextBefore)}␊
 ${finger}
 ${showControlCharacters(contextAfter)}␊
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯`
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .`
 }
 
 /**
  * Parses the given report content.
  *
  * @param {string} content
- * @returns {import('./report.js').Report} the built report
- * @throws {SyntaxError} when Peggy throws an error on parsing
+ * @returns {Report} the built report
+ * @throws {ParsingError} when Peggy throws an error on parsing
  */
 const parse = content => {
   try {
     return _parse(content)
   } catch (e) {
     if (e instanceof SyntaxError) {
-      e.stack = describeErrorContext(content, e)
+      throw new ParsingError(content, e)
     }
 
     throw e
   }
 }
 
-export { SyntaxError, parse }
+export { ParsingError, parse }
