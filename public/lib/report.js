@@ -3,158 +3,54 @@
  * @module
  */
 
-/**
- * An object whose the data stucture can be checked and frozen.
- */
-class Committable {
-  /**
-   * Ensures the data structure correctness.
-   *
-   * Throw a *TypeError* when an undefined property is encoutered. Finally,
-   * freeze the object.
-   */
-  commit () {
-    for (const name in this) {
-      if (this[name] === undefined) {
-        throw new TypeError(`Mandatory property ${name} undefined`)
-      }
-    }
-
-    if (Object.isFrozen(this)) {
-      throw new Error('Object already frozen')
-    }
-
-    Object.freeze(this)
-  }
+class Report {
+  date
+  duration
+  shop
+  software
+  vehicle
+  modules
 }
 
-/**
- * A VCDS report.
- */
-class Report extends Committable {
-  /** @type {Date} */ date
-  /** @type {Duration} */ duration
-  /** @type {string?} */ shop = null
-
-  /** @type {Software} */ software
-  /** @type {Vehicle} */ vehicle
-
-  constructor () {
-    super()
-    Object.seal(this)
-  }
-
-  /** @type {[Module]} */ modules = []
-
-  /**
-   * Adds a module to the report.
-   * @param {Module} module
-   */
-  addModule (module) {
-    this.modules[module.decimalAddress] = module
-  }
-
-  /**
-   * Retrieves a module by its address.
-   * @param {string} address the module address
-   * @returns {Module}
-   */
-  getModule (address) {
-    return this.modules[Module.decimalAddress(address)]
-  }
+class Duration {
+  minutes
+  seconds
 }
 
-class Duration extends Committable {
-  /** @type {integer} */ minutes
-  /** @type {integer} */ seconds
-
-  constructor (minutes, seconds) {
-    super()
-    Object.seal(this)
-
-    this.minutes = minutes
-    this.seconds = seconds
-  }
-}
-
-/**
- * VCDS version and platform information.
- */
-class Software extends Committable {
-  /** @type {string} */ version
-  /** @type {string} */ platform
-  /** @type {string} */ dataVersion
-  /** @type {string} */ dataDate
-
-  constructor () {
-    super()
-    Object.seal(this)
-  }
+class Software {
+  version
+  platform
+  dataVersion
+  dataDate
 }
 
 /**
  * A vehicle information.
  */
-class Vehicle extends Committable {
-  /** @type {string} */ vin
-  /** @type {string?} */ licensePlate = null
-  /** @type {string} */ chassis
-  /** @type {string} */ type
-  /** @type {Mileage} */ mileage
-
-  constructor () {
-    super()
-    Object.seal(this)
-  }
+class Vehicle {
+  vin
+  licensePlate
+  chassis
+  type
+  mileage
 }
 
-/**
- * A distance expressed in kilometers and miles.
- *
- * Designed to store two distance values in two different units, it can be
- * created using a static constructor when you get a value in a single unit.
- */
-class Mileage extends Committable {
-  static #KM_TO_MILES = 0.62137119223733
-
-  /**
-   * Creates a mileage from a distance in kilometers.
-   * @param {integer} value a distance in kilometers
-   * @returns {Mileage}
-   */
-  static fromKm (value) {
-    return new Mileage(value, Math.trunc(value * Mileage.#KM_TO_MILES))
-  }
-
-  /**
-   * Creates a mileage from a distance in miles.
-   * @param {integer} value a distance in miles
-   * @returns {Mileage}
-   */
-  static fromMiles (value) {
-    return new Mileage(Math.trunc(value / Mileage.#KM_TO_MILES), value)
-  }
-
-  /** @type {integer} */ km
-  /** @type {integer} */ miles
-
-  /**
-   * @param {integer} km a distance in kilometers
-   * @param {integer} miles a distance in miles
-   */
-  constructor (km, miles) {
-    super()
-    Object.seal(this)
-
-    this.km = km
-    this.miles = miles
-  }
+class Mileage {
+  km
+  miles
 }
 
-/**
- * A vehicule control module.
- */
-class Module extends Committable {
+class Module {
+  address
+  name
+  isReachable
+  status
+
+  info
+
+  subsystems
+  faults
+
   /**
    * Gives the decimal form of the given module address.
    * @param {string} address the module address
@@ -164,18 +60,6 @@ class Module extends Committable {
     return Number.parseInt(address)
   }
 
-  /** @type {string} */ address
-  /** @type {boolean} */ isReachable
-  /** @type {string} */ name
-  /** @type {ModuleStatus} */ status
-
-  /** @type {ModuleInfo?} */ info = null
-
-  constructor () {
-    super()
-    Object.seal(this)
-  }
-
   /** @type {integer} */
   get decimalAddress () {
     return Module.decimalAddress(this.address)
@@ -183,73 +67,40 @@ class Module extends Committable {
 
   /** @type {boolean} */
   get isFaulty () {
-    return !this.status.isWorking()
-  }
-
-  /** @type {[Subsystem]} */ subsystems = []
-
-  /**
-   * Adds a subsystem to the module.
-   * @param {Subsystem} subsystem
-   */
-  addSubsystem (subsystem) {
-    this.subsystems[subsystem.index - 1] = subsystem
-  }
-
-  /** @type {[Fault]} */ faults = []
-
-  /**
-   * Adds a fault to the module.
-   * @param {Fault} fault
-   */
-  addFault (fault) {
-    this.faults.push(fault)
+    return !this.status.isWorking
   }
 }
 
-/**
- * The status of a module.
- */
-class ModuleStatus extends Committable {
-  /** @type {integer} */ flags
-  /** @type {string} */ description
+class ModuleStatus {
+  flags
+  description
 
   static OK = 0b0000 // OK
   static MALFUNCTION = 0b0010 // Malfunction
   static UNREACHABLE = 0b1100 // Cannot be reached
   static COM_ERROR = 0b1000 // Sporadic communication error
 
-  constructor () {
-    super()
-    Object.seal(this)
-  }
-
-  isWorking () {
+  get isWorking () {
     return this.flags === ModuleStatus.OK
   }
 }
 
-/**
- * Informations about a module.
- *
- * Stored in a separate object because unavailable when a module is unreachable.
- */
-class ModuleInfo extends Committable {
-  /** @type {string} */ labelsFile
-  /** @type {PartNumber} */ partNumber
-  /** @type {string} */ component
-  /** @type {string} */ revision
-  /** @type {string} */ serial
-  /** @type {string} */ coding
-  /** @type {string} */ codingWsc
-  /** @type {string} */ vcid
-  /** @type {string} */ vinid
-  /** @type {string} */ readiness
+class ModuleInfo {
+  labelsFile
 
-  constructor () {
-    super()
-    Object.seal(this)
+  partNumber = {
+    software: null,
+    hardware: null
   }
+
+  component
+  revision
+  serial
+  coding
+  codingWsc
+  vcid
+  vinid
+  readiness
 }
 
 /**
@@ -257,17 +108,12 @@ class ModuleInfo extends Committable {
  *
  * @see https://blog.europaparts.com/audi-vw-part-numbers-demystified/
  */
-class PartNumber extends Committable {
-  /** @type {string} */ type
-  /** @type {integer} */ group
-  /** @type {integer} */ subgroup
-  /** @type {integer} */ number
-  /** @type {string} */ modification = null
-
-  constructor () {
-    super()
-    Object.seal(this)
-  }
+class PartNumber {
+  type
+  group
+  subgroup
+  number
+  modification
 
   toString () {
     return [
@@ -279,59 +125,35 @@ class PartNumber extends Committable {
   }
 }
 
-/**
- * A module subsystem.
- */
-class Subsystem extends Committable {
-  /** @type {integer} */ index
-  /** @type {string} */ partNumber
-  /** @type {string} */ component
+class Subsystem {
+  index
+  partNumber
+  component
 
-  /** @type {string?} */ labelsFile = null
-  /** @type {string?} */ coding = null
-  /** @type {string?} */ codingWsc = null
-
-  constructor () {
-    super()
-    Object.seal(this)
-  }
+  labelsFile
+  coding
+  codingWsc
 }
 
-/**
- * A fault related to a control module.
- */
-class Fault extends Committable {
-  /** @type {string} */ code
-  /** @type {string} */ subject
+class Fault {
+  code
+  subject
 
-  /** @type {string?} */ errorCode = null
+  errorCode
 
-  /** @type {string} */ descriptionCode
-  /** @type {string} */ description
+  descriptionCode
+  description
 
-  /** @type {FreezeFrame?} */ freezeFrame = null
-
-  constructor () {
-    super()
-    Object.seal(this)
-  }
+  freezeFrame
 }
 
-/**
- * Information collected when a fault occurs.
- */
-class FreezeFrame extends Committable {
-  /** @type {string} */ status
-  /** @type {integer} */ priority
-  /** @type {integer} */ frequency
-  /** @type {integer} */ resetCounter
-  /** @type {integer} */ mileage
-  /** @type {string} */ timeIndication
-
-  constructor () {
-    super()
-    Object.seal(this)
-  }
+class FreezeFrame {
+  status
+  priority
+  frequency
+  resetCounter
+  mileage
+  timeIndication
 }
 
 export { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Software, Subsystem, Vehicle }
