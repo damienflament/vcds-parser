@@ -42,4 +42,10 @@ const typeOf = value => {
   }
 }
 
-export { typeOf }
+/** Returns the given object sealed */
+const sealed = o => Object.seal(o)
+
+/** Returns the given object frozen. */
+const frozen = o => Object.freeze(o)
+
+export { frozen, sealed, typeOf }
