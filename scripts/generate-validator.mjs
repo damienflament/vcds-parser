@@ -1,9 +1,6 @@
 /**
- * Configures the application.
- *
- * The manifest file is updated from the package description.
- * The application configuration file is also updated, including the generated
- * static resources list.
+ * Generates a data validator and a TypeScript declaration file from the JSON
+ * schema.
  */
 
 'use strict'
@@ -13,16 +10,30 @@ import standaloneCode from 'ajv/dist/standalone/index.js'
 import * as esbuild from 'esbuild'
 import fs from 'fs-extra'
 import { watch } from 'fs/promises'
+import { compile as compileDefinition } from 'json-schema-to-typescript-lite'
 import { basename, dirname, resolve } from 'path'
 
 const args = process.argv.slice(2)
+const types = args.includes('--types')
 const watching = args.includes('--watch')
 
 const SCHEMA = resolve(import.meta.dirname, '../resources/vcds.schema.json')
 const VALIDATOR = resolve(import.meta.dirname, '../public/generated/validator.js')
+const DEFINITION = resolve(import.meta.dirname, '../public/lib/report.d.ts')
 
 const generate = async (schemaPath, validatorPath) =>
   fs.readJson(schemaPath)
+    .then(schema => {
+      if (types) {
+        console.log('> Generating types definition file')
+
+        compileDefinition(schema)
+          .then(code => fs.writeFile(DEFINITION, code))
+          .catch(e => { console.error(e) })
+      }
+
+      return schema
+    })
     .then(schema => {
       const ajv = new Ajv({
         strict: true,
@@ -40,7 +51,8 @@ const generate = async (schemaPath, validatorPath) =>
     })
     .then(code => {
       console.log('> Bundling validator for browser')
-      return esbuild.build({
+
+      esbuild.build({
         stdin: {
           contents: code,
           resolveDir: dirname(validatorPath),
@@ -56,9 +68,7 @@ const generate = async (schemaPath, validatorPath) =>
     .then(() => {
       console.log('  done.')
     })
-    .catch(e => {
-      console.error(e)
-    })
+    .catch(e => { console.error(e) })
 
 await generate(SCHEMA, VALIDATOR)
 

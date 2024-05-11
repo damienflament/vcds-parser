@@ -1,6 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "/vcds/report",
+    "title": "Report",
+    "description": "A VCDS report",
     "type": "object",
     "additionalProperties": false,
     "properties": {
@@ -41,6 +43,7 @@
     ],
     "definitions": {
         "duration": {
+            "description": "Elapsed time",
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -61,6 +64,7 @@
             ]
         },
         "mileage": {
+            "description": "A travelled distance expressed in kilometers and miles",
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -79,6 +83,7 @@
             ]
         },
         "software": {
+            "description": "VCDS version and platform information",
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -107,11 +112,12 @@
             ]
         },
         "vehicle": {
+            "description": "A vehicle information",
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "vin": {
-                    "$comment": "a VIN of 17 characters",
+                    "description": "a VIN of 17 characters",
                     "type": "string",
                     "minLength": 17,
                     "maxLength": 17
@@ -124,13 +130,13 @@
                     "minLength": 1
                 },
                 "chassis": {
-                    "$comment": "a vehicule chassis type, like '8P'",
+                    "description": "a vehicule chassis type, like '8P'",
                     "type": "string",
                     "minLength": 2,
                     "maxLength": 3
                 },
                 "type": {
-                    "$comment": "a system type, like '1K0'",
+                    "description": "a system type, like '1K0'",
                     "type": "string",
                     "minLength": 3,
                     "maxLength": 3
@@ -148,11 +154,12 @@
             ]
         },
         "module": {
+            "description": "A vehicule control module",
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "address": {
-                    "$comment": "hexadecimal value on 2 bytes, but ordered natural as a string",
+                    "description": "hexadecimal value on 2 bytes, but ordered natural as a string",
                     "type": "string",
                     "minLength": 2,
                     "maxLength": 2
@@ -165,7 +172,7 @@
                     "minLength": 1
                 },
                 "status": {
-                    "$ref": "#/definitions/status"
+                    "$ref": "#/definitions/moduleStatus"
                 },
                 "info": {
                     "anyOf": [
@@ -202,7 +209,8 @@
                 "faults"
             ]
         },
-        "status": {
+        "moduleStatus": {
+            "description": "The status of a module",
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -223,6 +231,7 @@
             ]
         },
         "info": {
+            "description": "Informations about a module. \n\nStored in a separate object because unavailable when a module is unreachable.",
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -316,6 +325,7 @@
             ]
         },
         "subsystem": {
+            "description": "A module subsystem",
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -363,6 +373,7 @@
             ]
         },
         "fault": {
+            "description": "A fault related to a control module",
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -410,6 +421,7 @@
             ]
         },
         "freezeFrame": {
+            "description": "Information collected when a fault occurs",
             "type": "object",
             "additionalProperties": false,
             "properties": {
