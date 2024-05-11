@@ -44,8 +44,12 @@ const ModuleReadError = (module, error) => {
   )
 }
 
-const Report = data => {
-  const { modules } = van.val(data)
+/**
+ * @param {import('../model.js').Report} report
+ * @returns {HTMLElement}
+ */
+const Report = report => {
+  const { modules } = van.val(report)
 
   return div(
     Object.values(modules).map(module => () => {
@@ -59,8 +63,7 @@ const Report = data => {
 }
 
 /**
- *
- * @param {import('../report.js').Module} module the module to show
+ * @param {import('../model.js').Module} module the module to show
  * @returns {HTMLElement}
  */
 const ModuleComponent = module => {

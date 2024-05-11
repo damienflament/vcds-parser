@@ -1,5 +1,5 @@
 /**
- * VCDS report.
+ * Data model.
  * @module
  */
 

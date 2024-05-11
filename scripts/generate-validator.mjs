@@ -19,7 +19,7 @@ const watching = args.includes('--watch')
 
 const SCHEMA = resolve(import.meta.dirname, '../resources/vcds.schema.json')
 const VALIDATOR = resolve(import.meta.dirname, '../public/generated/validator.js')
-const DEFINITION = resolve(import.meta.dirname, '../public/lib/report.d.ts')
+const DEFINITION = resolve(import.meta.dirname, '../public/lib/model.d.ts')
 
 const generate = async (schemaPath, validatorPath) =>
   fs.readJson(schemaPath)
