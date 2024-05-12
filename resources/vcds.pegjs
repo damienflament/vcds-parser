@@ -1,7 +1,5 @@
 /* Peggy grammar to parse VSCD scan reports. */
 {{
-  import { Duration, Fault, Mileage, Module, ModuleInfo, ModuleStatus, Report, Software, Subsystem, Vehicle } from '../lib/model.js'
-
   function string(str) {
     str = str.trim()
 
@@ -25,14 +23,6 @@
   const milesFromKm = value => Math.trunc(value * KM_TO_MILES)
 
   const kmFromMiles = value => Math.trunc(value / KM_TO_MILES)
-
-  function safelyAssign(target, ...sources) {
-    Object.seal(target)
-    Object.assign(target, ...sources)
-    Object.freeze(target)
-
-    return target
-  }
 }}
 
 {
@@ -71,35 +61,30 @@ report
 
     const modules = modulesStatus
       .filter(status => status.address !== '00') // Remove special module 00 for now
-      .map(status => safelyAssign(
-        new Module(),
+      .map(status => Object.assign(
         status,
         mappedInfos.get(status.address)
       ))
 
-    const software = safelyAssign(new Software(), {
-      version,
-      platform,
-      dataVersion,
-      dataDate
-    })
-
-    const vehicle = safelyAssign(new Vehicle(), {
-      vin,
-      licensePlate,
-      chassis,
-      type,
-      mileage
-    })
-
-    return safelyAssign(new Report(), {
+    return {
       date,
       duration,
       shop,
-      software,
-      vehicle,
+      software: {
+        version,
+        platform,
+        dataVersion,
+        dataDate
+      },
+      vehicle: {
+        vin,
+        licensePlate,
+        chassis,
+        type,
+        mileage
+      },
       modules
-    })
+    }
   }
 
 datetime
@@ -107,12 +92,7 @@ datetime
   { return text() }
 duration
   = minutes:$minutes ':' seconds:$seconds
-  {
-    return safelyAssign(new Duration(), {
-        minutes: integer(minutes),
-        seconds: integer(seconds)
-    })
-  }
+  { return { minutes: integer(minutes), seconds: integer(seconds) } }
 dayName 'the name of a week day'
   = 'Monday' / 'Tuesday' / 'Wednesday' / 'Thursday' / 'Friday' / 'Saturday' /
     'Sunday'
@@ -147,25 +127,18 @@ type 'a VAG vehicle, engine or transmission type code'
   = @$uppnum|3|
 mileage 'a mileage value in km and miles'
   = km:$dec+ 'km' '-' miles:$dec+ 'miles'
-  {
-    return safelyAssign(new Mileage(), {
-      km: integer(km),
-      miles: integer(miles)
-    })
-  }
+  { return { km: integer(km), miles: integer(miles) } }
 
 moduleStatus
   = address:moduleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$[^01]+ flags:$bin|4| eol
   {
-    const status = safelyAssign(new ModuleStatus(), {
-      flags: binary(flags),
-      description: string(description)
-    })
-
     return {
       address,
       name: string(name),
-      status
+      status: {
+        flags: binary(flags),
+        description: string(description)
+      }
     }
   }
 moduleAddress 'a module address' = $dec|2|
@@ -212,25 +185,21 @@ moduleInfo
         faults:faultsSection
         readiness:( 'Readiness:' _ @readiness eol )?
         {
-          const info = new ModuleInfo()
-
-          safelyAssign(info, {
-            labelsFile,
-            partNumber,
-            component: string(component),
-            revision,
-            serial,
-            coding,
-            codingWsc,
-            vcid,
-            vinid,
-            readiness
-          })
-
           return {
             address,
             isReachable: true,
-            info,
+            info: {
+              labelsFile,
+              partNumber,
+              component: string(component),
+              revision,
+              serial,
+              coding,
+              codingWsc,
+              vcid,
+              vinid,
+              readiness
+            },
             subsystems,
             faults
           }
@@ -302,14 +271,14 @@ subsystem
     ( [A-Z0-9 ]i+ eol )? // ignore this line as it contains the same info as above
     l
   {
-    return safelyAssign(new Subsystem(), {
+    return {
       index: integer(index),
       partNumber,
       component: string(component),
       labelsFile,
       coding,
       codingWsc
-    })
+    }
   }
 
 faultsSection
@@ -327,14 +296,14 @@ fault
     _|12| errorCode:(@errorCode _ '-' _)? descriptionCode:faultDescCode _ '-' _ description:$rol eol
     freezeFrame:(freezeFrame)?
   {
-    return safelyAssign(new Fault(), {
+    return {
       code,
       subject: string(subject),
       errorCode,
       descriptionCode,
       description,
       freezeFrame
-    })
+    }
   }
 
 errorCode 'error code' = $( 'P'? dec|4| )
