@@ -4,6 +4,7 @@
  */
 
 import { SyntaxError, parse as _parse } from '../generated/parser.js'
+import { deeplyFrozen } from './object.js'
 
 class ParsingError extends Error {
   name = 'ParsingError'
@@ -74,7 +75,7 @@ ${showControlCharacters(contextAfter)}␊
  */
 const parse = (content, filename) => new Promise((resolve, reject) => {
   try {
-    resolve(_parse(content, { filename }))
+    resolve(deeplyFrozen(_parse(content, { filename })))
   } catch (e) {
     if (e instanceof SyntaxError) {
       reject((new ParsingError(content, e)))

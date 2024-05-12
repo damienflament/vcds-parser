@@ -43,9 +43,30 @@ const typeOf = value => {
 }
 
 /** Returns the given object sealed */
-const sealed = o => Object.seal(o)
+const sealed = Object.seal
 
 /** Returns the given object frozen. */
-const frozen = o => Object.freeze(o)
+const frozen = Object.freeze
 
-export { frozen, sealed, typeOf }
+/** Returns the given object frozen up to the innermost properties. */
+const deeplyFrozen = o => {
+  if (Array.isArray(o)) {
+    for (let v of o) {
+      v = deeplyFrozen(v)
+    }
+
+    return frozen(o)
+  }
+
+  if (typeof o === 'object') {
+    for (const k in o) {
+      o[k] = deeplyFrozen(o[k])
+    }
+
+    return frozen(o)
+  }
+
+  return o
+}
+
+export { deeplyFrozen, frozen, sealed, typeOf }
