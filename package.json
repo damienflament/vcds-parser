@@ -25,13 +25,12 @@
     "generate-parser": "yarn peggy -o public/generated/parser.js --format es resources/vcds.pegjs",
     "watch-parser": "yarn peggy -o public/generated/parser.js --format es resources/vcds.pegjs --watch",
     "generate-validator": "yarn node scripts/generate-validator.mjs",
-    "watch-validator": "yarn node scripts/generate-validator.mjs --types --watch"
+    "watch-validator": "yarn node scripts/generate-validator.mjs --watch"
   },
   "devDependencies": {
     "ajv": "^8.13.0",
     "esbuild": "^0.21.1",
     "fs-extra": "^11.2.0",
-    "json-schema-to-typescript-lite": "^14.0.1",
     "klaw-sync": "^6.0.0",
     "peggy": "^4.0.2",
     "snazzy": "^9.0.0",

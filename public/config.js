@@ -21,7 +21,6 @@ export default {
     '/lib/components.js',
     '/lib/configuration.js',
     '/lib/filesystem.js',
-    '/lib/model.d.ts',
     '/lib/model.js',
     '/lib/object.js',
     '/lib/parser.js',

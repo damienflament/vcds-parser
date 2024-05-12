@@ -2,4 +2,3 @@
 /node_modules/
 
 /public/generated/
-/public/**/*.d.ts
