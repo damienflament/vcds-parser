@@ -48,6 +48,23 @@ const App = () => {
 
   const report = van.derive(() => state.reports.val.length > 0 ? state.reports.val[state.index.val] : null)
 
+  const isLoading = van.state(false)
+
+  const endLoading = () => {
+    setTimeout(() => {
+      isLoading.val = false
+    }, 250)
+  }
+
+  const reload = () => {
+    if (state.directory.val) {
+      isLoading.val = true
+      openDirectory(state.directory.val)
+    }
+  }
+
+  van.derive(reload)
+
   van.derive(() => {
     // Wrap data within model objects and validate
     state.reports.val.forEach((report) => {
@@ -62,6 +79,8 @@ const App = () => {
         } catch (e) {
           report.error = e
         }
+
+        endLoading()
       }
     })
   })
@@ -118,27 +137,25 @@ const App = () => {
           break
 
         case 'prompt':
+          endLoading()
           van.add(notificationsArea, Notification({
             message: 'Do you want to load the last opened directory ?',
             label: 'Yes, open it',
             onclick: () => openDirectory(directory)
           }))
           break
+
+        default:
+          endLoading()
       }
     })
   }
-
-  van.derive(() => {
-    if (state.directory.val) {
-      openDirectory(state.directory.val)
-    }
-  })
 
   /** Notification area */
   const notificationsArea = NotificationArea()
 
   const { pre, div, p, strong, span } = van.tags
-  const { Columns, Column, Content, Control, Field, Footer, Icon, Level, LevelLeft, LevelRight, Menu, MenuLabel, MenuList, Section } = bulma.elements
+  const { Button, Columns, Column, Content, Control, Field, Footer, Icon, Level, LevelLeft, LevelRight, Menu, MenuLabel, MenuList, Section } = bulma.elements
 
   return [
     Navbar({ logo: { src: '/assets/logo.png', alt: 'application logo' } }),
@@ -153,7 +170,25 @@ const App = () => {
       Columns(
         Column({ class: 'is-one-fifth' },
           Menu(
-            MenuLabel('Files'),
+            MenuLabel(
+              { class: 'is-size-6 is-flex is-align-items-center is-justify-content-space-between' },
+              span('Reports'),
+              () => {
+                document.addEventListener('keydown', ev => {
+                  if (ev.ctrlKey && ev.key === 'r') {
+                    ev.preventDefault()
+                    reload()
+                  }
+                })
+
+                const b = Button({ class: () => 'is-small ' + (isLoading.val ? 'is-loading' : ''), onclick: reload },
+                  Icon(FontAwesome('rotate')),
+                  span('Ctrl+R')
+                )
+
+                return b
+              }
+            ),
             () => MenuList(
               Array.from(state.reports.val.entries()).map(([i, r]) => // Iterator helper function map() is experimental, work on an array for now
                 MenuItem({
