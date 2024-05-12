@@ -35,12 +35,10 @@ ${stringify(data, 2, 4)}
  * @return {PRomise<boolean>} true if the validation succeeds
  * @throws {ValidationError} when the validation fails
  */
-const validate = data => new Promise((resolve, reject) => {
+const validate = data => {
   if (!_validation(data)) {
-    reject(new ValidationError(_validation.errors))
+    throw new ValidationError(_validation.errors)
   }
-
-  resolve(data)
-})
+}
 
 export { ValidationError, validate }

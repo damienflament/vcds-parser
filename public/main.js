@@ -34,7 +34,8 @@ const App = () => {
   /** Persisted state */
   const state = frozen({
     directory: van.state(null),
-    report: van.state(null),
+    reports: van.state([]),
+    index: van.state(-1),
     isViewingSource: van.state(false)
   })
 
@@ -45,22 +46,25 @@ const App = () => {
     console.log('Persistence disabled.')
   }
 
-  /**
-   * A flag indicating if the directory has been opened.
-   *
-   * If not, it means the `state.directory` value was just loaded from storage.
-   */
-  const isDirectoryOpen = van.state(false)
+  const report = van.derive(() => state.reports.val.length > 0 ? state.reports.val[state.index.val] : null)
 
-  /** Working directory label */
-  const directoryName = van.derive(() =>
-    isDirectoryOpen.val
-      ? state.directory.val.name
-      : 'Open a directory...'
-  )
+  van.derive(() => {
+    // Wrap data within model objects and validate
+    state.reports.val.forEach((report) => {
+      if (report.data) {
+        const model = new AutoScan()
 
-  /** Reports located in the working directory */
-  const reports = van.state([])
+        safelyAssign(model, report.data)
+        report.data = model
+
+        try {
+          validate(model)
+        } catch (e) {
+          report.error = e
+        }
+      }
+    })
+  })
 
   /**
    * Opens the given directory.
@@ -75,7 +79,13 @@ const App = () => {
         case 'granted':
           listDirectory(directory)
             .then((files) => {
-              reports.val = []
+              if (files.length === 0) {
+                state.reports.val = []
+                state.index.val = -1
+                return
+              }
+              let sync = 0
+              const reports = []
 
               files.forEach(f => {
                 const report = sealed({
@@ -85,27 +95,23 @@ const App = () => {
                   error: null
                 })
 
+                sync++
+
                 loadFileContent(f)
                   .then(c => {
                     report.content = c
 
                     return parse(c, f.name)
                   })
-                  .then(d => {
-                    const m = new AutoScan()
-                    safelyAssign(m, d)
-                    return m
-                  })
-                  .then(d => {
-                    report.data = d
-
-                    return validate(d)
-                  })
+                  .then(d => { report.data = frozen(d) })
                   .catch(e => { report.error = e })
                   .finally(() => {
-                    reports.val = reports.val.concat([report])
-                    state.report.val ??= reports.val[0]
-                    isDirectoryOpen.val = true
+                    reports.push(report)
+
+                    if (--sync === 0) {
+                      state.reports.val = reports
+                      state.index.val = 0
+                    }
                   })
               })
             })
@@ -141,22 +147,19 @@ const App = () => {
       notificationsArea,
       DirectoryPicker({
         label: 'Scans directory',
-        name: directoryName,
-        onsuccess: d => {
-          state.directory.val = d
-          state.report.val = null
-        }
+        name: () => state.directory.val?.name ?? '...',
+        onsuccess: d => { state.directory.val = d }
       }),
       Columns(
         Column({ class: 'is-one-fifth' },
           Menu(
             MenuLabel('Files'),
             () => MenuList(
-              reports.val.map((r) =>
+              Array.from(state.reports.val.entries()).map(([i, r]) => // Iterator helper function map() is experimental, work on an array for now
                 MenuItem({
-                  isSelected: () => r.filename === state.report.val.filename,
+                  isSelected: () => state.index.val === i,
                   onclick: () => {
-                    state.report.val = r
+                    state.index.val = i
                   }
                 }, r.filename)
               )
@@ -182,12 +185,12 @@ const App = () => {
               })
             )
           ),
-          pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, () => isDirectoryOpen.val && state.report.val ? state.report.val.content : ''),
+          pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, () => report.val ? report.val.content : ''),
           () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
-            () => isDirectoryOpen.val && state.report.val
-              ? state.report.val.error
-                ? ReportParseError(state.report.val.error)
-                : Report(state.report.val.data)
+            () => report.val
+              ? report.val.error
+                ? ReportParseError(report.val.error)
+                : Report(report.val.data)
               : ''
           )
         )
