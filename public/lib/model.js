@@ -3,13 +3,54 @@
  * @module
  */
 
-class Report {
+import { typeOf } from './object.js'
+
+const safelyFillArray = (array, data) => {
+  const Template = array.pop()
+
+  for (const element of data) {
+    const object = new Template()
+    safelyAssign(object, element)
+    array.push(object)
+  }
+
+  Object.freeze(array)
+}
+
+const safelyAssign = (object, data) => {
+  Object.seal(object)
+
+  for (const name in data) {
+    const datum = data[name]
+
+    switch (typeOf(object[name])) {
+      case 'Function':
+        if (datum === null) {
+          object[name] = null
+        } else {
+          object[name] = new object[name]()
+          safelyAssign(object[name], datum)
+        }
+        break
+      case 'Array':
+        safelyFillArray(object[name], datum)
+        break
+      default:
+        object[name] = datum
+    }
+  }
+
+  Object.freeze(object)
+}
+
+/** A VCDS auto-scan report */
+class AutoScan {
   date
-  duration
+  duration = Duration
   shop
-  software
-  vehicle
-  modules
+  software = Software
+  vehicle = Vehicle
+  modules = [Module]
 }
 
 class Duration {
@@ -24,17 +65,15 @@ class Software {
   dataDate
 }
 
-/**
- * A vehicle information.
- */
 class Vehicle {
   vin
   licensePlate
   chassis
   type
-  mileage
+  mileage = Mileage
 }
 
+/** A travelled distance expressed in kilometers and miles */
 class Mileage {
   km
   miles
@@ -44,12 +83,10 @@ class Module {
   address
   name
   isReachable
-  status
-
-  info
-
-  subsystems
-  faults
+  status = ModuleStatus
+  info = ModuleInfo
+  subsystems = [Subsystem]
+  faults = [Fault]
 
   /**
    * Gives the decimal form of the given module address.
@@ -103,33 +140,10 @@ class ModuleInfo {
   readiness
 }
 
-/**
- * A VAG part number.
- *
- * @see https://blog.europaparts.com/audi-vw-part-numbers-demystified/
- */
-class PartNumber {
-  type
-  group
-  subgroup
-  number
-  modification
-
-  toString () {
-    return [
-      this.type,
-      this.group + this.subgroup,
-      this.number,
-      this.modification
-    ].join(' ')
-  }
-}
-
 class Subsystem {
   index
   partNumber
   component
-
   labelsFile
   coding
   codingWsc
@@ -138,13 +152,11 @@ class Subsystem {
 class Fault {
   code
   subject
-
   errorCode
-
   descriptionCode
   description
 
-  freezeFrame
+  freezeFrame = FreezeFrame
 }
 
 class FreezeFrame {
@@ -152,8 +164,8 @@ class FreezeFrame {
   priority
   frequency
   resetCounter
-  mileage
+  mileage = Mileage
   timeIndication
 }
 
-export { Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, PartNumber, Report, Software, Subsystem, Vehicle }
+export { AutoScan, Duration, Fault, FreezeFrame, Mileage, Module, ModuleInfo, ModuleStatus, Software, Subsystem, Vehicle, safelyAssign }

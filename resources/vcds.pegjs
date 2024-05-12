@@ -1,4 +1,4 @@
-/* Peggy grammar to parse VSCD scan reports. */
+/* Peggy grammar to parse VSCD auto-scan reports. */
 {{
   function string(str) {
     str = str.trim()

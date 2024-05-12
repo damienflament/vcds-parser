@@ -7,6 +7,7 @@ import bulma from './lib/bulma.js'
 import { DirectoryPicker, DualButton, FontAwesome, MenuItem, Navbar, Notification, NotificationArea, Report, ReportParseError, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
+import { AutoScan, safelyAssign } from './lib/model.js'
 import { frozen, sealed } from './lib/object.js'
 import { parse } from './lib/parser.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
@@ -89,6 +90,11 @@ const App = () => {
                     report.content = c
 
                     return parse(c, f.name)
+                  })
+                  .then(d => {
+                    const m = new AutoScan()
+                    safelyAssign(m, d)
+                    return m
                   })
                   .then(d => {
                     report.data = d

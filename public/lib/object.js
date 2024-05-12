@@ -37,6 +37,8 @@ const typeOf = value => {
         : Number.isInteger(value)
           ? 'integer'
           : 'Number'
+    case 'Object':
+      return value.constructor.name
     default:
       return type
   }

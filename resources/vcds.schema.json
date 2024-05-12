@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "/vcds/report",
-    "title": "Report",
-    "description": "A VCDS report",
+    "$id": "/vcds/auto-scan",
+    "title": "AutoScan",
+    "description": "A VCDS auto-scan report",
     "type": "object",
     "additionalProperties": false,
     "properties": {
