@@ -1,8 +1,56 @@
 :root {
-  --theme-color: #00427b;
-  --background-color: #aaaaab;
+  --bulma-primary-rgb: rgb(0, 65, 122);
+  --bulma-primary-h: 208deg;
+  --bulma-primary-s: 100%;
+  --bulma-primary-l: 24%;
+
+  --bulma-scheme-rgb: rgb(170, 170, 172);
+  --bulma-scheme-h: 240deg;
+  --bulma-scheme-s: 1%;
+  --bulma-scheme-l: 67%;
+
+  /* The primary color is dark, invert light values */
+  --bulma-primary-00-l: 100%;
+  --bulma-primary-05-l: 96%;
+  --bulma-primary-10-l: 91%;
+  --bulma-primary-15-l: 86%;
+  --bulma-primary-20-l: 81%;
+  --bulma-primary-25-l: 76%;
+  --bulma-primary-30-l: 71%;
+  --bulma-primary-35-l: 66%;
+  --bulma-primary-40-l: 61%;
+  --bulma-primary-45-l: 56%;
+  --bulma-primary-50-l: 51%;
+  --bulma-primary-55-l: 46%;
+  --bulma-primary-60-l: 41%;
+  --bulma-primary-65-l: 36%;
+  --bulma-primary-70-l: 31%;
+  --bulma-primary-75-l: 26%;
+  --bulma-primary-80-l: 21%;
+  --bulma-primary-85-l: 16%;
+  --bulma-primary-90-l: 11%;
+  --bulma-primary-95-l: 6%;
+  --bulma-primary-100-l: 1%;
 }
 
-.navbar {
-  background-color: var(--theme-color);
+@media (prefers-color-scheme: light) {
+  :root {
+    /* CSS Variables */
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* CSS Variables */
+  }
+}
+
+[data-theme=light],
+.theme-light {
+  /* CSS Variables */
+}
+
+[data-theme=dark],
+.theme-dark {
+  /* CSS Variables */
 }
