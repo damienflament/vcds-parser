@@ -109,9 +109,7 @@ const persist = (state, storage) => {
       const stateItem = state[name]
 
       storage.get(name).then(value => {
-        if (value === undefined) {
-          storage.save(name, stateItem.val)
-        } else {
+        if (value !== undefined) {
           stateItem.val = value
         }
 
