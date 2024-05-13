@@ -4,7 +4,7 @@
  */
 
 import bulma from './lib/bulma.js'
-import { DirectoryPicker, DualButton, FontAwesome, MenuItem, Navbar, Notification, NotificationArea, Report, ReportParseError, StatusTag } from './lib/components.js'
+import { DirectoryPicker, DualButton, FontAwesome, Navbar, Notification, NotificationArea, Report, ReportParseError, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { AutoScan, safelyAssign } from './lib/model.js'
@@ -154,8 +154,15 @@ const App = () => {
   /** Notification area */
   const notificationsArea = NotificationArea()
 
-  const { pre, div, p, strong, span } = van.tags
-  const { Button, Columns, Column, Content, Control, Field, Footer, Icon, Level, LevelLeft, LevelRight, Menu, MenuLabel, MenuList, Section } = bulma.elements
+  const { a, pre, div, p, strong, span } = van.tags
+  const {
+    Footer, Section, Content,
+    Button, Icon,
+    Columns, Column,
+    Control, Field,
+    Level, LevelLeft, LevelRight,
+    Panel, PanelHeading
+  } = bulma.elements
 
   return [
     Navbar({ logo: { src: '/assets/logo.png', alt: 'application logo' } }),
@@ -168,11 +175,29 @@ const App = () => {
         onsuccess: d => { state.directory.val = d }
       }),
       Columns(
-        Column({ class: 'is-one-fifth' },
-          Menu(
-            MenuLabel(
-              { class: 'is-size-6 is-flex is-align-items-center is-justify-content-space-between' },
-              span('Reports'),
+        Column({ class: 'is-one-third' },
+          () => Panel(
+            PanelHeading({ class: 'is-flex is-align-items-center is-justify-content-space-between' },
+              'Reports'
+
+            ),
+            Array.from(state.reports.val.entries()).map(([i, { filename: f, data: r, error: e }]) => // Iterator helper function map() is experimental, work on an array for now
+              a(
+                {
+                  class: van.classes(
+                    'panel-block',
+                    state.index.val === i ? 'is-active' : '',
+                    r === null ? 'has-text-danger' : ''
+                  ),
+                  title: f,
+                  onclick: () => { state.index.val = i }
+                },
+                r === null
+                  ? 'Failed to parse report'
+                  : r.date
+              )
+            ),
+            div({ class: 'panel-block' },
               () => {
                 document.addEventListener('keydown', ev => {
                   if (ev.ctrlKey && ev.key === 'r') {
@@ -181,23 +206,16 @@ const App = () => {
                   }
                 })
 
-                const b = Button({ class: () => 'is-small ' + (isLoading.val ? 'is-loading' : ''), onclick: reload },
+                return Button(
+                  {
+                    class: () => 'is-fullwidth ' + (isLoading.val ? 'is-loading' : ''),
+                    title: 'Reload data from the filesystem',
+                    onclick: reload
+                  },
                   Icon(FontAwesome('rotate')),
-                  span('Ctrl+R')
+                  span('Reload [Ctrl+R]')
                 )
-
-                return b
               }
-            ),
-            () => MenuList(
-              Array.from(state.reports.val.entries()).map(([i, r]) => // Iterator helper function map() is experimental, work on an array for now
-                MenuItem({
-                  isSelected: () => state.index.val === i,
-                  onclick: () => {
-                    state.index.val = i
-                  }
-                }, r.filename)
-              )
             )
           )
         ),

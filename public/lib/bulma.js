@@ -12,6 +12,7 @@ import van from './van.js'
 const { article, aside, button, div, footer, header, p, span, ul } = van.tags
 
 const elementsTags = {
+  Block: div,
   Button: button,
   Buttons: div,
   Card: div,
@@ -46,6 +47,8 @@ const elementsTags = {
   NavbarBrand: div,
   NavbarItem: div,
   Notification: div,
+  Panel: div,
+  PanelHeading: p,
   Section: div,
   Tag: span,
   Tags: div
