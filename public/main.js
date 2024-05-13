@@ -154,7 +154,7 @@ const App = () => {
   /** Notification area */
   const notificationsArea = NotificationArea()
 
-  const { a, pre, div, p, strong, span } = van.tags
+  const { a, pre, div, img, p, strong, span } = van.tags
   const {
     Footer, Section, Content,
     Button, Icon,
@@ -252,15 +252,16 @@ const App = () => {
 
     Footer(
       Content({ class: 'has-text-centered' },
-        p(strong('VCDS Parser'), ' by Damien Flament.')
-      ),
-      Field({ class: 'is-grouped is-grouped-centered' },
-        Control(
-          StatusTag({ class: config.persistence ? 'is-success' : 'is-warning' }, 'Persistence')
+        p(strong('VCDS Parser'), ' by Damien Flament.'),
+        Field({ class: 'is-grouped is-grouped-centered' },
+          Control(
+            StatusTag({ class: config.persistence ? 'is-success' : 'is-warning' }, 'Persistence')
+          ),
+          Control(
+            StatusTag({ class: config.serviceWorker ? 'is-success' : 'is-warning' }, 'Service Worker')
+          )
         ),
-        Control(
-          StatusTag({ class: config.serviceWorker ? 'is-success' : 'is-warning' }, 'Service Worker')
-        )
+        a({ href: 'https://bulma.io' }, img({ style: 'height: 1.5em', src: 'https://bulma.io/assets/images/made-with-bulma.png', alt: 'Made with Bulma' }))
       )
     )
   ]
