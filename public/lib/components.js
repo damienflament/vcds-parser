@@ -12,25 +12,9 @@ import van from './van.js'
 export * from './components/notification.js'
 export * from './components/report.js'
 
-const { a, div, i, img, label, li, span } = van.tags
+const { div, i, label, span } = van.tags
 
-const { Button, Buttons, File, FileCta, FileIcon, FileName, Icon, IconText, Navbar, NavbarBrand, NavbarItem, Tag, Tags } = bulma.elements
-
-/**
- * A responsive horizontal navigation bar.
- *
- * @param {object} [props]
- * @param {object} props.logo
- * @param {string} props.logo.src the logo path
- * @param {string} props.logo.alt the logo alternative description
- * @returns {HTMLElement}
- */
-const NavbarComponent = ({ logo: { src, alt } }) =>
-  Navbar(
-    NavbarBrand(
-      NavbarItem(img({ src: van.val(src), alt: van.val(alt) }))
-    )
-  )
+const { Button, Buttons, File, FileCta, FileIcon, FileName, Icon, IconText, Tag, Tags } = bulma.elements
 
 /**
  * A Font Awesome icon.
@@ -130,26 +114,6 @@ const DualButton = ({
 )
 
 /**
- * A menu item.
- *
- * To be used as a menu child.
- *
- * @param {object} [props]
- * @param {boolean} props.isSelected if true, the item is shown as selected
- * @param {() => any} props.onclick called when the item is clicked
- * @param {...any} children the item children
- * @returns {HTMLElement}
- */
-const MenuItem = (...args) => {
-  const [props, children] = van.args(args)
-
-  return li(a({
-    class: van.val(props.isSelected) ? 'is-active' : '',
-    onclick: van.handler(props.onclick)
-  }, ...children))
-}
-
-/**
  * A spoiler.
  *
  * Hides its content. Has an arrow to show it.
@@ -177,4 +141,4 @@ const Spoiler = (...children) => {
   )
 }
 
-export { DirectoryPicker, DualButton, FontAwesome, MenuItem, NavbarComponent as Navbar, Spoiler, StatusTag }
+export { DirectoryPicker, DualButton, FontAwesome, Spoiler, StatusTag }

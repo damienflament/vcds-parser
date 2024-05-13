@@ -4,7 +4,7 @@
  */
 
 import bulma from './lib/bulma.js'
-import { DirectoryPicker, DualButton, FontAwesome, Navbar, Notification, NotificationArea, Report, ReportParseError, StatusTag } from './lib/components.js'
+import { DirectoryPicker, DualButton, FontAwesome, Notification, NotificationArea, Report, ReportParseError, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { AutoScan, safelyAssign } from './lib/model.js'
@@ -151,12 +151,12 @@ const App = () => {
     })
   }
 
-  /** Notification area */
   const notificationsArea = NotificationArea()
 
   const { a, pre, div, img, p, strong, span } = van.tags
   const {
     Footer, Section, Content,
+    Navbar, NavbarBrand, NavbarItem,
     Button, Icon,
     Columns, Column,
     Control, Field,
@@ -164,106 +164,120 @@ const App = () => {
     Panel, PanelHeading
   } = bulma.elements
 
+  const navigation = Navbar({ class: 'has-background-primary' },
+    NavbarBrand(
+      NavbarItem(img({ src: '/assets/logo.png', alt: 'application logo' }))
+    )
+  )
+
+  const footer = Footer(
+    Content({ class: 'has-text-centered' },
+      p(strong('VCDS Parser'), ' by Damien Flament.'),
+      Field({ class: 'is-grouped is-grouped-centered' },
+        Control(
+          StatusTag({ class: config.persistence ? 'is-success' : 'is-warning' }, 'Persistence')
+        ),
+        Control(
+          StatusTag({ class: config.serviceWorker ? 'is-success' : 'is-warning' }, 'Service Worker')
+        )
+      ),
+      a({ href: 'https://bulma.io' }, img({ style: 'height: 1.5em', src: 'https://bulma.io/assets/images/made-with-bulma.png', alt: 'Made with Bulma' }))
+    )
+  )
+
+  const viewerModeSwhitcher = DualButton({
+    left: [
+      Icon(FontAwesome('toolbox')),
+      span('Report')
+    ],
+    onclickLeft: () => { state.isViewingSource.val = false },
+    right: [
+      Icon(FontAwesome('file-lines')),
+      span('Source')
+    ],
+    onclickRight: () => { state.isViewingSource.val = true },
+    isLeftSelected: () => !state.isViewingSource.val
+  })
+
+  const sourceViewer = pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, () => report.val ? report.val.content : '')
+
+  const reportViewer = () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
+    () => report.val
+      ? report.val.error
+        ? ReportParseError(report.val.error)
+        : Report(report.val.data)
+      : ''
+  )
+
+  const reportsReloadButton = () => {
+    document.addEventListener('keydown', ev => {
+      if (ev.ctrlKey && ev.key === 'r') {
+        ev.preventDefault()
+        reload()
+      }
+    })
+
+    return Button(
+      {
+        class: () => 'is-fullwidth ' + (isLoading.val ? 'is-loading' : ''),
+        title: 'Reload data from the filesystem',
+        onclick: reload
+      },
+      Icon(FontAwesome('rotate')),
+      span('Reload [Ctrl+R]')
+    )
+  }
+
+  const reportsPanel = () => Panel({ class: 'is-primary' },
+    PanelHeading({ class: 'is-flex is-align-items-center is-justify-content-space-between' },
+      'Reports'
+
+    ),
+    Array.from(state.reports.val.entries()).map(([i, { filename: f, data: r, error: e }]) => // Iterator helper function map() is experimental, work on an array for now
+      a(
+        {
+          class: van.classes(
+            'panel-block',
+            state.index.val === i ? 'is-active' : '',
+            r === null ? 'has-text-danger' : ''
+          ),
+          title: f,
+          onclick: () => { state.index.val = i }
+        },
+        r === null
+          ? 'Failed to parse report'
+          : r.date
+      )
+    ),
+    div({ class: 'panel-block' }, reportsReloadButton)
+  )
+
   return [
-    Navbar({ logo: { src: '/assets/logo.png', alt: 'application logo' } }),
+    navigation,
 
     Section(
       notificationsArea,
+
       DirectoryPicker({
         label: 'Scans directory',
         name: () => state.directory.val?.name ?? '...',
         onsuccess: d => { state.directory.val = d }
       }),
+
       Columns(
-        Column({ class: 'is-one-third' },
-          () => Panel(
-            PanelHeading({ class: 'is-flex is-align-items-center is-justify-content-space-between' },
-              'Reports'
-
-            ),
-            Array.from(state.reports.val.entries()).map(([i, { filename: f, data: r, error: e }]) => // Iterator helper function map() is experimental, work on an array for now
-              a(
-                {
-                  class: van.classes(
-                    'panel-block',
-                    state.index.val === i ? 'is-active' : '',
-                    r === null ? 'has-text-danger' : ''
-                  ),
-                  title: f,
-                  onclick: () => { state.index.val = i }
-                },
-                r === null
-                  ? 'Failed to parse report'
-                  : r.date
-              )
-            ),
-            div({ class: 'panel-block' },
-              () => {
-                document.addEventListener('keydown', ev => {
-                  if (ev.ctrlKey && ev.key === 'r') {
-                    ev.preventDefault()
-                    reload()
-                  }
-                })
-
-                return Button(
-                  {
-                    class: () => 'is-fullwidth ' + (isLoading.val ? 'is-loading' : ''),
-                    title: 'Reload data from the filesystem',
-                    onclick: reload
-                  },
-                  Icon(FontAwesome('rotate')),
-                  span('Reload [Ctrl+R]')
-                )
-              }
-            )
-          )
-        ),
+        Column({ class: 'is-one-third' }, reportsPanel),
         Column(
           Level(
             LevelLeft(),
-            LevelRight(
-              DualButton({
-                left: [
-                  Icon(FontAwesome('toolbox')),
-                  span('Report')
-                ],
-                onclickLeft: () => { state.isViewingSource.val = false },
-                right: [
-                  Icon(FontAwesome('file-lines')),
-                  span('Source')
-                ],
-                onclickRight: () => { state.isViewingSource.val = true },
-                isLeftSelected: () => !state.isViewingSource.val
-              })
-            )
+            LevelRight(viewerModeSwhitcher)
           ),
-          pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, () => report.val ? report.val.content : ''),
-          () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
-            () => report.val
-              ? report.val.error
-                ? ReportParseError(report.val.error)
-                : Report(report.val.data)
-              : ''
-          )
+          sourceViewer,
+          reportViewer
         )
       )
     ),
 
-    Footer(
-      Content({ class: 'has-text-centered' },
-        p(strong('VCDS Parser'), ' by Damien Flament.'),
-        Field({ class: 'is-grouped is-grouped-centered' },
-          Control(
-            StatusTag({ class: config.persistence ? 'is-success' : 'is-warning' }, 'Persistence')
-          ),
-          Control(
-            StatusTag({ class: config.serviceWorker ? 'is-success' : 'is-warning' }, 'Service Worker')
-          )
-        ),
-        a({ href: 'https://bulma.io' }, img({ style: 'height: 1.5em', src: 'https://bulma.io/assets/images/made-with-bulma.png', alt: 'Made with Bulma' }))
-      )
-    )
+    footer
   ]
 }
 
