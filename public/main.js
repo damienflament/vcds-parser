@@ -4,7 +4,7 @@
  */
 
 import bulma from './lib/bulma.js'
-import { DirectoryPicker, DualButton, FontAwesome, Notification, NotificationArea, Report, ReportParseError, StatusTag } from './lib/components.js'
+import { DirectoryPicker, DualButton, FontAwesome, Report, ReportParseError, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { AutoScan, safelyAssign } from './lib/model.js'
@@ -136,22 +136,11 @@ const App = () => {
             })
           break
 
-        case 'prompt':
-          endLoading()
-          van.add(notificationsArea, Notification({
-            message: 'Do you want to load the last opened directory ?',
-            label: 'Yes, open it',
-            onclick: () => openDirectory(directory)
-          }))
-          break
-
         default:
           endLoading()
       }
     })
   }
-
-  const notificationsArea = NotificationArea()
 
   const { a, pre, div, img, p, strong, span } = van.tags
   const {
@@ -256,8 +245,6 @@ const App = () => {
     navigation,
 
     Section(
-      notificationsArea,
-
       DirectoryPicker({
         label: 'Scans directory',
         name: () => state.directory.val?.name ?? '...',
