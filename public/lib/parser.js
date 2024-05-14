@@ -55,15 +55,15 @@ const describeErrorContext = (content, error) => {
   to line ${endLine} column ${endCol}
 
   Context:
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+.................................................
 ${contextBefore}
 ${finger}
 ${contextAfter}
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+.................................................
 ${showControlCharacters(contextBefore)}␊
 ${finger}
 ${showControlCharacters(contextAfter)}␊
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .`
+.................................................`
 }
 
 /**
