@@ -150,6 +150,7 @@ const App = () => {
     Columns, Column,
     Control, Field,
     Level, LevelLeft, LevelRight,
+    Message, MessageHeader, MessageBody,
     Panel, PanelHeading
   } = bulma.elements
 
@@ -188,7 +189,14 @@ const App = () => {
     isLeftSelected: () => !state.isViewingSource.val
   })
 
-  const sourceViewer = pre({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' }, () => report.val ? report.val.content : '')
+  const sourceViewer = Message({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' },
+    MessageHeader(
+      p(() => report.val?.filename ?? '')
+    ),
+    MessageBody({ class: 'content' },
+      pre(() => report.val?.content ?? '')
+    )
+  )
 
   const reportViewer = () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
     () => report.val
