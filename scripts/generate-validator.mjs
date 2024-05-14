@@ -5,8 +5,6 @@
  * dependencies are bundled to be loaded as a single module by the browser.
  */
 
-'use strict'
-
 import Ajv from 'ajv'
 import standaloneCode from 'ajv/dist/standalone/index.js'
 import * as esbuild from 'esbuild'

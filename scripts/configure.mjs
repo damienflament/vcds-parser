@@ -6,8 +6,6 @@
  * static resources list.
  */
 
-'use strict'
-
 import fs from 'fs-extra'
 import klawSync from 'klaw-sync'
 import { relative, resolve } from 'path'
