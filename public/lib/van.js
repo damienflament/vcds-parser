@@ -3,7 +3,14 @@
  * @module
  */
 
-import van from '../vendor/van-1.5.0.debug.js'
+import { configureFromUrl } from './configuration.js'
+import { sealed } from './object.js'
+
+const config = sealed({ debug: false })
+configureFromUrl(config, window.location.href)
+
+const vanPath = config.debug ? '../vendor/van-1.5.0.debug.js' : '../vendor/van-1.5.0.js'
+const van = (await import(vanPath)).default
 
 /**
  * Ensures the given value is allowed as a property value.
