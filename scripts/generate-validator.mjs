@@ -1,6 +1,8 @@
 /**
- * Generates a data validator and a TypeScript declaration file from the JSON
- * schema.
+ * Generates the data validator.
+ *
+ * The validator is generated from the JSON schema. Its code and the
+ * dependencies are bundled to be loaded as a single module by the browser.
  */
 
 'use strict'
@@ -64,8 +66,8 @@ if (watching) {
   const watcher = watch(SCHEMA)
 
   for await (const ev of watcher) {
-    console.log(`  Changes occur on schema ${ev.filename}`)
+    console.log(`! Change occurs on schema ${ev.filename}`)
 
-    generate(SCHEMA, VALIDATOR)
+    await generate(SCHEMA, VALIDATOR)
   }
 }
