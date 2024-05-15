@@ -9,7 +9,7 @@ import { sealed } from './object.js'
 const config = sealed({ debug: false })
 configureFromUrl(config, window.location.href)
 
-const vanPath = config.debug ? '../vendor/van-1.5.0.debug.js' : '../vendor/van-1.5.0.js'
+const vanPath = config.debug ? '../vendor/van.debug.js' : '../vendor/van.js'
 const van = (await import(vanPath)).default
 
 /**

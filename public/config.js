@@ -38,11 +38,12 @@ export default {
     '/vendor/fontawesome/css/solid.min.css',
     '/vendor/fontawesome/webfonts/fa-brands-400.ttf',
     '/vendor/fontawesome/webfonts/fa-brands-400.woff2',
+    '/vendor/fontawesome/webfonts/fa-regular-400.ttf',
+    '/vendor/fontawesome/webfonts/fa-regular-400.woff2',
     '/vendor/fontawesome/webfonts/fa-solid-900.ttf',
     '/vendor/fontawesome/webfonts/fa-solid-900.woff2',
-    '/vendor/van-1.5.0.debug.js',
-    '/vendor/van-1.5.0.js',
-    '/vendor/van-1.5.0.min.js',
+    '/vendor/van.debug.js',
+    '/vendor/van.js',
     '/'
   ]
 }
