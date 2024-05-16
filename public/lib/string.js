@@ -21,7 +21,7 @@ const camelToDashCase = string =>
    * @returns {string}
   */
 const stringify = (data, indent = 2, initialIndent = 0) => {
-  let str = JSON.stringify(data, null, indent)
+  let str = JSON.stringify(data, null, indent) ?? data.toString()
 
   if (initialIndent > 0) {
     str = str.split('\n')
