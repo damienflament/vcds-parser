@@ -5,6 +5,16 @@
 
 import { typeOf } from './object.js'
 
+/**
+ * Fills the given array with the given data.
+ *
+ * The array must contain a single element which must be a class object. That
+ * element is taken off to be used as a template. Each element from the data
+ * array is assigned to a new instance of the template.
+ *
+ * @param {array} array
+ * @param {array} data
+ */
 const safelyFillArray = (array, data) => {
   const Template = array.pop()
 
@@ -17,6 +27,20 @@ const safelyFillArray = (array, data) => {
   Object.freeze(array)
 }
 
+/**
+ * Assigns the given data to the given object's properties.
+ *
+ * Object composition is allowed through the initialization of class field. If
+ * the field is a class object, the data is assigned to a new instance of this
+ * class. If it is an array containing a single class object, each data element
+ * is assigned to a new instance of the class.
+ *
+ * Before assigning, the object is sealed to prevent new property creation.
+ * After assigning, the object is frozen.
+ *
+ * @param {object} object
+ * @param {object} data
+ */
 const safelyAssign = (object, data) => {
   Object.seal(object)
 
@@ -24,6 +48,8 @@ const safelyAssign = (object, data) => {
     const datum = data[name]
 
     switch (typeOf(object[name])) {
+      // The field is a class, assign data to a new instance. Null value is
+      // allowed.
       case 'Function':
         if (datum === null) {
           object[name] = null
@@ -32,9 +58,11 @@ const safelyAssign = (object, data) => {
           safelyAssign(object[name], datum)
         }
         break
+      // The field is an array, fill it.
       case 'Array':
         safelyFillArray(object[name], datum)
         break
+      // The field is a primitive, assign it.
       default:
         object[name] = datum
     }
@@ -90,6 +118,7 @@ class Module {
 
   /**
    * Gives the decimal form of the given module address.
+   *
    * @param {string} address the module address
    * @returns {integer}
    */
