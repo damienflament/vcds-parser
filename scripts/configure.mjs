@@ -7,14 +7,13 @@
  */
 
 import fs from 'fs-extra'
-import klawSync from 'klaw-sync'
-import { relative, resolve } from 'path'
+import { resolve } from 'path'
 import standard from 'standard'
 
 const PACKAGE = resolve(import.meta.dirname, '../package.json')
-const PUBLIC = resolve(import.meta.dirname, '../public/')
-const MANIFEST = resolve(PUBLIC, 'vcds-parser.webmanifest')
-const CONFIG = resolve(PUBLIC, 'config.js')
+// const PUBLIC = resolve(import.meta.dirname, '../public/')
+const MANIFEST = resolve(import.meta.dirname, '../public/vcds-parser.webmanifest')
+const CONFIG = resolve(import.meta.dirname, '../config.js')
 
 const jsonOptions = { spaces: 2 }
 
@@ -31,10 +30,10 @@ fs.readJson(PACKAGE).then(info => {
 
   const config = {
     version: info.version,
-    cacheName: info.name + '-' + info.version,
-    staticResources: klawSync(PUBLIC, { nodir: true })
-      .map(({ path }) => '/' + relative(PUBLIC, path))
-      .concat(['/'])
+    cacheName: info.name + '-' + info.version
+    // staticResources: klawSync(PUBLIC, { nodir: true })
+    //   .map(({ path }) => '/' + relative(PUBLIC, path))
+    //   .concat(['/'])
   }
 
   // Configuration file is indented by JSON then linted by Standard.

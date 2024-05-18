@@ -1,4 +1,6 @@
+/.vscode/
 /.yarn/
 /node_modules/
 
-/public/generated/
+/generated/
+/dist/
