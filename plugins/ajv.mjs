@@ -5,10 +5,12 @@ import * as path from 'path'
 
 export default function () {
   const ajv = new Ajv({
+    allErrors: true,
+    verbose: true,
     code: {
-      source: true,
       esm: true,
-      lines: true
+      lines: true,
+      source: true
     }
   })
 
