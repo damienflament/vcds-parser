@@ -1,10 +1,11 @@
 import Ajv from 'ajv'
 import standaloneCode from 'ajv/dist/standalone'
 import fs from 'fs-extra'
-import * as path from 'path'
+import * as common from './common.mjs'
 
 export default function () {
   const ajv = new Ajv({
+    strict: true,
     allErrors: true,
     verbose: true,
     code: {
@@ -18,20 +19,8 @@ export default function () {
 
   return {
     name: 'ajv',
-    resolveId (source, importer, options) {
-      if (!source?.startsWith('ajv:')) return null
-
-      const url = new URL(source)
-      const { dir, name } = path.parse(url.pathname)
-
-      const id = path.resolve(path.dirname(importer), dir, `${name}-validator.js`)
-      schemas[id] = path.resolve(path.dirname(importer), url.pathname)
-
-      return {
-        id,
-        resolvedBy: 'ajv'
-      }
-    },
+    resolveId: (source, importer, options) =>
+      common.resolveId('ajv', 'validator', schemas, source, importer, options),
     load (id) {
       if (!schemas[id]) return null
 
