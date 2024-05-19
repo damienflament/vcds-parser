@@ -12,6 +12,8 @@ export default function () {
     load (id) {
       if (!grammars[id]) return null
 
+      this.addWatchFile(grammars[id])
+
       const src = fs.readFileSync(grammars[id]).toString()
       const parserCode = peggy.generate(
         src,

@@ -24,6 +24,8 @@ export default function () {
     load (id) {
       if (!schemas[id]) return null
 
+      this.addWatchFile(schemas[id])
+
       const schema = fs.readJsonSync(schemas[id])
       const validation = ajv.compile(schema)
       const validationCode = standaloneCode(ajv, validation)
