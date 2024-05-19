@@ -8,12 +8,14 @@ import { DirectoryPicker, DualButton, FontAwesome, Report, ReportParseError, Sta
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { AutoScan, safelyAssign } from './lib/model.js'
-import { frozen, sealed } from './lib/object.js'
 import { parse } from './lib/parser.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
 import { validate } from './lib/validator.js'
 import van from './lib/van.js'
+
+const sealed = Object.seal
+const frozen = Object.freeze
 
 /** Application configuration */
 const config = sealed({
