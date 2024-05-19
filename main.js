@@ -3,7 +3,8 @@
  * @module
  */
 
-import bulma from './lib/bulma.js'
+import { formatDistanceToNowStrict } from 'date-fns'
+import { format } from 'string-kit'
 import { DirectoryPicker, DualButton, FontAwesome, Report, ReportParseError, StatusTag } from './lib/components.js'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
@@ -12,6 +13,8 @@ import { parse } from './lib/parser.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
 import { validate } from './lib/validator.js'
+
+import bulma from './lib/bulma.js'
 import van from './lib/van.js'
 
 const sealed = Object.seal
@@ -68,6 +71,16 @@ const App = () => {
   van.derive(reload)
 
   van.derive(() => {
+    // Sort reports by mileage, youngest first and keep failed parsing last
+    state.reports.val.sort(
+      ({ data: a }, { data: b }) =>
+        a === null
+          ? +1
+          : b === null
+            ? -1
+            : b.vehicle.mileage.km - a.vehicle.mileage.km
+    )
+
     // Wrap data within model objects and validate
     state.reports.val.forEach((report) => {
       if (report.data) {
@@ -153,7 +166,7 @@ const App = () => {
     Control, Field,
     Level, LevelLeft, LevelRight,
     Message, MessageHeader, MessageBody,
-    Panel, PanelHeading
+    Panel, PanelHeading, PanelIcon
   } = bulma.elements
 
   const navigation = Navbar({ class: 'has-background-primary' },
@@ -208,7 +221,7 @@ const App = () => {
       : ''
   )
 
-  const reportsReloadButton = () => {
+  const reloadButton = () => {
     document.addEventListener('keydown', ev => {
       if (ev.ctrlKey && ev.key === 'r') {
         ev.preventDefault()
@@ -228,27 +241,34 @@ const App = () => {
   }
 
   const reportsPanel = () => Panel({ class: 'is-primary' },
-    PanelHeading({ class: 'is-flex is-align-items-center is-justify-content-space-between' },
-      'Reports'
-
-    ),
-    Array.from(state.reports.val.entries()).map(([i, { filename: f, data: r, error: e }]) => // Iterator helper function map() is experimental, work on an array for now
-      a(
-        {
-          class: van.classes(
-            'panel-block',
-            state.index.val === i ? 'is-active' : '',
-            r === null ? 'has-text-danger' : ''
-          ),
-          title: f,
-          onclick: () => { state.index.val = i }
-        },
-        r === null
-          ? 'Failed to parse report'
-          : r.date
-      )
-    ),
-    div({ class: 'panel-block' }, reportsReloadButton)
+    PanelHeading({ class: 'is-flex is-align-items-center is-justify-content-space-between' }, 'Reports'),
+    Array.from(state.reports.val.entries())
+      .map(([i, { filename: f, data: r, error: e }]) => // Iterator helper function map() is experimental, work on an array for now
+        a(
+          {
+            class: van.classes(
+              'panel-block',
+              state.index.val === i ? 'is-active' : '',
+              r === null ? 'has-text-warning' : ''
+            ),
+            title: f,
+            onclick: () => { state.index.val = i }
+          },
+          r === null
+            ? [
+                PanelIcon(),
+                'Failed to parse report'
+              ]
+            : [
+                PanelIcon(
+                  { class: r.hasFaults ? 'has-text-danger' : 'has-text-success' },
+                  FontAwesome(r.hasFaults ? 'circle-xmark' : 'circle-check')
+                ),
+                format('%n km - %s', r.vehicle.mileage.km, formatDistanceToNowStrict(r.date, { addSuffix: true }))
+              ]
+        )
+      ),
+    div({ class: 'panel-block' }, reloadButton)
   )
 
   return [

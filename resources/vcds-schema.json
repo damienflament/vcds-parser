@@ -7,7 +7,7 @@
     "additionalProperties": false,
     "properties": {
         "date": {
-            "type": "string"
+            "type": "object"
         },
         "duration": {
             "$ref": "#/definitions/duration"

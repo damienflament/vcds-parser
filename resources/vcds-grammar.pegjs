@@ -89,7 +89,7 @@ report
 
 datetime
   = dayName ',' day ',' monthName ',' year ',' hours ':' minutes ':' seconds ':00009'
-  { return text() }
+  { return new Date(text()) }
 duration
   = minutes:$minutes ':' seconds:$seconds
   { return { minutes: integer(minutes), seconds: integer(seconds) } }
