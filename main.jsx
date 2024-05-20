@@ -5,15 +5,18 @@
 
 import { formatDistanceToNowStrict } from 'date-fns'
 import { format } from 'string-kit'
-import { DirectoryPicker, FontAwesome, StatusTag } from './ui/components.jsx'
-import { Report, ReportParseError } from './ui/report.jsx'
+
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { AutoScan, safelyAssign } from './lib/model.js'
-import { parse } from './lib/parser.js'
 import { registerServiceWorker, unregisterServiceWorker } from './lib/serviceworker.js'
 import { Storage, persist } from './lib/storage.js'
+
+import { parse } from './lib/parser.js'
 import { validate } from './lib/validator.js'
+
+import { DirectoryPicker, FontAwesome, StatusTag } from './ui/components.jsx'
+import { Report, ReportParseError } from './ui/report.jsx'
 
 import bulma from './lib/bulma.js'
 import van from './lib/van.js'
@@ -35,6 +38,13 @@ if (config.serviceWorker) {
   console.log('Service Worker disabled.')
   unregisterServiceWorker()
 }
+
+const darkColorSchemeQueryList = window.matchMedia('(prefers-color-scheme: dark)')
+const isColorSchemeDark = van.state(darkColorSchemeQueryList.matches)
+
+darkColorSchemeQueryList.addEventListener('change', query => {
+  isColorSchemeDark.val = query.matches
+})
 
 const App = () => {
   /** Persisted state */
@@ -177,7 +187,13 @@ const App = () => {
     </Navbar>
   )
 
-  const footer = (
+  const bulmaIcon = () => {
+    const path = () => `/assets/made-with-bulma--${isColorSchemeDark.val ? 'semiwhite' : 'semiblack'}.png`
+
+    return <a href='https://bulma.io'><img style={{ height: '1.5em' }} src={path} alt='Made with Bulma' /></a>
+  }
+
+  const footer = () =>
     <Footer>
       <Content class='has-text-centered'>
         <p><strong>VCDS Parser</strong> by Damien Flament.</p>
@@ -185,10 +201,9 @@ const App = () => {
           <Control><StatusTag class={config.persistence ? 'is-success' : 'is-warning'}>Persistence</StatusTag></Control>
           <Control><StatusTag class={config.serviceWorker ? 'is-success' : 'is-warning'}>Service Worker</StatusTag></Control>
         </Field>
-        <a href='https://bulma.io'><img style={{ height: '1.5em' }} src='https://bulma.io/assets/images/made-with-bulma.png' alt='Made with Bulma' /></a>
+        {bulmaIcon}
       </Content>
     </Footer>
-  )
 
   const viewerModeSwhitcher = () => {
     const showReport = () => { state.isViewingSource.val = false }
