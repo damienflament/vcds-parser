@@ -1,0 +1,23 @@
+diff --git a/src/createElement.js b/src/createElement.js
+index 1648600390692e0d2eedd5cbdddfe0db8499728e..108dd08f358c38b545c41c5b0b26933391e9a335 100644
+--- a/src/createElement.js
++++ b/src/createElement.js
+@@ -1,7 +1,8 @@
+ import van from "vanjs-core";
+ import { setAttribute } from "./hyper";
+-const createElement = (jsxTag, { children, style, ref, ...props }) => {
++const createElement = (jsxTag, allProps) => {
+     if (typeof jsxTag === "string") {
++        const {children, ref, ...props} = allProps
+         // TODO VanNode to VanElement
+         const ele = van.tags[jsxTag](children);
+         for (const [key, value] of Object.entries(props ?? {})) {
+@@ -27,7 +28,7 @@ const createElement = (jsxTag, { children, style, ref, ...props }) => {
+         return ele;
+     }
+     if (typeof jsxTag === "function") {
+-        return jsxTag({ ...props, ref, style, children });
++        return jsxTag(allProps);
+     }
+ };
+ export default createElement;

@@ -1,0 +1,17 @@
+diff --git a/src/index.js b/src/index.js
+index 2bf1dae985ee1b74aa9a8b78565e8407689fe7b4..80817875c98ef416ca4fbb5991d67cf1685b6635 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -2,4 +2,4 @@ import van from "vanjs-core";
+ export function createState(v) {
+     return van.state(v);
+ }
+-export { default as createElement, default as jsx, default as jsxDEV, } from "./createElement";
++export { default as createElement, default as jsx, default as jsxs, default as jsxDEV, } from "./createElement";
+diff --git a/src/jsx-runtime.js b/src/jsx-runtime.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..6d1e0ee83e7d50615ce85da58cd1bf4683ed0d03
+--- /dev/null
++++ b/src/jsx-runtime.js
+@@ -0,0 +1 @@
++export * from "./index";
