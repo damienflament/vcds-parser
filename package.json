@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "ajv": "^8.13.0",
-    "ajv-cli": "patch:ajv-cli@npm%3A5.0.0#~/.yarn/patches/ajv-cli-npm-5.0.0-e12d6f3c52.patch",
     "fs-extra": "^11.2.0",
     "klaw-sync": "^6.0.0",
     "peggy": "^4.0.2",

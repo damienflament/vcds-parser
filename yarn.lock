@@ -535,50 +535,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv-cli@npm:5.0.0":
-  version: 5.0.0
-  resolution: "ajv-cli@npm:5.0.0"
-  dependencies:
-    ajv: "npm:^8.0.0"
-    fast-json-patch: "npm:^2.0.0"
-    glob: "npm:^7.1.0"
-    js-yaml: "npm:^3.14.0"
-    json-schema-migrate: "npm:^2.0.0"
-    json5: "npm:^2.1.3"
-    minimist: "npm:^1.2.0"
-  peerDependencies:
-    ts-node: ">=9.0.0"
-  peerDependenciesMeta:
-    ts-node:
-      optional: true
-  bin:
-    ajv: dist/index.js
-  checksum: 10c0/91c70cb3997fefdb32157b20278643d9ccf6e4897a6b8babf42d6bdb55cb1b7df31524bd5589bf897be14378893b4cf21c366ba313708c3d618e0e976292d7f1
-  languageName: node
-  linkType: hard
-
-"ajv-cli@patch:ajv-cli@npm%3A5.0.0#~/.yarn/patches/ajv-cli-npm-5.0.0-e12d6f3c52.patch":
-  version: 5.0.0
-  resolution: "ajv-cli@patch:ajv-cli@npm%3A5.0.0#~/.yarn/patches/ajv-cli-npm-5.0.0-e12d6f3c52.patch::version=5.0.0&hash=e4198a"
-  dependencies:
-    ajv: "npm:^8.0.0"
-    fast-json-patch: "npm:^2.0.0"
-    glob: "npm:^7.1.0"
-    js-yaml: "npm:^3.14.0"
-    json-schema-migrate: "npm:^2.0.0"
-    json5: "npm:^2.1.3"
-    minimist: "npm:^1.2.0"
-  peerDependencies:
-    ts-node: ">=9.0.0"
-  peerDependenciesMeta:
-    ts-node:
-      optional: true
-  bin:
-    ajv: dist/index.js
-  checksum: 10c0/70c503c721f5e153bea15ee3d706b3efa10cfcf7a3b15008bf6f640990a14eadf89486fdf867c4c701178a7a7c2b359c789df50b46678fbd091594da853129a2
-  languageName: node
-  linkType: hard
-
 "ajv@npm:^6.12.4":
   version: 6.12.6
   resolution: "ajv@npm:6.12.6"
@@ -591,7 +547,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv@npm:^8.0.0, ajv@npm:^8.13.0":
+"ajv@npm:^8.13.0":
   version: 8.13.0
   resolution: "ajv@npm:8.13.0"
   dependencies:
@@ -640,15 +596,6 @@ __metadata:
     normalize-path: "npm:^3.0.0"
     picomatch: "npm:^2.0.4"
   checksum: 10c0/57b06ae984bc32a0d22592c87384cd88fe4511b1dd7581497831c56d41939c8a001b28e7b853e1450f2bf61992dfcaa8ae2d0d161a0a90c4fb631ef07098fbac
-  languageName: node
-  linkType: hard
-
-"argparse@npm:^1.0.7":
-  version: 1.0.10
-  resolution: "argparse@npm:1.0.10"
-  dependencies:
-    sprintf-js: "npm:~1.0.2"
-  checksum: 10c0/b2972c5c23c63df66bca144dbc65d180efa74f25f8fd9b7d9a0a6c88ae839db32df3d54770dcb6460cf840d232b60695d1a6b1053f599d84e73f7437087712de
   languageName: node
   linkType: hard
 
@@ -1927,16 +1874,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esprima@npm:^4.0.0":
-  version: 4.0.1
-  resolution: "esprima@npm:4.0.1"
-  bin:
-    esparse: ./bin/esparse.js
-    esvalidate: ./bin/esvalidate.js
-  checksum: 10c0/ad4bab9ead0808cf56501750fd9d3fb276f6b105f987707d059005d57e182d18a7c9ec7f3a01794ebddcca676773e42ca48a32d67a250c9d35e009ca613caba3
-  languageName: node
-  linkType: hard
-
 "esquery@npm:^1.4.2":
   version: 1.5.0
   resolution: "esquery@npm:1.5.0"
@@ -2001,13 +1938,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-deep-equal@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "fast-deep-equal@npm:2.0.1"
-  checksum: 10c0/1602e0d6ed63493c865cc6b03f9070d6d3926e8cd086a123060b58f80a295f3f08b1ecfb479ae7c45b7fd45535202aea7cf5b49bc31bffb81c20b1502300be84
-  languageName: node
-  linkType: hard
-
 "fast-deep-equal@npm:^3.1.1, fast-deep-equal@npm:^3.1.3":
   version: 3.1.3
   resolution: "fast-deep-equal@npm:3.1.3"
@@ -2025,15 +1955,6 @@ __metadata:
     merge2: "npm:^1.3.0"
     micromatch: "npm:^4.0.4"
   checksum: 10c0/42baad7b9cd40b63e42039132bde27ca2cb3a4950d0a0f9abe4639ea1aa9d3e3b40f98b1fe31cbc0cc17b664c9ea7447d911a152fa34ec5b72977b125a6fc845
-  languageName: node
-  linkType: hard
-
-"fast-json-patch@npm:^2.0.0":
-  version: 2.2.1
-  resolution: "fast-json-patch@npm:2.2.1"
-  dependencies:
-    fast-deep-equal: "npm:^2.0.1"
-  checksum: 10c0/3200148b8244081ac628e8044a3ba6c42bbe26542d1586b0e87221bff8d5ef58252a2dd846a709ff4683cf826e89123025c2708729933dde859430a40f0d321e
   languageName: node
   linkType: hard
 
@@ -2279,7 +2200,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^7.1.0, glob@npm:^7.1.3":
+"glob@npm:^7.1.3":
   version: 7.2.3
   resolution: "glob@npm:7.2.3"
   dependencies:
@@ -2898,18 +2819,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^3.14.0":
-  version: 3.14.1
-  resolution: "js-yaml@npm:3.14.1"
-  dependencies:
-    argparse: "npm:^1.0.7"
-    esprima: "npm:^4.0.0"
-  bin:
-    js-yaml: bin/js-yaml.js
-  checksum: 10c0/6746baaaeac312c4db8e75fa22331d9a04cccb7792d126ed8ce6a0bbcfef0cedaddd0c5098fade53db067c09fe00aa1c957674b4765610a8b06a5a189e46433b
-  languageName: node
-  linkType: hard
-
 "js-yaml@npm:^4.1.0":
   version: 4.1.0
   resolution: "js-yaml@npm:4.1.0"
@@ -2942,15 +2851,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json-schema-migrate@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "json-schema-migrate@npm:2.0.0"
-  dependencies:
-    ajv: "npm:^8.0.0"
-  checksum: 10c0/9d14970cd1cab496b0a5dc52c3a69a0346dc2bd4ce3135a3561739eddb46cb7696dc815ff9ddcd015c4c4532b56495a1ec5db4b141b77e6d2c9c7b492cd02c6a
-  languageName: node
-  linkType: hard
-
 "json-schema-traverse@npm:^0.4.1":
   version: 0.4.1
   resolution: "json-schema-traverse@npm:0.4.1"
@@ -2980,15 +2880,6 @@ __metadata:
   bin:
     json5: lib/cli.js
   checksum: 10c0/9ee316bf21f000b00752e6c2a3b79ecf5324515a5c60ee88983a1910a45426b643a4f3461657586e8aeca87aaf96f0a519b0516d2ae527a6c3e7eed80f68717f
-  languageName: node
-  linkType: hard
-
-"json5@npm:^2.1.3":
-  version: 2.2.3
-  resolution: "json5@npm:2.2.3"
-  bin:
-    json5: lib/cli.js
-  checksum: 10c0/5a04eed94810fa55c5ea138b2f7a5c12b97c3750bc63d11e511dcecbfef758003861522a070c2272764ee0f4e3e323862f386945aeb5b85b87ee43f084ba586c
   languageName: node
   linkType: hard
 
@@ -4386,13 +4277,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sprintf-js@npm:~1.0.2":
-  version: 1.0.3
-  resolution: "sprintf-js@npm:1.0.3"
-  checksum: 10c0/ecadcfe4c771890140da5023d43e190b7566d9cf8b2d238600f31bec0fc653f328da4450eb04bd59a431771a8e9cc0e118f0aa3974b683a4981b4e07abc2a5bb
-  languageName: node
-  linkType: hard
-
 "ssri@npm:^10.0.0":
   version: 10.0.6
   resolution: "ssri@npm:10.0.6"
@@ -4878,7 +4762,6 @@ __metadata:
   dependencies:
     "@fortawesome/fontawesome-free": "npm:^6.5.2"
     ajv: "npm:^8.13.0"
-    ajv-cli: "patch:ajv-cli@npm%3A5.0.0#~/.yarn/patches/ajv-cli-npm-5.0.0-e12d6f3c52.patch"
     bulma: "npm:^1.0.0"
     dashify: "npm:^2.0.0"
     date-fns: "npm:^3.6.0"
