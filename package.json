@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.2",
+    "ajv": "^8.13.0",
     "bulma": "^1.0.0",
     "dashify": "^2.0.0",
     "date-fns": "^3.6.0",
@@ -34,7 +35,6 @@
     "vanjs-core": "^1.5.0"
   },
   "devDependencies": {
-    "ajv": "^8.13.0",
     "fs-extra": "^11.2.0",
     "klaw-sync": "^6.0.0",
     "peggy": "^4.0.2",
