@@ -4845,6 +4845,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"vanjs-jsx@npm:0.2.1":
+  version: 0.2.1
+  resolution: "vanjs-jsx@npm:0.2.1"
+  peerDependencies:
+    vanjs-core: ^1.1.3
+  checksum: 10c0/7532a17e2deef6f1f5ea4fc0406dca1b03cb4fd03cbe5079ade1f73b825dce2a9f278f04430c27cf5d549fb4c33fe07cd4ad3f8be71bd7e7332bd51cbdc52627
+  languageName: node
+  linkType: hard
+
+"vanjs-jsx@patch:vanjs-jsx@npm%3A0.2.1#~/.yarn/patches/vanjs-jsx-npm-0.2.1-85c8697fe6.patch::version=0.2.1&hash=fb620d":
+  version: 0.2.1
+  resolution: "vanjs-jsx@patch:vanjs-jsx@npm%3A0.2.1#~/.yarn/patches/vanjs-jsx-npm-0.2.1-85c8697fe6.patch::version=0.2.1&hash=fb620d"
+  peerDependencies:
+    vanjs-core: ^1.1.3
+  checksum: 10c0/198d66c361fc9a8c0ab8a5cde710d8751ce3cdcadc0fd121008a3a8061de910ec308e6cab8242bbc909367323831e0faaf357dd36a69e585b0426daa0ef31fe5
+  languageName: node
+  linkType: hard
+
+"vanjs-jsx@patch:vanjs-jsx@patch%3Avanjs-jsx@npm%253A0.2.1%23~/.yarn/patches/vanjs-jsx-npm-0.2.1-85c8697fe6.patch%3A%3Aversion=0.2.1&hash=fb620d#~/.yarn/patches/vanjs-jsx-patch-50a8cb6640.patch":
+  version: 0.2.1
+  resolution: "vanjs-jsx@patch:vanjs-jsx@patch%3Avanjs-jsx@npm%253A0.2.1%23~/.yarn/patches/vanjs-jsx-npm-0.2.1-85c8697fe6.patch%3A%3Aversion=0.2.1&hash=fb620d#~/.yarn/patches/vanjs-jsx-patch-50a8cb6640.patch::version=0.2.1&hash=dd07c5"
+  peerDependencies:
+    vanjs-core: ^1.1.3
+  checksum: 10c0/79948ba9101aa3fd4880fd32a41ca1f66409e063901fd74ff61a9868f875836decad54766c93418efd06478d5cf1e3bd3faaaebd93efa3fc8a678ec24e500322
+  languageName: node
+  linkType: hard
+
 "vcds-parser@workspace:.":
   version: 0.0.0-use.local
   resolution: "vcds-parser@workspace:."
@@ -4863,6 +4890,7 @@ __metadata:
     string-kit: "npm:^0.18.2"
     type-detect: "npm:^4.0.8"
     vanjs-core: "npm:^1.5.0"
+    vanjs-jsx: "patch:vanjs-jsx@patch%3Avanjs-jsx@npm%253A0.2.1%23~/.yarn/patches/vanjs-jsx-npm-0.2.1-85c8697fe6.patch%3A%3Aversion=0.2.1&hash=fb620d#~/.yarn/patches/vanjs-jsx-patch-50a8cb6640.patch"
     vite: "npm:^5.2.0"
     vite-plugin-commonjs: "npm:^0.10.1"
     vite-plugin-node-polyfills: "npm:^0.21.0"

@@ -22,5 +22,10 @@ export default defineConfig({
         assetFileNames: 'assets/[name][extname]'
       }
     }
+  },
+  esbuild: {
+    jsx: 'automatic',
+    jsxDev: false,
+    jsxImportSource: 'vanjs-jsx'
   }
 })

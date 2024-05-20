@@ -5,7 +5,8 @@
 
 import { formatDistanceToNowStrict } from 'date-fns'
 import { format } from 'string-kit'
-import { DirectoryPicker, DualButton, FontAwesome, Report, ReportParseError, StatusTag } from './lib/components.js'
+import { DirectoryPicker, FontAwesome, StatusTag } from './ui/components.jsx'
+import { Report, ReportParseError } from './ui/report.jsx'
 import { configureFromUrl } from './lib/configuration.js'
 import { listDirectory, loadFileContent, requestPermission } from './lib/filesystem.js'
 import { AutoScan, safelyAssign } from './lib/model.js'
@@ -157,11 +158,10 @@ const App = () => {
     })
   }
 
-  const { a, pre, div, img, p, strong, span } = van.tags
   const {
     Footer, Section, Content,
     Navbar, NavbarBrand, NavbarItem,
-    Button, Icon,
+    Buttons, Button, Icon,
     Columns, Column,
     Control, Field,
     Level, LevelLeft, LevelRight,
@@ -169,57 +169,70 @@ const App = () => {
     Panel, PanelHeading, PanelIcon
   } = bulma.elements
 
-  const navigation = Navbar({ class: 'has-background-primary' },
-    NavbarBrand(
-      NavbarItem(img({ src: '/assets/logo.png', alt: 'application logo' }))
+  const navigation = (
+    <Navbar class='has-background-primary'>
+      <NavbarBrand>
+        <NavbarItem><img src='/assets/logo.png' alt='application logo' /></NavbarItem>
+      </NavbarBrand>
+    </Navbar>
+  )
+
+  const footer = (
+    <Footer>
+      <Content class='has-text-centered'>
+        <p><strong>VCDS Parser</strong> by Damien Flament.</p>
+        <Field class='is-grouped is-grouped-centered'>
+          <Control><StatusTag class={config.persistence ? 'is-success' : 'is-warning'}>Persistence</StatusTag></Control>
+          <Control><StatusTag class={config.serviceWorker ? 'is-success' : 'is-warning'}>Service Worker</StatusTag></Control>
+        </Field>
+        <a href='https://bulma.io'><img style={{ height: '1.5em' }} src='https://bulma.io/assets/images/made-with-bulma.png' alt='Made with Bulma' /></a>
+      </Content>
+    </Footer>
+  )
+
+  const viewerModeSwhitcher = () => {
+    const showReport = () => { state.isViewingSource.val = false }
+    const showSource = () => { state.isViewingSource.val = true }
+
+    return (
+      <Buttons class='has-addons'>
+        <Button
+          class={() => state.isViewingSource.val ? '' : 'is-selected is-primary'}
+          onclick={showReport}
+        >
+          <Icon><FontAwesome name='toolbox' /></Icon>
+          <span>Report</span>
+        </Button>
+        <Button
+          class={() => state.isViewingSource.val ? 'is-selected is-primary' : ''}
+          onclick={showSource}
+        >
+          <Icon><FontAwesome name='file-lines' /></Icon>
+          <span>Source</span>
+        </Button>
+      </Buttons>
     )
+  }
+
+  const sourceViewer = (
+    <Message class={() => state.isViewingSource.val ? '' : 'is-sr-only'}>
+      <MessageHeader>
+        <p>{() => report.val?.filename ?? ''}</p>
+      </MessageHeader>
+      <MessageBody>
+        <pre>{() => report.val?.content ?? ''}</pre>
+      </MessageBody>
+    </Message>
   )
 
-  const footer = Footer(
-    Content({ class: 'has-text-centered' },
-      p(strong('VCDS Parser'), ' by Damien Flament.'),
-      Field({ class: 'is-grouped is-grouped-centered' },
-        Control(
-          StatusTag({ class: config.persistence ? 'is-success' : 'is-warning' }, 'Persistence')
-        ),
-        Control(
-          StatusTag({ class: config.serviceWorker ? 'is-success' : 'is-warning' }, 'Service Worker')
-        )
-      ),
-      a({ href: 'https://bulma.io' }, img({ style: 'height: 1.5em', src: 'https://bulma.io/assets/images/made-with-bulma.png', alt: 'Made with Bulma' }))
-    )
-  )
-
-  const viewerModeSwhitcher = DualButton({
-    left: [
-      Icon(FontAwesome('toolbox')),
-      span('Report')
-    ],
-    onclickLeft: () => { state.isViewingSource.val = false },
-    right: [
-      Icon(FontAwesome('file-lines')),
-      span('Source')
-    ],
-    onclickRight: () => { state.isViewingSource.val = true },
-    isLeftSelected: () => !state.isViewingSource.val
-  })
-
-  const sourceViewer = Message({ class: () => state.isViewingSource.val ? '' : 'is-sr-only' },
-    MessageHeader(
-      p(() => report.val?.filename ?? '')
-    ),
-    MessageBody({ class: 'content' },
-      pre(() => report.val?.content ?? '')
-    )
-  )
-
-  const reportViewer = () => div({ class: () => state.isViewingSource.val ? 'is-sr-only' : '' },
-    () => report.val
-      ? report.val.error
-        ? ReportParseError(report.val.error)
-        : Report(report.val.data)
-      : ''
-  )
+  const reportViewer = () =>
+    <div class={() => state.isViewingSource.val ? 'is-sr-only' : ''}>
+      {() => report.val
+        ? report.val.error
+          ? (<ReportParseError error={report.val.error} />)
+          : (<Report report={report.val.data} />)
+        : ''}
+    </div>
 
   const reloadButton = () => {
     document.addEventListener('keydown', ev => {
@@ -229,73 +242,63 @@ const App = () => {
       }
     })
 
-    return Button(
-      {
-        class: () => 'is-fullwidth ' + (isLoading.val ? 'is-loading' : ''),
-        title: 'Reload data from the filesystem',
-        onclick: reload
-      },
-      Icon(FontAwesome('rotate')),
-      span('Reload [Ctrl+R]')
+    return (
+      <Button class={() => 'is-fullwidth ' + (isLoading.val ? 'is-loading' : '')} title='Reload data from the filesystem' onclick={reload}>
+        <Icon><FontAwesome name='rotate' /></Icon>
+        <span>Reload [Ctrl+R]</span>
+      </Button>
     )
   }
 
-  const reportsPanel = () => Panel({ class: 'is-primary' },
-    PanelHeading({ class: 'is-flex is-align-items-center is-justify-content-space-between' }, 'Reports'),
-    Array.from(state.reports.val.entries())
-      .map(([i, { filename: f, data: r, error: e }]) => // Iterator helper function map() is experimental, work on an array for now
-        a(
-          {
-            class: van.classes(
-              'panel-block',
-              state.index.val === i ? 'is-active' : '',
-              r === null ? 'has-text-warning' : ''
-            ),
-            title: f,
-            onclick: () => { state.index.val = i }
-          },
-          r === null
-            ? [
-                PanelIcon(),
-                'Failed to parse report'
-              ]
-            : [
-                PanelIcon(
-                  { class: r.hasFaults ? 'has-text-danger' : 'has-text-success' },
-                  FontAwesome(r.hasFaults ? 'circle-xmark' : 'circle-check')
-                ),
-                format('%n km - %s', r.vehicle.mileage.km, formatDistanceToNowStrict(r.date, { addSuffix: true }))
-              ]
+  const reportsPanel = () => {
+    const items = Array.from(state.reports.val.entries())
+      .map(([i, { filename: f, data: r }]) => {
+        const classes = van.classes('panel-block', state.index.val === i ? 'is-active' : '', r === null ? 'has-text-warning' : '')
+        const iconClass = r === null || r.hasFaults ? 'has-text-danger' : 'has-text-success'
+        const icon = <FontAwesome name={r?.hasFaults ? 'circle-xmark' : 'circle-check'} />
+        const label = r === null
+          ? 'Failed to parse report'
+          : format('%n km - %s', r.vehicle.mileage.km, formatDistanceToNowStrict(r.date, { addSuffix: true }))
+        const setIndex = () => { state.index.val = i }
+
+        return (
+          <a key={i} class={classes} title={f} onclick={setIndex}>
+            <PanelIcon class={iconClass}>{r !== null ? icon : null}</PanelIcon>
+            {label}
+          </a>
         )
-      ),
-    div({ class: 'panel-block' }, reloadButton)
-  )
-
-  return [
-    navigation,
-
-    Section(
-      DirectoryPicker({
-        label: 'Scans directory',
-        name: () => state.directory.val?.name ?? '...',
-        onsuccess: d => { state.directory.val = d }
-      }),
-
-      Columns(
-        Column({ class: 'is-one-third' }, reportsPanel),
-        Column(
-          Level(
-            LevelLeft(),
-            LevelRight(viewerModeSwhitcher)
-          ),
-          sourceViewer,
-          reportViewer
-        )
+      }
       )
-    ),
 
-    footer
-  ]
+    return (
+      <Panel class='is-primary'>
+        <PanelHeading class='is-flex is-align-items-center is-justify-content-space-between'>Reports</PanelHeading>
+        {items}
+        <div class='panel-block'>{reloadButton}</div>
+      </Panel>
+    )
+  }
+
+  return (
+    <div>
+      {navigation}
+      <Section>
+        <DirectoryPicker label='Scans directory' directoryName={() => state.directory.val?.name ?? '...'} onsuccess={d => { state.directory.val = d }} />
+        <Columns>
+          <Column class='is-one-third'>{reportsPanel}</Column>
+          <Column>
+            <Level>
+              <LevelLeft />
+              <LevelRight>{viewerModeSwhitcher}</LevelRight>
+            </Level>
+            {sourceViewer}
+            {reportViewer}
+          </Column>
+        </Columns>
+      </Section>
+      {footer}
+    </div>
+  )
 }
 
 van.add(document.body, App())

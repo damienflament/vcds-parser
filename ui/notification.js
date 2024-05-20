@@ -3,8 +3,8 @@
  * @module
  */
 
-import bulma from '../bulma.js'
-import van from '../van.js'
+import bulma from '../lib/bulma.js'
+import van from '../lib/van.js'
 
 const { div, p } = van.tags
 const { Button, Content, Delete, Notification } = bulma.elements

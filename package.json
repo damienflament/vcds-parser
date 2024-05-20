@@ -41,6 +41,7 @@
     "peggy": "^4.0.2",
     "snazzy": "^9.0.0",
     "standard": "^17.1.0",
+    "vanjs-jsx": "patch:vanjs-jsx@patch%3Avanjs-jsx@npm%253A0.2.1%23~/.yarn/patches/vanjs-jsx-npm-0.2.1-85c8697fe6.patch%3A%3Aversion=0.2.1&hash=fb620d#~/.yarn/patches/vanjs-jsx-patch-50a8cb6640.patch",
     "vite": "^5.2.0",
     "vite-plugin-commonjs": "^0.10.1",
     "vite-plugin-node-polyfills": "^0.21.0"
