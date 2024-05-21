@@ -12,19 +12,21 @@ import van from '../lib/van.js'
 const { File, FileCta, FileIcon, FileName, Icon, IconText, Tag, Tags } = bulma.elements
 
 /** A Font Awesome icon. */
-const FontAwesome = ({ name, style = 'solid' }) => <i class={`fa-${style} fa-${name}`} />
+const FontAwesome = ({ name, style = 'solid' }) =>
+  <i class={() => `fa-${van.val(style)} fa-${van.val(name)}`} />
 
 /** A directory upload input using Javascript. */
 const DirectoryPicker = ({ label: pickerLabel, directoryName, onsuccess: callback }) => {
-  const pickDirectory = () => window.showDirectoryPicker()
-    .then(d => callback(d))
-    .catch(e => {
-      if (e instanceof DOMException && e.name === 'AbortError') {
-        ; // The user aborted the directory picker.
-      } else {
-        throw e
-      }
-    })
+  const pickDirectory = () =>
+    window.showDirectoryPicker()
+      .then(d => callback(d))
+      .catch(e => {
+        if (e instanceof DOMException && e.name === 'AbortError') {
+          ; // The user aborted the directory picker.
+        } else {
+          throw e
+        }
+      })
 
   return (
     <File class='has-name is-fullwidth'>
@@ -53,17 +55,22 @@ const StatusTag = ({ children, class: klass }) =>
  */
 const Spoiler = ({ children }) => {
   const isClosed = van.state(true)
+
+  const iconName = () => isClosed.val ? 'angle-down' : 'angle-up'
+  const label = () => isClosed.val ? 'Show more...' : 'Show less...'
+  const contentClass = () => isClosed.val ? 'is-sr-only' : ''
+
   const toggleClosed = () => { isClosed.val = !isClosed.val }
 
   return (
     <div>
       <div class='is-flex is-justify-content-end mb-2'>
         <IconText class='is-flex-direction-row-reverse is-clickable' onclick={toggleClosed}>
-          <Icon>{() => <FontAwesome name={isClosed.val ? 'angle-down' : 'angle-up'} />}</Icon>
-          <span>{() => isClosed.val ? 'Show more...' : 'Show less...'}</span>
+          <Icon><FontAwesome name={iconName} /></Icon>
+          <span>{label}</span>
         </IconText>
       </div>
-      <div class={() => isClosed.val ? 'is-sr-only' : ''}>{children}</div>
+      <div class={contentClass}>{children}</div>
     </div>
   )
 }

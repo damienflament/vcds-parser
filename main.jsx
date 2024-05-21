@@ -169,7 +169,7 @@ const App = () => {
   }
 
   const {
-    Footer, Section, Content,
+    Block, Section, Content, Footer,
     Navbar, NavbarBrand, NavbarItem,
     Buttons, Button, Icon,
     Columns, Column,
@@ -193,7 +193,7 @@ const App = () => {
     return <a href='https://bulma.io'><img style={{ height: '1.5em' }} src={path} alt='Made with Bulma' /></a>
   }
 
-  const footer = () =>
+  const footer = (
     <Footer>
       <Content class='has-text-centered'>
         <p><strong>VCDS Parser</strong> by Damien Flament.</p>
@@ -204,24 +204,30 @@ const App = () => {
         {bulmaIcon}
       </Content>
     </Footer>
+  )
+
+  const directoryPicker = (
+    <DirectoryPicker
+      label='Scans directory'
+      directoryName={() => state.directory.val?.name ?? '...'}
+      onsuccess={d => { state.directory.val = d }}
+    />
+  )
 
   const viewerModeSwhitcher = () => {
+    const reportButtonClass = () => state.isViewingSource.val ? '' : 'is-selected is-primary'
+    const sourceButtonClass = () => state.isViewingSource.val ? 'is-selected is-primary' : ''
+
     const showReport = () => { state.isViewingSource.val = false }
     const showSource = () => { state.isViewingSource.val = true }
 
     return (
       <Buttons class='has-addons'>
-        <Button
-          class={() => state.isViewingSource.val ? '' : 'is-selected is-primary'}
-          onclick={showReport}
-        >
+        <Button class={reportButtonClass} onclick={showReport}>
           <Icon><FontAwesome name='toolbox' /></Icon>
           <span>Report</span>
         </Button>
-        <Button
-          class={() => state.isViewingSource.val ? 'is-selected is-primary' : ''}
-          onclick={showSource}
-        >
+        <Button class={sourceButtonClass} onclick={showSource}>
           <Icon><FontAwesome name='file-lines' /></Icon>
           <span>Source</span>
         </Button>
@@ -229,25 +235,37 @@ const App = () => {
     )
   }
 
-  const sourceViewer = (
-    <Message class={() => state.isViewingSource.val ? '' : 'is-sr-only'}>
-      <MessageHeader>
-        <p>{() => report.val?.filename ?? ''}</p>
-      </MessageHeader>
-      <MessageBody>
-        <pre>{() => report.val?.content ?? ''}</pre>
-      </MessageBody>
-    </Message>
-  )
+  const sourceViewer = () => {
+    const viewerClass = () => state.isViewingSource.val ? '' : 'is-sr-only'
+    const filename = () => report.val?.filename ?? ''
+    const content = () => report.val?.content ?? ''
 
-  const reportViewer = () =>
-    <div class={() => state.isViewingSource.val ? 'is-sr-only' : ''}>
-      {() => report.val
-        ? report.val.error
-          ? (<ReportParseError error={report.val.error} />)
-          : (<Report report={report.val.data} />)
-        : ''}
-    </div>
+    return (
+      <Message class={viewerClass}>
+        <MessageHeader>
+          <p>{filename}</p>
+        </MessageHeader>
+        <MessageBody>
+          <pre>{content}</pre>
+        </MessageBody>
+      </Message>
+    )
+  }
+
+  const reportViewer = () => {
+    const viewerClass = () => state.isViewingSource.val ? 'is-sr-only' : ''
+    const view = () => report.val
+      ? report.val.error
+        ? (<ReportParseError error={report.val.error} />)
+        : (<Report report={report.val.data} />)
+      : ''
+
+    return (
+      <Block class={viewerClass}>
+        {view}
+      </Block>
+    )
+  }
 
   const reloadButton = () => {
     document.addEventListener('keydown', ev => {
@@ -257,8 +275,10 @@ const App = () => {
       }
     })
 
+    const buttonClas = () => `is-fullwidth ${isLoading.val ? 'is-loading' : ''}`
+
     return (
-      <Button class={() => 'is-fullwidth ' + (isLoading.val ? 'is-loading' : '')} title='Reload data from the filesystem' onclick={reload}>
+      <Button class={buttonClas} title='Reload data from the filesystem' onclick={reload}>
         <Icon><FontAwesome name='rotate' /></Icon>
         <span>Reload [Ctrl+R]</span>
       </Button>
@@ -266,24 +286,35 @@ const App = () => {
   }
 
   const reportsPanel = () => {
-    const items = Array.from(state.reports.val.entries())
-      .map(([i, { filename: f, data: r }]) => {
-        const classes = van.classes('panel-block', state.index.val === i ? 'is-active' : '', r === null ? 'has-text-warning' : '')
-        const iconClass = r === null || r.hasFaults ? 'has-text-danger' : 'has-text-success'
-        const icon = <FontAwesome name={r?.hasFaults ? 'circle-xmark' : 'circle-check'} />
-        const label = r === null
-          ? 'Failed to parse report'
-          : format('%n km - %s', r.vehicle.mileage.km, formatDistanceToNowStrict(r.date, { addSuffix: true }))
-        const setIndex = () => { state.index.val = i }
+    const items = () =>
+      <div>
+        {Array.from(state.reports.val.entries())
+          .map(([index, { filename, data: report }]) => {
+            const itemClass = () => `panel-block ${state.index.val === index ? 'is-active' : ''} ${report === null ? 'has-text-warning' : ''}`
+            const iconName = () =>
+              report === null
+                ? ''
+                : report?.hasFaults
+                  ? 'circle-xmark'
+                  : 'circle-check'
+            const iconClass = () => report === null || report.hasFaults ? 'has-text-danger' : 'has-text-success'
+            const label = report === null
+              ? 'Failed to parse report'
+              : format('%n km - %s',
+                report.vehicle.mileage.km,
+                formatDistanceToNowStrict(report.date, { addSuffix: true })
+              )
 
-        return (
-          <a key={i} class={classes} title={f} onclick={setIndex}>
-            <PanelIcon class={iconClass}>{r !== null ? icon : null}</PanelIcon>
-            {label}
-          </a>
-        )
-      }
-      )
+            const setIndex = () => { state.index.val = index }
+
+            return (
+              <a key={index} class={itemClass} title={filename} onclick={setIndex}>
+                <PanelIcon class={iconClass}><FontAwesome name={iconName} /></PanelIcon>
+                {label}
+              </a>
+            )
+          })}
+      </div>
 
     return (
       <Panel class='is-primary'>
@@ -298,7 +329,7 @@ const App = () => {
     <div>
       {navigation}
       <Section>
-        <DirectoryPicker label='Scans directory' directoryName={() => state.directory.val?.name ?? '...'} onsuccess={d => { state.directory.val = d }} />
+        {directoryPicker}
         <Columns>
           <Column class='is-one-third'>{reportsPanel}</Column>
           <Column>
