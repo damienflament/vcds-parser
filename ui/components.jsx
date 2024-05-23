@@ -63,7 +63,7 @@ const Spoiler = ({ children }) => {
   const toggleClosed = () => { isClosed.val = !isClosed.val }
 
   return (
-    <div>
+    <>
       <div class='is-flex is-justify-content-end mb-2'>
         <IconText class='is-flex-direction-row-reverse is-clickable' onclick={toggleClosed}>
           <Icon><FontAwesome name={iconName} /></Icon>
@@ -71,7 +71,7 @@ const Spoiler = ({ children }) => {
         </IconText>
       </div>
       <div class={contentClass}>{children}</div>
-    </div>
+    </>
   )
 }
 

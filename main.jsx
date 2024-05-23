@@ -285,35 +285,33 @@ const App = () => {
   }
 
   const reportsPanel = () => {
-    const items = () =>
-      <div>
-        {Array.from(state.reports.val.entries())
-          .map(([index, { filename, data: report }]) => {
-            const itemClass = () => `panel-block ${state.index.val === index ? 'is-active' : ''} ${report === null ? 'has-text-warning' : ''}`
-            const iconName = () =>
-              report === null
-                ? ''
-                : report?.hasFaults
-                  ? 'circle-xmark'
-                  : 'circle-check'
-            const iconClass = () => report === null || report.hasFaults ? 'has-text-danger' : 'has-text-success'
-            const label = report === null
-              ? 'Failed to parse report'
-              : format('%n km - %s',
-                report.vehicle.mileage.km,
-                formatDistanceToNowStrict(report.date, { addSuffix: true })
-              )
-
-            const setIndex = () => { state.index.val = index }
-
-            return (
-              <a key={index} class={itemClass} title={filename} onclick={setIndex}>
-                <PanelIcon class={iconClass}><FontAwesome name={iconName} /></PanelIcon>
-                {label}
-              </a>
+    const items =
+      Array.from(state.reports.val.entries())
+        .map(([index, { filename, data: report }]) => {
+          const itemClass = () => `panel-block ${state.index.val === index ? 'is-active' : ''} ${report === null ? 'has-text-warning' : ''}`
+          const iconName = () =>
+            report === null
+              ? ''
+              : report?.hasFaults
+                ? 'circle-xmark'
+                : 'circle-check'
+          const iconClass = () => report === null || report.hasFaults ? 'has-text-danger' : 'has-text-success'
+          const label = report === null
+            ? 'Failed to parse report'
+            : format('%n km - %s',
+              report.vehicle.mileage.km,
+              formatDistanceToNowStrict(report.date, { addSuffix: true })
             )
-          })}
-      </div>
+
+          const setIndex = () => { state.index.val = index }
+
+          return (
+            <a key={index} class={itemClass} title={filename} onclick={setIndex}>
+              <PanelIcon class={iconClass}><FontAwesome name={iconName} /></PanelIcon>
+              {label}
+            </a>
+          )
+        })
 
     return (
       <Panel class='is-primary'>
@@ -325,7 +323,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <>
       {navigation}
       <Section>
         {directoryPicker}
@@ -342,7 +340,7 @@ const App = () => {
         </Columns>
       </Section>
       {footer}
-    </div>
+    </>
   )
 }
 
