@@ -1,17 +1,57 @@
-diff --git a/src/index.js b/src/index.js
-index 2bf1dae985ee1b74aa9a8b78565e8407689fe7b4..80817875c98ef416ca4fbb5991d67cf1685b6635 100644
---- a/src/index.js
-+++ b/src/index.js
-@@ -2,4 +2,4 @@ import van from "vanjs-core";
- export function createState(v) {
-     return van.state(v);
- }
--export { default as createElement, default as jsx, default as jsxDEV, } from "./createElement";
-+export { default as createElement, default as jsx, default as jsxs, default as jsxDEV, } from "./createElement";
-diff --git a/src/jsx-runtime.js b/src/jsx-runtime.js
+diff --git a/jsx-runtime.js b/jsx-runtime.js
 new file mode 100644
 index 0000000000000000000000000000000000000000..6d1e0ee83e7d50615ce85da58cd1bf4683ed0d03
 --- /dev/null
 +++ b/src/jsx-runtime.js
 @@ -0,0 +1 @@
 +export * from "./index";
+diff --git a/src/createElement.js b/src/createElement.js
+index 1648600390692e0d2eedd5cbdddfe0db8499728e..ad779d7ffeed926a0192bd915df1d9c017bac516 100644
+--- a/src/createElement.js
++++ b/src/createElement.js
+@@ -1,7 +1,8 @@
+ import van from "vanjs-core";
+ import { setAttribute } from "./hyper";
+-const createElement = (jsxTag, { children, style, ref, ...props }) => {
++const createElement = (jsxTag, allProps) => {
+     if (typeof jsxTag === "string") {
++        const {children, ref, ...props} = allProps;
+         // TODO VanNode to VanElement
+         const ele = van.tags[jsxTag](children);
+         for (const [key, value] of Object.entries(props ?? {})) {
+@@ -27,7 +28,7 @@ const createElement = (jsxTag, { children, style, ref, ...props }) => {
+         return ele;
+     }
+     if (typeof jsxTag === "function") {
+-        return jsxTag({ ...props, ref, style, children });
++        return jsxTag(allProps);
+     }
+ };
+ export default createElement;
+diff --git a/src/index.d.ts b/src/index.d.ts
+index 14a10fa7afb0922f0c9365f0fc6491e51298fa0c..602769644bfc5427ebb202deeba3648731d4caf1 100644
+--- a/src/index.d.ts
++++ b/src/index.d.ts
+@@ -1,6 +1,8 @@
+ import { State, StateView } from "vanjs-core";
++import { VanNode } from "./createElement";
+ export declare function createState<T>(initialValue: T): State<T>;
+ export declare function createState<T>(initialValue: T | null): StateView<T>;
+ export declare function createState<T = undefined>(): State<T | undefined>;
+-export { default as createElement, default as jsx, default as jsxDEV, } from "./createElement";
++export declare function Fragment({ children }: { children?: VanNode | undefined }): VanNode | undefined
++export { default as createElement, default as jsx, default as jsxDEV, default as jsxs } from "./createElement";
+ export * from "./type";
+diff --git a/src/index.js b/src/index.js
+index 2bf1dae985ee1b74aa9a8b78565e8407689fe7b4..0c06957cfb6c6f5d2f8c0144b4e5c51081445f65 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -2,4 +2,7 @@ import van from "vanjs-core";
+ export function createState(v) {
+     return van.state(v);
+ }
+-export { default as createElement, default as jsx, default as jsxDEV, } from "./createElement";
++export function Fragment({children}) {
++    return children;
++}
++export { default as createElement, default as jsx, default as jsxDEV, default as jsxs } from "./createElement";
