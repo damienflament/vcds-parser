@@ -206,13 +206,12 @@ const App = () => {
     </Footer>
   )
 
-  const directoryPicker = (
-    <DirectoryPicker
-      label='Scans directory'
-      directoryName={() => state.directory.val?.name ?? '...'}
-      onsuccess={d => { state.directory.val = d }}
-    />
-  )
+  const directoryPicker = () => {
+    const name = () => state.directory.val?.name ?? '...'
+    const setDirectory = d => { state.directory.val = d }
+
+    return <DirectoryPicker label='Scans directory' directoryName={name} onsuccess={setDirectory} />
+  }
 
   const viewerModeSwhitcher = () => {
     const reportButtonClass = () => state.isViewingSource.val ? '' : 'is-selected is-primary'
