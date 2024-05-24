@@ -1,10 +1,17 @@
-import { inspect } from 'string-kit'
+import { inspect, format } from 'string-kit'
 import { FontAwesome, Spoiler } from './components.jsx'
+import { format as formatDate } from 'date-fns'
 
 import bulma from '../lib/bulma.js'
 import van from '../lib/van.js'
 
-const { Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Icon, Message, MessageHeader, MessageBody, Tag } = bulma.elements
+const {
+  Icon,
+  Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent,
+  Field, Control,
+  Message, MessageHeader, MessageBody,
+  Tag, Tags
+} = bulma.elements
 
 const comfortMessage = <p>This error is <strong>NOT related to the vehicle</strong>. This is a problem with <strong>VCDS Parser</strong>.</p>
 
@@ -40,7 +47,40 @@ const ModuleReadError = ({ module, error: { name, message, stack } }) =>
     </MessageBody>
   </Message>
 
-const Report = ({ report: { modules } }) => {
+const ReportInfoTag = ({ icon, title, info, data = null, isCopiable = false }) => {
+  if (!info) return
+
+  let infoTag
+
+  if (data || isCopiable) {
+    const copyData = () => {
+      navigator.clipboard.writeText(data ?? info)
+    }
+
+    infoTag = <Tag class='is-hoverable' title='Copy data' onclick={copyData}>{info}</Tag>
+  } else {
+    infoTag = <Tag>{info}</Tag>
+  }
+
+  return (
+    <Control>
+      <Tags class='has-addons are-medium'>
+        <Tag class='is-info' title={title}><FontAwesome name={icon} /></Tag>
+        {infoTag}
+      </Tags>
+    </Control>
+  )
+}
+
+const ReportView = (
+  {
+    report: {
+      date,
+      shop,
+      vehicle: { mileage, vin, licensePlate, chassis, type },
+      modules
+    }
+  }) => {
   const modulesViews = Object.values(modules).map(m => () => {
     try {
       return <Module module={m} />
@@ -49,7 +89,19 @@ const Report = ({ report: { modules } }) => {
     }
   })
 
-  return <div>{modulesViews}</div>
+  return (
+    <div>
+      <Field class='box is-grouped is-grouped-multiline'>
+        <ReportInfoTag icon='car-side' title='Chassis (type)' info={`${chassis} (${type})`} />
+        <ReportInfoTag icon='car-rear' title='License plate' info={licensePlate} />
+        <ReportInfoTag icon='fingerprint' title='VIN' info={vin} isCopiable />
+        <ReportInfoTag icon='calendar-day' title='Date' info={formatDate(date, 'PPPPp')} />
+        <ReportInfoTag icon='road' title='Mileage' info={format('%n km', mileage.km)} data={mileage.km} />
+        <ReportInfoTag icon='warehouse' title='Shop' info={shop} isCopiable />
+      </Field>
+      {modulesViews}
+    </div>
+  )
 }
 
 const Module = ({ module }) => {
@@ -80,4 +132,4 @@ const Module = ({ module }) => {
   )
 }
 
-export { Report, ReportParseError }
+export { ReportView, ReportParseError }

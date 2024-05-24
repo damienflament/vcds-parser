@@ -3,7 +3,7 @@
  * @module
  */
 
-import { formatDistanceToNowStrict } from 'date-fns'
+import { formatRelative } from 'date-fns'
 import { format } from 'string-kit'
 
 import { configureFromUrl } from './lib/configuration.js'
@@ -16,7 +16,7 @@ import { parse } from './lib/parser.js'
 import { validate } from './lib/validator.js'
 
 import { DirectoryPicker, FontAwesome, StatusTag } from './ui/components.jsx'
-import { Report, ReportParseError } from './ui/report.jsx'
+import { ReportView, ReportParseError } from './ui/report.jsx'
 
 import bulma from './lib/bulma.js'
 import van from './lib/van.js'
@@ -256,7 +256,7 @@ const App = () => {
     const view = () => report.val
       ? report.val.error
         ? (<ReportParseError error={report.val.error} />)
-        : (<Report report={report.val.data} />)
+        : (<ReportView report={report.val.data} />)
       : ''
 
     return (
@@ -274,10 +274,10 @@ const App = () => {
       }
     })
 
-    const buttonClas = () => `is-fullwidth ${isLoading.val ? 'is-loading' : ''}`
+    const buttonClass = () => `is-fullwidth ${isLoading.val ? 'is-loading' : ''}`
 
     return (
-      <Button class={buttonClas} title='Reload data from the filesystem' onclick={reload}>
+      <Button class={buttonClass} title='Reload data from the filesystem' onclick={reload}>
         <Icon><FontAwesome name='rotate' /></Icon>
         <span>Reload [Ctrl+R]</span>
       </Button>
@@ -300,7 +300,7 @@ const App = () => {
             ? 'Failed to parse report'
             : format('%n km - %s',
               report.vehicle.mileage.km,
-              formatDistanceToNowStrict(report.date, { addSuffix: true })
+              formatRelative(report.date, Date.now())
             )
 
           const setIndex = () => { state.index.val = index }
