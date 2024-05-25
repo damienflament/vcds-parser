@@ -53,11 +53,27 @@ const ReportInfoTag = ({ icon, title, info, data = null, isCopiable = false }) =
   let infoTag
 
   if (data || isCopiable) {
+    const initClass = 'is-hoverable has-tooltip-arrow'
+    const initTooltip = 'Copy data'
+
+    const tagClass = van.state(initClass)
+    const tooltip = van.state(initTooltip)
+
     const copyData = () => {
       navigator.clipboard.writeText(data ?? info)
+        .then(() => {
+          tagClass.val = `${initClass} has-tooltip-success`
+          tooltip.val = 'Data copied !'
+        })
+        .finally(() => {
+          setTimeout(() => {
+            tagClass.val = initClass
+            tooltip.val = initTooltip
+          }, 1000)
+        })
     }
 
-    infoTag = <Tag class='is-hoverable' title='Copy data' onclick={copyData}>{info}</Tag>
+    infoTag = <Tag class={() => tagClass} data-tooltip={tooltip} onclick={copyData}>{info}</Tag>
   } else {
     infoTag = <Tag>{info}</Tag>
   }

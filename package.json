@@ -25,6 +25,7 @@
     "version": "run configure && git add -A config.js"
   },
   "dependencies": {
+    "@creativebulma/bulma-tooltip": "^1.2.0",
     "@fortawesome/fontawesome-free": "^6.5.2",
     "ajv": "^8.13.0",
     "bulma": "^1.0.0",

@@ -5,6 +5,13 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
+"@creativebulma/bulma-tooltip@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@creativebulma/bulma-tooltip@npm:1.2.0"
+  checksum: 10c0/a11544b79b6c52ac1c18c01637879ea078024b1a521162c1328e1df51e0eafc64d03560e032eac85415d240c23ccc91544434919c4d0c60ff953ce3bf6aad011
+  languageName: node
+  linkType: hard
+
 "@esbuild/aix-ppc64@npm:0.20.2":
   version: 0.20.2
   resolution: "@esbuild/aix-ppc64@npm:0.20.2"
@@ -4751,6 +4758,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "vcds-parser@workspace:."
   dependencies:
+    "@creativebulma/bulma-tooltip": "npm:^1.2.0"
     "@fortawesome/fontawesome-free": "npm:^6.5.2"
     ajv: "npm:^8.13.0"
     bulma: "npm:^1.0.0"
