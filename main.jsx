@@ -97,10 +97,9 @@ const App = () => {
       if (report.data) {
         const model = new AutoScan()
 
-        safelyAssign(model, report.data)
-        report.data = model
-
         try {
+          safelyAssign(model, report.data)
+          report.data = model
           validate(model)
         } catch (e) {
           report.error = e
