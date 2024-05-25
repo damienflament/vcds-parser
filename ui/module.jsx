@@ -27,7 +27,7 @@ const ModuleView = ({ module }) => {
     ? (
       <>
         <Title>{module.name}</Title>
-        <Subtitle class='is-spaced'>{module.info.component}</Subtitle>
+        <Subtitle class='is-spaced'><ClipboardCopy>{module.info.component}</ClipboardCopy></Subtitle>
         <ModuleInfo info={module.info} />
       </>
       )
