@@ -176,7 +176,7 @@ moduleInfo
         _|3| 'Component:' _ component:$rol eol
         revision:( _|3| 'Revision:' _ @$w _+ )?
           serial:( 'Serial number:' _ @$w eol )?
-        coding:( _|3| 'Coding:' _ @codingValue eol )?
+        codingValue:( _|3| 'Coding:' _ @codingValue eol )?
         _|3| 'Shop #:' _ 'WSC' _ codingWsc:shopWsc eol
         _|3| 'VCID:' _ vcid:vcid eol
         vinid:( _|3| 'VINID:' _ @vinid eol )?
@@ -194,8 +194,10 @@ moduleInfo
               component: string(component),
               revision,
               serial,
-              coding,
-              codingWsc,
+              coding: {
+                value: codingValue,
+                wsc: codingWsc
+              },
               vcid,
               vinid,
               readiness

@@ -57,7 +57,11 @@ const ModuleInfo = ({ info }) => {
       hardware: hardwarePart
     },
     serial,
-    revision
+    revision,
+    coding: {
+      value: codingValue,
+      wsc
+    }
   } = info
 
   return (
@@ -65,15 +69,24 @@ const ModuleInfo = ({ info }) => {
       <Title class='is-4'>Identification</Title>
       <Table class='is-striped is-fullwidth'>
         <tbody>
-          <tr><th>Software part number</th><td>{softwarePart ?? '-'}</td></tr>
-          <tr><th>Hardware part number</th><td>{hardwarePart ?? '-'}</td></tr>
-          <tr><th>Serial number</th><td>{serial ?? '-'}</td></tr>
-          <tr><th>Revision number</th><td>{revision ?? '-'}</td></tr>
+          <ModuleInfoRow label='Software part number' data={softwarePart} />
+          <ModuleInfoRow label='Hardware part number' data={hardwarePart} />
+          <ModuleInfoRow label='Serial number' data={serial} />
+          <ModuleInfoRow label='Revision number' data={revision} />
+        </tbody>
+      </Table>
+      <Title class='is-4'>Coding</Title>
+      <Table class='is-striped is-fullwidth'>
+        <tbody>
+          <ModuleInfoRow label='Coding value' data={codingValue} />
+          <ModuleInfoRow label='WorkShop Code (WSC)' data={wsc} />
         </tbody>
       </Table>
     </>
   )
 }
+
+const ModuleInfoRow = ({ label, data }) => <tr><th>{label}</th><td>{data ?? '-'}</td></tr>
 
 /** A message showing an error of module data reading. */
 const ModuleReadError = ({ module, error: { name, message, stack } }) =>

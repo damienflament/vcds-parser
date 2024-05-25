@@ -177,10 +177,10 @@
                 "info": {
                     "anyOf": [
                         {
-                            "type": "null"
+                            "$ref": "#/definitions/info"
                         },
                         {
-                            "$ref": "#/definitions/info"
+                            "type": "null"
                         }
                     ]
                 },
@@ -282,15 +282,26 @@
                     "minLength": 1
                 },
                 "coding": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "minLength": 1
-                },
-                "codingWsc": {
-                    "type": "string",
-                    "minLength": 1
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "value": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "minLength": 1
+                        },
+                        "wsc": {
+                            "$comment": "WorkShop Code",
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    },
+                    "required": [
+                        "value",
+                        "wsc"
+                    ]
                 },
                 "vcid": {
                     "type": "string",
@@ -318,7 +329,6 @@
                 "revision",
                 "serial",
                 "coding",
-                "codingWsc",
                 "vcid",
                 "vinid",
                 "readiness"
