@@ -88,15 +88,14 @@ const ReportInfoTag = ({ icon, title, info, data = null, isCopiable = false }) =
   )
 }
 
-const ReportView = (
-  {
-    report: {
-      date,
-      shop,
-      vehicle: { mileage, vin, licensePlate, chassis, type },
-      modules
-    }
-  }) => {
+const ReportView = ({ report }) => {
+  const {
+    date,
+    shop,
+    vehicle: { mileage, vin, licensePlate, chassis, type },
+    modules
+  } = report
+
   const modulesViews = Object.values(modules).map(m => () => {
     try {
       return <Module module={m} />
