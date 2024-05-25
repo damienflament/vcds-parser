@@ -12,7 +12,8 @@ const ModuleView = ({ module }) => {
   const isOpened = van.state(false)
 
   const addressClass = `${module.isFaulty ? 'is-danger' : 'is-success'} mr-2`
-  const reachabilityClass = module.isReachable ? '' : 'has-text-danger'
+  const reachabilityClass = module.isReachable ? '' : 'has-text-danger '
+  const reachabilityTooltip = module.isReachable ? 'Module reachable' : 'Module unreachable'
 
   const toggleIconName = () => isOpened.val ? 'angle-up' : 'angle-down'
   const contentClass = () => isOpened.val ? '' : 'is-sr-only'
@@ -38,7 +39,7 @@ const ModuleView = ({ module }) => {
         <CardHeaderTitle>
           <Tag class={addressClass}>{module.address}</Tag>
           <p class='is-flex-grow-1'>{module.name}</p>
-          <Icon class={reachabilityClass}><FontAwesome name='plug' /></Icon>
+          <Icon class={reachabilityClass} data-tooltip={reachabilityTooltip}><FontAwesome name='plug' /></Icon>
         </CardHeaderTitle>
         <CardHeaderIcon><FontAwesome name={toggleIconName} /></CardHeaderIcon>
       </CardHeader>

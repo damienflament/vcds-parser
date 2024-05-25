@@ -54,3 +54,14 @@
 .theme-dark {
   /* CSS Variables */
 }
+
+/* Bulma Tooltip */
+.icon[data-tooltip],
+.tag[data-tooltip] {
+  border-bottom: 0;
+}
+
+[data-tooltip=""]::before {
+  /* Empty tooltips are not displayed */
+  display: none !important;
+}
