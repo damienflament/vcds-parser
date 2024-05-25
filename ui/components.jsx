@@ -12,8 +12,8 @@ import van from '../lib/van.js'
 const { File, FileCta, FileIcon, FileName, Icon, IconText, Tag, Tags } = bulma.elements
 
 /** A Font Awesome icon. */
-const FontAwesome = ({ name, style = 'solid' }) =>
-  <i class={() => `fa-${van.val(style)} fa-${van.val(name)}`} />
+const FontAwesome = ({ name, style = 'solid', ...props }) =>
+  <i class={() => `fa-${van.val(style)} fa-${van.val(name)}`} {...props} />
 
 /** A directory upload input using Javascript. */
 const DirectoryPicker = ({ label: pickerLabel, directoryName, onsuccess: callback }) => {
