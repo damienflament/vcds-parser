@@ -6,7 +6,7 @@ import van from '../lib/van.js'
 import bulma from '../lib/bulma.js'
 import { comfortMessage } from './report.jsx'
 
-const { Icon, Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Message, MessageHeader, MessageBody, Tag } = bulma.elements
+const { Icon, Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Message, MessageHeader, MessageBody, Subtitle, Table, Tag, Title } = bulma.elements
 
 const ModuleView = ({ module }) => {
   const isOpened = van.state(false)
@@ -16,10 +16,21 @@ const ModuleView = ({ module }) => {
 
   const toggleIconName = () => isOpened.val ? 'angle-up' : 'angle-down'
   const contentClass = () => isOpened.val ? '' : 'is-sr-only'
-  const cardContent = <CardContent class={contentClass} />
-  cardContent.innerHTML = inspect({ depth: 5, style: 'html' }, module)
+
+  const repr = <div />
+  repr.innerHTML = inspect({ depth: 5, outputMaxLength: 10000, style: 'html' }, module)
 
   const toggleOpened = () => { isOpened.val = !isOpened.val }
+
+  const info = module.info
+    ? (
+      <>
+        <Title>{module.name}</Title>
+        <Subtitle class='is-spaced'>{module.info.component}</Subtitle>
+        <ModuleInfo info={module.info} />
+      </>
+      )
+    : null
 
   return (
     <Card>
@@ -31,8 +42,36 @@ const ModuleView = ({ module }) => {
         </CardHeaderTitle>
         <CardHeaderIcon><FontAwesome name={toggleIconName} /></CardHeaderIcon>
       </CardHeader>
-      {cardContent}
+      <CardContent class={contentClass}>
+        {info}
+        {repr}
+      </CardContent>
     </Card>
+  )
+}
+
+const ModuleInfo = ({ info }) => {
+  const {
+    partNumber: {
+      software: softwarePart,
+      hardware: hardwarePart
+    },
+    serial,
+    revision
+  } = info
+
+  return (
+    <>
+      <Title class='is-4'>Identification</Title>
+      <Table class='is-striped is-fullwidth'>
+        <tbody>
+          <tr><th>Software part number</th><td>{softwarePart ?? '-'}</td></tr>
+          <tr><th>Hardware part number</th><td>{hardwarePart ?? '-'}</td></tr>
+          <tr><th>Serial number</th><td>{serial ?? '-'}</td></tr>
+          <tr><th>Revision number</th><td>{revision ?? '-'}</td></tr>
+        </tbody>
+      </Table>
+    </>
   )
 }
 
