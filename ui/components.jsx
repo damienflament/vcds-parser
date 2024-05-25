@@ -75,4 +75,40 @@ const Spoiler = ({ children }) => {
   )
 }
 
-export { DirectoryPicker, FontAwesome, Spoiler, StatusTag }
+/**
+ * Shows a piece of data which can be copied to the clipboard.
+ *
+ * Uses Bulma Tooltip.
+ *
+ * @see https://bulma-tooltip.netlify.app/get-started/
+ */
+const ClipboardCopy = ({ children, data = null }) => {
+  const readyTooltip = 'Copy data'
+  const successTooltip = 'Data copied !'
+
+  const readyClass = 'has-tooltip-arrow'
+  const successClass = readyClass + ' has-tooltip-success'
+
+  const className = van.state(readyClass)
+  const tooltip = van.state(readyTooltip)
+
+  data ??= children
+
+  const copyData = () => {
+    navigator.clipboard.writeText(data)
+      .then(() => {
+        className.val = successClass
+        tooltip.val = successTooltip
+      })
+      .finally(() => {
+        setTimeout(() => {
+          className.val = readyClass
+          tooltip.val = readyTooltip
+        }, 1000)
+      })
+  }
+
+  return <span class={() => className.val} data-tooltip={() => tooltip.val} onclick={copyData}>{children}</span>
+}
+
+export { ClipboardCopy, DirectoryPicker, FontAwesome, Spoiler, StatusTag }

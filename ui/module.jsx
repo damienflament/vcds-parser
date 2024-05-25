@@ -1,6 +1,6 @@
 import { inspect } from 'string-kit'
 
-import { FontAwesome, Spoiler } from './components.jsx'
+import { ClipboardCopy, FontAwesome, Spoiler } from './components.jsx'
 
 import van from '../lib/van.js'
 import bulma from '../lib/bulma.js'
@@ -12,7 +12,7 @@ const ModuleView = ({ module }) => {
   const isOpened = van.state(false)
 
   const addressClass = `${module.isFaulty ? 'is-danger' : 'is-success'} mr-2`
-  const reachableClass = module.isReachable ? '' : 'has-text-danger'
+  const reachabilityClass = module.isReachable ? '' : 'has-text-danger'
 
   const toggleIconName = () => isOpened.val ? 'angle-up' : 'angle-down'
   const contentClass = () => isOpened.val ? '' : 'is-sr-only'
@@ -38,7 +38,7 @@ const ModuleView = ({ module }) => {
         <CardHeaderTitle>
           <Tag class={addressClass}>{module.address}</Tag>
           <p class='is-flex-grow-1'>{module.name}</p>
-          <Icon class={reachableClass}><FontAwesome name='plug' /></Icon>
+          <Icon class={reachabilityClass}><FontAwesome name='plug' /></Icon>
         </CardHeaderTitle>
         <CardHeaderIcon><FontAwesome name={toggleIconName} /></CardHeaderIcon>
       </CardHeader>
@@ -86,7 +86,13 @@ const ModuleInfo = ({ info }) => {
   )
 }
 
-const ModuleInfoRow = ({ label, data }) => <tr><th>{label}</th><td>{data ?? '-'}</td></tr>
+const ModuleInfoRow = ({ label, data }) => {
+  const value = data
+    ? <ClipboardCopy>{data}</ClipboardCopy>
+    : '-'
+
+  return <tr><th>{label}</th><td>{value}</td></tr>
+}
 
 /** A message showing an error of module data reading. */
 const ModuleReadError = ({ module, error: { name, message, stack } }) =>

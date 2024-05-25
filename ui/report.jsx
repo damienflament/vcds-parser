@@ -1,11 +1,10 @@
 import { format } from 'string-kit'
 import { format as formatDate } from 'date-fns'
 
-import { FontAwesome, Spoiler } from './components.jsx'
+import { ClipboardCopy, FontAwesome, Spoiler } from './components.jsx'
 import { ModuleView, ModuleReadError } from './module.jsx'
 
 import bulma from '../lib/bulma.js'
-import van from '../lib/van.js'
 
 const { Field, Control, Message, MessageHeader, MessageBody, Tag, Tags } = bulma.elements
 
@@ -25,42 +24,20 @@ const ReportParseError = ({ error: { name, message, stack } }) =>
   </Message>
 
 /** A tag showing a piece of information. */
-const ReportInfoTag = ({ icon, title, info, data = null, isCopiable = false }) => {
-  if (!info) return
+const ReportInfoTag = ({ icon, title, info, data = null, clipboardCopy = false }) => {
+  if (!info) return // Handles optional info
 
-  let infoTag
-
-  if (data || isCopiable) {
-    const initClass = 'is-hoverable has-tooltip-arrow'
-    const initTooltip = 'Copy data'
-
-    const tagClass = van.state(initClass)
-    const tooltip = van.state(initTooltip)
-
-    const copyData = () => {
-      navigator.clipboard.writeText(data ?? info)
-        .then(() => {
-          tagClass.val = `${initClass} has-tooltip-success`
-          tooltip.val = 'Data copied !'
-        })
-        .finally(() => {
-          setTimeout(() => {
-            tagClass.val = initClass
-            tooltip.val = initTooltip
-          }, 1000)
-        })
-    }
-
-    infoTag = <Tag class={() => tagClass} data-tooltip={tooltip} onclick={copyData}>{info}</Tag>
-  } else {
-    infoTag = <Tag>{info}</Tag>
+  if (clipboardCopy) {
+    info = data
+      ? <ClipboardCopy data={data}>{info}</ClipboardCopy>
+      : <ClipboardCopy>{info}</ClipboardCopy>
   }
 
   return (
     <Control>
       <Tags class='has-addons are-medium'>
         <Tag class='is-info' title={title}><FontAwesome name={icon} /></Tag>
-        {infoTag}
+        <Tag>{info}</Tag>
       </Tags>
     </Control>
   )
@@ -87,10 +64,10 @@ const ReportView = ({ report }) => {
       <Field class='box is-grouped is-grouped-multiline'>
         <ReportInfoTag icon='car-side' title='Chassis (type)' info={`${chassis} (${type})`} />
         <ReportInfoTag icon='car-rear' title='License plate' info={licensePlate} />
-        <ReportInfoTag icon='fingerprint' title='VIN' info={vin} isCopiable />
+        <ReportInfoTag icon='fingerprint' title='VIN' info={vin} clipboardCopy />
         <ReportInfoTag icon='calendar-day' title='Date' info={formatDate(date, 'PPPPp')} />
-        <ReportInfoTag icon='road' title='Mileage' info={format('%n km', mileage.km)} data={mileage.km} />
-        <ReportInfoTag icon='warehouse' title='Shop' info={shop} isCopiable />
+        <ReportInfoTag icon='road' title='Mileage' info={format('%n km', mileage.km)} data={mileage.km} clipboardCopy />
+        <ReportInfoTag icon='warehouse' title='Shop' info={shop} clipboardCopy />
       </Field>
       {modulesViews}
     </div>
