@@ -231,7 +231,7 @@
             ]
         },
         "info": {
-            "description": "Informations about a module. \n\nStored in a separate object because unavailable when a module is unreachable.",
+            "description": "Informations about a module. Stored in a separate object because unavailable when a module is unreachable.",
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -365,7 +365,7 @@
                     ],
                     "minLength": 1
                 },
-                "codingWsc": {
+                "wsc": {
                     "type": [
                         "string",
                         "null"
@@ -379,7 +379,7 @@
                 "component",
                 "labelsFile",
                 "coding",
-                "codingWsc"
+                "wsc"
             ]
         },
         "fault": {

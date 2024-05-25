@@ -22,12 +22,22 @@ const ModuleView = ({ module }) => {
 
   const toggleOpened = () => { isOpened.val = !isOpened.val }
 
+  const subsystems = module.hasSubsystems
+    ? (
+      <>
+        <Title class='is-4 is-spaced'>Subsystems</Title>
+        {module.subsystems.map(s => <Subsystem key={s.index} system={s} />)}
+      </>
+      )
+    : null
+
   const info = module.info
     ? (
       <>
         <Title>{module.name}</Title>
         <Subtitle class='is-spaced'><ClipboardCopy>{module.info.component}</ClipboardCopy></Subtitle>
         <Info info={module.info} />
+        {subsystems}
       </>
       )
     : null
@@ -64,14 +74,6 @@ const Info = ({ info }) => {
     }
   } = info
 
-  const InfoRow = ({ label, data }) => {
-    const value = data
-      ? <ClipboardCopy>{data}</ClipboardCopy>
-      : '-'
-
-    return <tr><th>{label}</th><td>{value}</td></tr>
-  }
-
   return (
     <>
       <Title class='is-4'>Identification</Title>
@@ -87,6 +89,36 @@ const Info = ({ info }) => {
       <Table class='is-striped is-fullwidth'>
         <tbody>
           <InfoRow label='Coding value' data={codingValue} />
+          <InfoRow label='WorkShop Code (WSC)' data={wsc} />
+        </tbody>
+      </Table>
+    </>
+  )
+}
+
+const InfoRow = ({ label, data }) => {
+  const value = data
+    ? <ClipboardCopy>{data}</ClipboardCopy>
+    : '-'
+
+  return <tr><th>{label}</th><td>{value}</td></tr>
+}
+
+const Subsystem = ({ system }) => {
+  const {
+    component,
+    partNumber,
+    coding,
+    wsc
+  } = system
+
+  return (
+    <>
+      <Subtitle class='is-5'><ClipboardCopy>{component}</ClipboardCopy></Subtitle>
+      <Table class='is-striped is-fullwidth'>
+        <tbody>
+          <InfoRow label='Part Number' data={partNumber} />
+          <InfoRow label='Coding value' data={coding} />
           <InfoRow label='WorkShop Code (WSC)' data={wsc} />
         </tbody>
       </Table>

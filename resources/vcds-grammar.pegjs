@@ -269,7 +269,7 @@ subsystem
   = _|3| 'Subsystem' _ index:$dec+ _ '-' _ 'Part No:' _ partNumber:partNumber labelsFile:( _+ 'Labels:' _ @$rol )? eol
     _|3| 'Component:' _ component:$rol eol
     coding:( _|3| 'Coding:' _ @codingValue eol )?
-    codingWsc:( _|3| 'Shop #: WSC' _ @shortShopWsc rol eol )?
+    wsc:( _|3| 'Shop #: WSC' _ @shortShopWsc rol eol )?
     ( [A-Z0-9 ]i+ eol )? // ignore this line as it contains the same info as above
     l
   {
@@ -279,7 +279,7 @@ subsystem
       component: string(component),
       labelsFile,
       coding,
-      codingWsc
+      wsc
     }
   }
 
