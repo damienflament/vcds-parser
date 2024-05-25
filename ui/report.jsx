@@ -8,41 +8,6 @@ import bulma from '../lib/bulma.js'
 
 const { Field, Control, Message, MessageHeader, MessageBody, Tag, Tags } = bulma.elements
 
-export const comfortMessage = <p>This error is <strong>NOT related to the vehicle</strong>. This is a problem with <strong>VCDS Parser</strong>.</p>
-
-/** A message showing an error of report parsing. */
-const ReportParseError = ({ error: { name, message, stack } }) =>
-  <Message>
-    <MessageHeader><p>Failed to parse report</p></MessageHeader>
-    <MessageBody class='content'>
-      {comfortMessage}
-      <Spoiler>
-        <p><strong>{name}</strong>: {message}</p>
-        <pre>{stack}</pre>
-      </Spoiler>
-    </MessageBody>
-  </Message>
-
-/** A tag showing a piece of information. */
-const ReportInfoTag = ({ icon, title, info, data = null, clipboardCopy = false }) => {
-  if (!info) return // Handles optional info
-
-  if (clipboardCopy) {
-    info = data
-      ? <ClipboardCopy data={data}>{info}</ClipboardCopy>
-      : <ClipboardCopy>{info}</ClipboardCopy>
-  }
-
-  return (
-    <Control>
-      <Tags class='has-addons are-medium'>
-        <Tag class='is-info' title={title}><FontAwesome name={icon} /></Tag>
-        <Tag>{info}</Tag>
-      </Tags>
-    </Control>
-  )
-}
-
 const ReportView = ({ report }) => {
   const {
     date,
@@ -59,19 +24,51 @@ const ReportView = ({ report }) => {
     }
   })
 
+  const InfoTag = ({ icon, title, info, data = null, clipboardCopy = false }) => {
+    if (!info) return // Handles optional info
+
+    if (clipboardCopy) {
+      info = data
+        ? <ClipboardCopy data={data}>{info}</ClipboardCopy>
+        : <ClipboardCopy>{info}</ClipboardCopy>
+    }
+
+    return (
+      <Control>
+        <Tags class='has-addons are-medium'>
+          <Tag class='is-info' title={title}><FontAwesome name={icon} /></Tag>
+          <Tag>{info}</Tag>
+        </Tags>
+      </Control>
+    )
+  }
+
   return (
     <div>
       <Field class='box is-grouped is-grouped-multiline'>
-        <ReportInfoTag icon='car-side' title='Chassis (type)' info={`${chassis} (${type})`} />
-        <ReportInfoTag icon='car-rear' title='License plate' info={licensePlate} />
-        <ReportInfoTag icon='fingerprint' title='VIN' info={vin} clipboardCopy />
-        <ReportInfoTag icon='calendar-day' title='Date' info={formatDate(date, 'PPPPp')} />
-        <ReportInfoTag icon='road' title='Mileage' info={format('%n km', mileage.km)} data={mileage.km} clipboardCopy />
-        <ReportInfoTag icon='warehouse' title='Shop' info={shop} clipboardCopy />
+        <InfoTag icon='car-side' title='Chassis (type)' info={`${chassis} (${type})`} />
+        <InfoTag icon='car-rear' title='License plate' info={licensePlate} />
+        <InfoTag icon='fingerprint' title='VIN' info={vin} clipboardCopy />
+        <InfoTag icon='calendar-day' title='Date' info={formatDate(date, 'PPPPp')} />
+        <InfoTag icon='road' title='Mileage' info={format('%n km', mileage.km)} data={mileage.km} clipboardCopy />
+        <InfoTag icon='warehouse' title='Shop' info={shop} clipboardCopy />
       </Field>
       {modulesViews}
     </div>
   )
 }
+
+/** A message showing an error of report parsing. */
+const ReportParseError = ({ error: { name, message, stack } }) =>
+  <Message>
+    <MessageHeader><p>Failed to parse report</p></MessageHeader>
+    <MessageBody class='content'>
+      <p>This error is <strong>NOT related to the vehicle</strong>. This is a problem with <strong>VCDS Parser</strong>.</p>
+      <Spoiler>
+        <p><strong>{name}</strong>: {message}</p>
+        <pre>{stack}</pre>
+      </Spoiler>
+    </MessageBody>
+  </Message>
 
 export { ReportView, ReportParseError }

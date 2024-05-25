@@ -4,7 +4,6 @@ import { ClipboardCopy, FontAwesome, Spoiler } from './components.jsx'
 
 import van from '../lib/van.js'
 import bulma from '../lib/bulma.js'
-import { comfortMessage } from './report.jsx'
 
 const { Icon, Card, CardHeader, CardHeaderTitle, CardHeaderIcon, CardContent, Message, MessageHeader, MessageBody, Subtitle, Table, Tag, Title } = bulma.elements
 
@@ -28,7 +27,7 @@ const ModuleView = ({ module }) => {
       <>
         <Title>{module.name}</Title>
         <Subtitle class='is-spaced'><ClipboardCopy>{module.info.component}</ClipboardCopy></Subtitle>
-        <ModuleInfo info={module.info} />
+        <Info info={module.info} />
       </>
       )
     : null
@@ -51,7 +50,7 @@ const ModuleView = ({ module }) => {
   )
 }
 
-const ModuleInfo = ({ info }) => {
+const Info = ({ info }) => {
   const {
     partNumber: {
       software: softwarePart,
@@ -65,34 +64,34 @@ const ModuleInfo = ({ info }) => {
     }
   } = info
 
+  const InfoRow = ({ label, data }) => {
+    const value = data
+      ? <ClipboardCopy>{data}</ClipboardCopy>
+      : '-'
+
+    return <tr><th>{label}</th><td>{value}</td></tr>
+  }
+
   return (
     <>
       <Title class='is-4'>Identification</Title>
       <Table class='is-striped is-fullwidth'>
         <tbody>
-          <ModuleInfoRow label='Software part number' data={softwarePart} />
-          <ModuleInfoRow label='Hardware part number' data={hardwarePart} />
-          <ModuleInfoRow label='Serial number' data={serial} />
-          <ModuleInfoRow label='Revision number' data={revision} />
+          <InfoRow label='Software part number' data={softwarePart} />
+          <InfoRow label='Hardware part number' data={hardwarePart} />
+          <InfoRow label='Serial number' data={serial} />
+          <InfoRow label='Revision number' data={revision} />
         </tbody>
       </Table>
       <Title class='is-4'>Coding</Title>
       <Table class='is-striped is-fullwidth'>
         <tbody>
-          <ModuleInfoRow label='Coding value' data={codingValue} />
-          <ModuleInfoRow label='WorkShop Code (WSC)' data={wsc} />
+          <InfoRow label='Coding value' data={codingValue} />
+          <InfoRow label='WorkShop Code (WSC)' data={wsc} />
         </tbody>
       </Table>
     </>
   )
-}
-
-const ModuleInfoRow = ({ label, data }) => {
-  const value = data
-    ? <ClipboardCopy>{data}</ClipboardCopy>
-    : '-'
-
-  return <tr><th>{label}</th><td>{value}</td></tr>
 }
 
 /** A message showing an error of module data reading. */
@@ -105,7 +104,7 @@ const ModuleReadError = ({ module, error: { name, message, stack } }) =>
       </p>
     </MessageHeader>
     <MessageBody class='content'>
-      {comfortMessage}
+      <p>This error is <strong>NOT related to the vehicle</strong>. This is a problem with <strong>VCDS Parser</strong>.</p>
       <Spoiler>
         <p><strong>{name}</strong>: {message}</p>
         <pre>{stack}</pre>
