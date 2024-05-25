@@ -42,10 +42,10 @@ const DirectoryPicker = ({ label: pickerLabel, directoryName, onsuccess: callbac
 }
 
 /** A double tag to display a label on the left with a colored tag on the right. */
-const StatusTag = ({ children, class: klass }) =>
+const StatusTag = ({ children, class: className }) =>
   <Tags class='has-addons'>
     <Tag>{children}</Tag>
-    <Tag class={klass} />
+    <Tag class={className} />
   </Tags>
 
 /**
