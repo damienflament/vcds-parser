@@ -387,28 +387,48 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "code": {
-                    "type": "string",
-                    "minLength": 1
-                },
                 "subject": {
                     "type": "string",
                     "minLength": 1
                 },
-                "errorCode": {
-                    "type": [
-                        "string",
-                        "null"
+                "code": {
+                    "type": "object",
+                    "properties": {
+                        "odb2": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "minLength": 1
+                        },
+                        "vag": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    },
+                    "required": [
+                        "odb2",
+                        "vag"
                     ],
-                    "minLength": 1
+                    "additionalProperties": false
                 },
-                "descriptionCode": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "description": {
-                    "type": "string",
-                    "minLength": 1
+                "symptom": {
+                    "type": "object",
+                    "properties": {
+                        "code": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "description": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    },
+                    "required": [
+                        "code",
+                        "description"
+                    ],
+                    "additionalProperties": false
                 },
                 "freezeFrame": {
                     "anyOf": [
@@ -422,11 +442,9 @@
                 }
             },
             "required": [
-                "code",
                 "subject",
-                "errorCode",
-                "descriptionCode",
-                "description",
+                "code",
+                "symptom",
                 "freezeFrame"
             ]
         },

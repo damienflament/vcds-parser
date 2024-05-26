@@ -294,23 +294,27 @@ faultsSection
   )
 
 fault
-  = code:faultCode _ '-' _ subject:$rol eol
-    _|12| errorCode:(@errorCode _ '-' _)? descriptionCode:faultDescCode _ '-' _ description:$rol eol
+  = vagCode:vagCode _ '-' _ subject:$rol eol
+    _|12| odbCode:(@odbCode _ '-' _)? symptomCode:symptomCode _ '-' _ description:$rol eol
     freezeFrame:(freezeFrame)?
   {
     return {
-      code,
       subject: string(subject),
-      errorCode,
-      descriptionCode,
-      description,
+      code: {
+        odb2: odbCode,
+        vag: vagCode
+      },
+      symptom: {
+        code: symptomCode,
+        description
+      },
       freezeFrame
     }
   }
 
-errorCode 'error code' = $( 'P'? dec|4| )
-faultCode 'fault code' = $dec|5|
-faultDescCode 'fault description code' = $dec|3|
+odbCode 'ODB2 fault code' = $( 'P'? dec|4| )
+vagCode 'VAG fault code' = $dec|5|
+symptomCode 'fault symptom code' = $dec|3|
 
 freezeFrame
   = _|13| 'Freeze Frame:' eol

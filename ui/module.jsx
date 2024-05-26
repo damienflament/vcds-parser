@@ -1,4 +1,4 @@
-import { inspect } from 'string-kit'
+import { format, inspect } from 'string-kit'
 
 import { ClipboardCopy, FontAwesome, Spoiler } from './components.jsx'
 
@@ -18,7 +18,7 @@ const ModuleView = ({ module }) => {
   const contentClass = () => isOpened.val ? '' : 'is-sr-only'
 
   const repr = <div />
-  repr.innerHTML = inspect({ depth: 5, outputMaxLength: 10000, style: 'html' }, module)
+  repr.innerHTML = inspect({ depth: 7, outputMaxLength: 20000, style: 'html' }, module)
 
   const toggleOpened = () => { isOpened.val = !isOpened.val }
 
@@ -31,6 +31,15 @@ const ModuleView = ({ module }) => {
       )
     : null
 
+  const faults = module.hasFaults
+    ? (
+      <>
+        <Title class='is-4 is-spaced'>Faults</Title>
+        {module.faults.map(f => <Fault key={f.code} fault={f} />)}
+      </>
+      )
+    : null
+
   const info = module.info
     ? (
       <>
@@ -38,6 +47,7 @@ const ModuleView = ({ module }) => {
         <Subtitle class='is-spaced'><ClipboardCopy>{module.info.component}</ClipboardCopy></Subtitle>
         <Info info={module.info} />
         {subsystems}
+        {faults}
       </>
       )
     : null
@@ -77,31 +87,33 @@ const Info = ({ info }) => {
   return (
     <>
       <Title class='is-4'>Identification</Title>
-      <Table class='is-striped is-fullwidth'>
-        <tbody>
-          <InfoRow label='Software part number' data={softwarePart} />
-          <InfoRow label='Hardware part number' data={hardwarePart} />
-          <InfoRow label='Serial number' data={serial} />
-          <InfoRow label='Revision number' data={revision} />
-        </tbody>
-      </Table>
+      <InfoTable>
+        <InfoRow label='Software part number' info={softwarePart} clipboardCopy />
+        <InfoRow label='Hardware part number' info={hardwarePart} clipboardCopy />
+        <InfoRow label='Serial number' info={serial} clipboardCopy />
+        <InfoRow label='Revision number' info={revision} clipboardCopy />
+      </InfoTable>
       <Title class='is-4'>Coding</Title>
-      <Table class='is-striped is-fullwidth'>
-        <tbody>
-          <InfoRow label='Coding value' data={codingValue} />
-          <InfoRow label='WorkShop Code (WSC)' data={wsc} />
-        </tbody>
-      </Table>
+      <InfoTable>
+        <InfoRow label='Coding value' info={codingValue} clipboardCopy />
+        <InfoRow label='WorkShop Code (WSC)' info={wsc} clipboardCopy />
+      </InfoTable>
     </>
   )
 }
 
-const InfoRow = ({ label, data }) => {
-  const value = data
-    ? <ClipboardCopy>{data}</ClipboardCopy>
-    : '-'
+const InfoTable = ({ children }) => <Table class='is-striped is-fullwidth'><tbody>{children}</tbody></Table>
 
-  return <tr><th>{label}</th><td>{value}</td></tr>
+const InfoRow = ({ label, info, data = null, clipboardCopy = false }) => {
+  if (info === '' || info === null) {
+    info = '-'
+  } else if (clipboardCopy) {
+    info = data
+      ? <ClipboardCopy data={data}>{info}</ClipboardCopy>
+      : <ClipboardCopy>{info}</ClipboardCopy>
+  }
+
+  return <tr><th>{label}</th><td>{info}</td></tr>
 }
 
 const Subsystem = ({ system }) => {
@@ -115,13 +127,61 @@ const Subsystem = ({ system }) => {
   return (
     <>
       <Subtitle class='is-5'><ClipboardCopy>{component}</ClipboardCopy></Subtitle>
-      <Table class='is-striped is-fullwidth'>
-        <tbody>
-          <InfoRow label='Part Number' data={partNumber} />
-          <InfoRow label='Coding value' data={coding} />
-          <InfoRow label='WorkShop Code (WSC)' data={wsc} />
-        </tbody>
-      </Table>
+      <InfoTable>
+        <InfoRow label='Part Number' info={partNumber} clipboardCopy />
+        <InfoRow label='Coding value' info={coding} clipboardCopy />
+        <InfoRow label='WorkShop Code (WSC)' info={wsc} clipboardCopy />
+      </InfoTable>
+    </>
+  )
+}
+
+const Fault = ({ fault }) => {
+  const {
+    subject,
+    code: {
+      odb2,
+      vag
+    },
+    symptom: {
+      description
+    }
+  } = fault
+
+  return (
+    <>
+      <Title class='is-5'>{subject}</Title>
+      <InfoTable>
+        <InfoRow label='OBD2 Code' info={odb2} clipboardCopy />
+        <InfoRow label='VAG Code' info={vag} clipboardCopy />
+        <InfoRow label='Symptom' info={description} />
+      </InfoTable>
+      {fault.freezeFrame && <FreezeFrame frame={fault.freezeFrame} />}
+    </>
+  )
+}
+
+const FreezeFrame = ({ frame }) => {
+  const {
+    status,
+    priority,
+    mileage,
+    frequency,
+    resetCounter,
+    timeIndication
+  } = frame
+
+  return (
+    <>
+      <Title class='is-6'>Freeze frame</Title>
+      <InfoTable>
+        <InfoRow label='Status' info={status} />
+        <InfoRow label='Priority' info={priority} />
+        <InfoRow label='Mileage' info={format('%n km', mileage.km)} data={mileage.km} clipboardCopy />
+        <InfoRow label='Frequency' info={frequency} />
+        <InfoRow label='Reset counter' info={resetCounter} />
+        <InfoRow label='Time indication' info={timeIndication} />
+      </InfoTable>
     </>
   )
 }
