@@ -32,28 +32,28 @@
 }
 
 start
-  = report
+  = Report
 
-report // A complete VCDS report
-  = date:datetime eol
+Report // A complete VCDS report
+  = date:Datetime eol
     'VCDS -- Windows Based VAG/VAS Emulator Running on Windows 10 x64' eol
-    'VCDS Version:' _ version:versionSpecifier _ '(' platform:('x64') ')' eol
-    'Data version:' _ dataDate:dataVersionDate _ dataVersion:dataVersionSpecifier eol
+    'VCDS Version:' _ version:VersionSpecifier _ '(' platform:('x64') ')' eol
+    'Data version:' _ dataDate:DataVersionDate _ dataVersion:DataVersionSpecifier eol
     'www.Ross-Tech.com' eol
     l
     'Dealer/Shop Name:' _ shop:$rol eol
     l
-    'VIN:' _ vin:vin _+ 'License Plate:' _ licensePlate:( $licensePlate )? eol
+    'VIN:' _ vin:Vin _+ 'License Plate:' _ licensePlate:( $LicensePlate )? eol
     l+
-    'Chassis Type:' _ chassis:chassis _ '(' type:type ')' eol
+    'Chassis Type:' _ chassis:Chassis _ '(' type:Type ')' eol
     'Scan:' rol eol // ignore module addresses list
     l
-    'VIN:' _ vin _+ 'Mileage:' _ km:$dec+ 'km' '-' miles:$dec+ 'miles' eol
+    'VIN:' _ Vin _+ 'Mileage:' _ km:$dec+ 'km' '-' miles:$dec+ 'miles' eol
     l
-    modulesStatus:moduleStatus+
+    modulesStatus:ModuleStatus+
     l+
-    modulesInfos:moduleInfo+
-    'End' '-'+ '(Elapsed Time:' _ duration:duration ')' '-'+ '\r\n'
+    modulesInfos:ModuleInfo+
+    'End' '-'+ '(Elapsed Time:' _ duration:Duration ')' '-'+ '\r\n'
 
   {
     const mappedInfos = new Map()
@@ -93,8 +93,8 @@ report // A complete VCDS report
     }
   }
 
-moduleStatus // A module status line
-  = address:moduleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$[^01]+ flags:$bin|4| eol
+ModuleStatus // A module status line
+  = address:ModuleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$[^01]+ flags:$bin|4| eol
   {
     return {
       address,
@@ -106,9 +106,9 @@ moduleStatus // A module status line
     }
   }
 
-moduleInfo // A module information section
-  = dashLine
-    'Address' _ address:moduleAddress ':'
+ModuleInfo // A module information section
+  = DashLine
+    'Address' _ address:ModuleAddress ':'
       info:(
           [^\r]+ // ignore module name
           eol
@@ -130,23 +130,23 @@ moduleInfo // A module information section
           eol
 
         _|3| partNumber:(
-            'Part No:' _ hardware:partNumber
+            'Part No:' _ hardware:PartNumber
             { return { software: null, hardware } }
             /
-            'Part No' _ 'SW:' _ software:partNumber _+ 'HW:' _ hardware:( partNumber / 'Hardware No' { return null } ) rol // 'Hardware No' value may be a bug
+            'Part No' _ 'SW:' _ software:PartNumber _+ 'HW:' _ hardware:( PartNumber / 'Hardware No' { return null } ) rol // 'Hardware No' value may be a bug
             { return { software, hardware } }
           ) eol
         _|3| 'Component:' _ component:$rol eol
         revision:( _|3| 'Revision:' _ @$w _+ )?
           serial:( 'Serial number:' _ @$w eol )?
-        codingValue:( _|3| 'Coding:' _ @codingValue eol )?
-        _|3| 'Shop #:' _ 'WSC' _ codingWsc:shopWsc eol
-        _|3| 'VCID:' _ vcid:vcid eol
-        vinid:( _|3| 'VINID:' _ @vinid eol )?
+        codingValue:( _|3| 'Coding:' _ @CodingValue eol )?
+        _|3| 'Shop #:' _ 'WSC' _ codingWsc:Wsc eol
+        _|3| 'VCID:' _ vcid:Vcid eol
+        vinid:( _|3| 'VINID:' _ @Vinid eol )?
         l
-        subsystems:subsystem*
-        faults:faultsSection
-        readiness:( 'Readiness:' _ @readiness eol )?
+        subsystems:Subsystem*
+        faults:FaultsSection
+        readiness:( 'Readiness:' _ @Readiness eol )?
         {
           return {
             address,
@@ -173,11 +173,11 @@ moduleInfo // A module information section
     l
     { return info }
 
-subsystem // A module subsystem
-  = _|3| 'Subsystem' _ index:$dec+ _ '-' _ 'Part No:' _ partNumber:partNumber labelsFile:( _+ 'Labels:' _ @$rol )? eol
+Subsystem // A module subsystem
+  = _|3| 'Subsystem' _ index:$dec+ _ '-' _ 'Part No:' _ partNumber:PartNumber labelsFile:( _+ 'Labels:' _ @$rol )? eol
     _|3| 'Component:' _ component:$rol eol
-    coding:( _|3| 'Coding:' _ @codingValue eol )?
-    wsc:( _|3| 'Shop #: WSC' _ @shortWsc rol eol )?
+    coding:( _|3| 'Coding:' _ @CodingValue eol )?
+    wsc:( _|3| 'Shop #: WSC' _ @ShortWsc rol eol )?
     ( [A-Z0-9 ]i+ eol )? // ignore this line as it contains the same info as above
     l
   {
@@ -191,20 +191,20 @@ subsystem // A module subsystem
     }
   }
 
-faultsSection // The module information section showing faults
+FaultsSection // The module information section showing faults
   = (
     'No fault code found.' eol
     { return [] }
     /
     [1-9][0-9]* _ 'Fault' 's'? _ 'Found:' eol
-    faults:fault+
+    faults:Fault+
     { return faults }
   )
 
-fault // A module fault information
-  = vagCode:vagCode _ '-' _ subject:$rol eol
-    _|12| odbCode:(@odbCode _ '-' _)? symptomCode:symptomCode _ '-' _ description:$rol eol
-    freezeFrame:(freezeFrame)?
+Fault // A module fault information
+  = vagCode:VagCode _ '-' _ subject:$rol eol
+    _|12| odbCode:(@OdbCode _ '-' _)? symptomCode:SymptomCode _ '-' _ description:$rol eol
+    freezeFrame:(FreezeFrame)?
   {
     return {
       subject: string(subject),
@@ -220,7 +220,7 @@ fault // A module fault information
     }
   }
 
-freezeFrame // A fault freeze frame
+FreezeFrame // A fault freeze frame
   = _|13| 'Freeze Frame:' eol
     _|20| 'Fault Status:' _ status:$bin|8| eol
     _|20| 'Fault Priority:' _ priority:dec eol
@@ -246,21 +246,21 @@ l
   }
 
 /***************************** AUTOMOTIVE RULES *******************************/
-vin 'a VIN (Vehicule Identification Number)'
+Vin 'a VIN (Vehicule Identification Number)'
   = $uppnum|17|
-licensePlate 'a license plate number'
+LicensePlate 'a license plate number'
   = $[A-Z0-9-]+
-odbCode 'ODB2 fault code' = $( 'P'? dec|4| )
+OdbCode 'ODB2 fault code' = $( 'P'? dec|4| )
 
 /******************************** VAG RULES ***********************************/
-chassis 'a VAG chassis code'
+Chassis 'a VAG chassis code'
   = @$uppnum|2|
-type 'a VAG vehicle, engine or transmission type code'
+Type 'a VAG vehicle, engine or transmission Type code'
   = @$uppnum|3|
-shopWsc 'a WSC (WorkShop Code)' = $( shortWsc _ dec|3| _ dec|5| )
-shortWsc 'a short WSC (WorkShop Code)' = $dec|5|
-vagCode 'VAG fault code' = $dec|5|
-symptomCode 'fault symptom code' = $dec|3|
+Wsc 'a WSC (WorkShop Code)' = $( ShortWsc _ dec|3| _ dec|5| )
+ShortWsc 'a short WSC (WorkShop Code)' = $dec|5|
+VagCode 'VAG fault code' = $dec|5|
+SymptomCode 'fault symptom code' = $dec|3|
 
 /*
   Part Number
@@ -301,56 +301,56 @@ symptomCode 'fault symptom code' = $dec|3|
   X   re-manufactured part
 
 */
-partNumber 'a part number'
-  = type:type _ group:partGroup subgroup:partSubgroup _ number:partSpecNumber modificationCode:(_ @partModifCode)?
+PartNumber 'a part number'
+  = type:Type _ group:PartGroup subgroup:PartSubgroup _ number:PartSpecNumber modificationCode:(_ @PartModifCode)?
   { return text() }
-partGroup 'the main group of a part number' = dec
-partSubgroup 'the subgroup of a part number' = $dec|2|
-partSpecNumber 'the specific number of a part' = $dec|3|
-partModifCode 'the modification code of a part number' = upp
+PartGroup 'the main group of a part number' = dec
+PartSubgroup 'the subgroup of a part number' = $dec|2|
+PartSpecNumber 'the specific number of a part' = $dec|3|
+PartModifCode 'the modification code of a part number' = upp
 
 /******************************** VCDS RULES **********************************/
-versionSpecifier 'a version specifier'
+VersionSpecifier 'a version specifier'
   = $( dec+ '.' dec+ '.' dec+ '.' dec+ )
-dataVersionDate 'a VCDS data version date'
+DataVersionDate 'a VCDS data version date'
   = $dec|8|
-dataVersionSpecifier 'a VCDS data version specifier'
+DataVersionSpecifier 'a VCDS data version specifier'
   = $( 'DS' dec|3| '.' dec )
 
-moduleAddress 'a module address' = $hexa|2|
-codingValue 'a coding value' = $hexa+
-vcid 'a VCID (Vag-Com identifier)' = $( hexa|18| '-' hexa|4| )
-vinid 'a VINID' = $hexa|34|
-readiness 'readiness flags' = $( bin|4| _ bin|4| )
+ModuleAddress 'a module address' = $hexa|2|
+CodingValue 'a coding value' = $hexa+
+Vcid 'a VCID (Vag-Com identifier)' = $( hexa|18| '-' hexa|4| )
+Vinid 'a VINID' = $hexa|34|
+Readiness 'readiness flags' = $( bin|4| _ bin|4| )
 
 /**************************** MISCELANEOUS RULES ******************************/
-dashLine 'a dash line' = '-'+ eol
+DashLine 'a dash line' = '-'+ eol
 
 /**************************** DATE AND TIME RULES *****************************/
-datetime
-  = dayName ',' day ',' monthName ',' year ',' hours ':' minutes ':' seconds ':00009'
+Datetime
+  = DayName ',' Day ',' MonthName ',' Year ',' Hours ':' Minutes ':' Seconds ':00009'
   { return new Date(text()) }
-duration
-  = minutes:$minutes ':' seconds:$seconds
+Duration
+  = minutes:$Minutes ':' seconds:$Seconds
   { return { minutes: integer(minutes), seconds: integer(seconds) } }
-dayName 'the name of a week day'
+DayName 'the name of a week day'
   = 'Monday' / 'Tuesday' / 'Wednesday' / 'Thursday' / 'Friday' / 'Saturday' /
     'Sunday'
-day 'a day number'
+Day 'a day number'
   = $([0-2][0-9] / '3'[0-1])
-monthName 'the name of a month'
+MonthName 'the name of a month'
   = 'January' / 'February' / 'March' / 'April' / 'May' / 'June' / 'July' /
     'August' / 'September' / 'October' / 'November' / 'December'
-year 'a year'
+Year 'a year'
   = $[12][0-9]|3|
-hours 'hours'
+Hours 'hours'
   = $( [01][0-9] / '2'[0-3] )
-minutes 'minutes'
+Minutes 'minutes'
   = $[0-5][0-9]
-seconds 'seconds'
+Seconds 'seconds'
   = $[0-5][0-9]
 
-/******************************* GENERIC RULES ********************************/
+/********************************* HELPERS ************************************/
 dec 'a decimal character' = [0-9]
 hexa 'an hexadecimal character' = [0-9A-F]
 bin 'a binary character' = [01]
