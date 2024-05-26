@@ -1,5 +1,8 @@
 /* Peggy grammar to parse VSCD auto-scan reports. */
+
+
 {{
+
   function string(str) {
     str = str.trim()
 
@@ -31,7 +34,7 @@
 start
   = report
 
-report
+report // A complete VCDS report
   = date:datetime eol
     'VCDS -- Windows Based VAG/VAS Emulator Running on Windows 10 x64' eol
     'VCDS Version:' _ version:versionSpecifier _ '(' platform:('x64') ')' eol
@@ -45,7 +48,7 @@ report
     'Chassis Type:' _ chassis:chassis _ '(' type:type ')' eol
     'Scan:' rol eol // ignore module addresses list
     l
-    'VIN:' _ vin _+ 'Mileage:' _ mileage:mileage eol
+    'VIN:' _ vin _+ 'Mileage:' _ km:$dec+ 'km' '-' miles:$dec+ 'miles' eol
     l
     modulesStatus:moduleStatus+
     l+
@@ -81,55 +84,16 @@ report
         licensePlate,
         chassis,
         type,
-        mileage
+        mileage: {
+          km: integer(km),
+          miles: integer(miles)
+        }
       },
       modules
     }
   }
 
-datetime
-  = dayName ',' day ',' monthName ',' year ',' hours ':' minutes ':' seconds ':00009'
-  { return new Date(text()) }
-duration
-  = minutes:$minutes ':' seconds:$seconds
-  { return { minutes: integer(minutes), seconds: integer(seconds) } }
-dayName 'the name of a week day'
-  = 'Monday' / 'Tuesday' / 'Wednesday' / 'Thursday' / 'Friday' / 'Saturday' /
-    'Sunday'
-day 'a day number'
-  = $([0-2][0-9] / '3'[0-1])
-monthName 'the name of a month'
-  = 'January' / 'February' / 'March' / 'April' / 'May' / 'June' / 'July' /
-    'August' / 'September' / 'October' / 'November' / 'December'
-year 'a year'
-  = $[12][0-9]|3|
-hours 'hours'
-  = $( [01][0-9] / '2'[0-3] )
-minutes 'minutes'
-  = $[0-5][0-9]
-seconds 'seconds'
-  = $[0-5][0-9]
-
-versionSpecifier 'a version specifier'
-  = $( dec+ '.' dec+ '.' dec+ '.' dec+ )
-dataVersionDate 'a VCDS data version date'
-  = $dec|8|
-dataVersionSpecifier 'a VCDS data version specifier'
-  = $( 'DS' dec|3| '.' dec )
-
-vin 'a VIN (Vehicule Identification Number)'
-  = $uppnum|17|
-licensePlate 'a license plate number'
-  = $[A-Z0-9-]+
-chassis 'a VAG chassis code'
-  = @$uppnum|2|
-type 'a VAG vehicle, engine or transmission type code'
-  = @$uppnum|3|
-mileage 'a mileage value in km and miles'
-  = km:$dec+ 'km' '-' miles:$dec+ 'miles'
-  { return { km: integer(km), miles: integer(miles) } }
-
-moduleStatus
+moduleStatus // A module status line
   = address:moduleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$[^01]+ flags:$bin|4| eol
   {
     return {
@@ -141,9 +105,8 @@ moduleStatus
       }
     }
   }
-moduleAddress 'a module address' = $dec|2|
 
-moduleInfo
+moduleInfo // A module information section
   = dashLine
     'Address' _ address:moduleAddress ':'
       info:(
@@ -210,6 +173,94 @@ moduleInfo
     l
     { return info }
 
+subsystem // A module subsystem
+  = _|3| 'Subsystem' _ index:$dec+ _ '-' _ 'Part No:' _ partNumber:partNumber labelsFile:( _+ 'Labels:' _ @$rol )? eol
+    _|3| 'Component:' _ component:$rol eol
+    coding:( _|3| 'Coding:' _ @codingValue eol )?
+    wsc:( _|3| 'Shop #: WSC' _ @shortWsc rol eol )?
+    ( [A-Z0-9 ]i+ eol )? // ignore this line as it contains the same info as above
+    l
+  {
+    return {
+      index: integer(index),
+      partNumber,
+      component: string(component),
+      labelsFile,
+      coding,
+      wsc
+    }
+  }
+
+faultsSection // The module information section showing faults
+  = (
+    'No fault code found.' eol
+    { return [] }
+    /
+    [1-9][0-9]* _ 'Fault' 's'? _ 'Found:' eol
+    faults:fault+
+    { return faults }
+  )
+
+fault // A module fault information
+  = vagCode:vagCode _ '-' _ subject:$rol eol
+    _|12| odbCode:(@odbCode _ '-' _)? symptomCode:symptomCode _ '-' _ description:$rol eol
+    freezeFrame:(freezeFrame)?
+  {
+    return {
+      subject: string(subject),
+      code: {
+        odb2: odbCode,
+        vag: vagCode
+      },
+      symptom: {
+        code: symptomCode,
+        description
+      },
+      freezeFrame
+    }
+  }
+
+freezeFrame // A fault freeze frame
+  = _|13| 'Freeze Frame:' eol
+    _|20| 'Fault Status:' _ status:$bin|8| eol
+    _|20| 'Fault Priority:' _ priority:dec eol
+    _|20| 'Fault Frequency:' _ frequency:$dec+ eol
+    _|20| 'Reset counter:' _ resetCounter:$dec+ eol
+    _|20| 'Mileage:' _ value:$dec+
+      _ mileage:(
+        'km' { return { km: integer(value), miles: milesFromKm(value) } }
+      /
+        'miles' { return { miles: integer(value), km: kmFromMiles(value) } }
+      ) eol
+    _|20| 'Time Indication:' _ timeIndication:$dec eol
+l
+  {
+    return {
+      status,
+      priority: integer(priority),
+      frequency: integer(frequency),
+      resetCounter: integer(resetCounter),
+      mileage,
+      timeIndication: integer(timeIndication)
+    }
+  }
+
+/***************************** AUTOMOTIVE RULES *******************************/
+vin 'a VIN (Vehicule Identification Number)'
+  = $uppnum|17|
+licensePlate 'a license plate number'
+  = $[A-Z0-9-]+
+odbCode 'ODB2 fault code' = $( 'P'? dec|4| )
+
+/******************************** VAG RULES ***********************************/
+chassis 'a VAG chassis code'
+  = @$uppnum|2|
+type 'a VAG vehicle, engine or transmission type code'
+  = @$uppnum|3|
+shopWsc 'a WSC (WorkShop Code)' = $( shortWsc _ dec|3| _ dec|5| )
+shortWsc 'a short WSC (WorkShop Code)' = $dec|5|
+vagCode 'VAG fault code' = $dec|5|
+symptomCode 'fault symptom code' = $dec|3|
 
 /*
   Part Number
@@ -258,92 +309,48 @@ partSubgroup 'the subgroup of a part number' = $dec|2|
 partSpecNumber 'the specific number of a part' = $dec|3|
 partModifCode 'the modification code of a part number' = upp
 
+/******************************** VCDS RULES **********************************/
+versionSpecifier 'a version specifier'
+  = $( dec+ '.' dec+ '.' dec+ '.' dec+ )
+dataVersionDate 'a VCDS data version date'
+  = $dec|8|
+dataVersionSpecifier 'a VCDS data version specifier'
+  = $( 'DS' dec|3| '.' dec )
+
+moduleAddress 'a module address' = $hexa|2|
 codingValue 'a coding value' = $hexa+
-shopWsc 'a shop WSC' = $( shortShopWsc _ dec|3| _ dec|5| )
-shortShopWsc 'a short shop WSC' = $dec|5|
-vcid 'a VCID' = $( hexa|18| '-' hexa|4| )
+vcid 'a VCID (Vag-Com identifier)' = $( hexa|18| '-' hexa|4| )
 vinid 'a VINID' = $hexa|34|
 readiness 'readiness flags' = $( bin|4| _ bin|4| )
 
-subsystem
-  = _|3| 'Subsystem' _ index:$dec+ _ '-' _ 'Part No:' _ partNumber:partNumber labelsFile:( _+ 'Labels:' _ @$rol )? eol
-    _|3| 'Component:' _ component:$rol eol
-    coding:( _|3| 'Coding:' _ @codingValue eol )?
-    wsc:( _|3| 'Shop #: WSC' _ @shortShopWsc rol eol )?
-    ( [A-Z0-9 ]i+ eol )? // ignore this line as it contains the same info as above
-    l
-  {
-    return {
-      index: integer(index),
-      partNumber,
-      component: string(component),
-      labelsFile,
-      coding,
-      wsc
-    }
-  }
-
-faultsSection
-  = (
-    'No fault code found.' eol
-    { return [] }
-    /
-    [1-9][0-9]* _ 'Fault' 's'? _ 'Found:' eol
-    faults:fault+
-    { return faults }
-  )
-
-fault
-  = vagCode:vagCode _ '-' _ subject:$rol eol
-    _|12| odbCode:(@odbCode _ '-' _)? symptomCode:symptomCode _ '-' _ description:$rol eol
-    freezeFrame:(freezeFrame)?
-  {
-    return {
-      subject: string(subject),
-      code: {
-        odb2: odbCode,
-        vag: vagCode
-      },
-      symptom: {
-        code: symptomCode,
-        description
-      },
-      freezeFrame
-    }
-  }
-
-odbCode 'ODB2 fault code' = $( 'P'? dec|4| )
-vagCode 'VAG fault code' = $dec|5|
-symptomCode 'fault symptom code' = $dec|3|
-
-freezeFrame
-  = _|13| 'Freeze Frame:' eol
-    _|20| 'Fault Status:' _ status:$bin|8| eol
-    _|20| 'Fault Priority:' _ priority:dec eol
-    _|20| 'Fault Frequency:' _ frequency:$dec+ eol
-    _|20| 'Reset counter:' _ resetCounter:$dec+ eol
-    _|20| 'Mileage:' _ value:$dec+
-      _ mileage:(
-        'km' { return { km: integer(value), miles: milesFromKm(value) } }
-      /
-        'miles' { return { miles: integer(value), km: kmFromMiles(value) } }
-      ) eol
-    _|20| 'Time Indication:' _ timeIndication:$dec eol
-l
-  {
-    return {
-      status,
-      priority: integer(priority),
-      frequency: integer(frequency),
-      resetCounter: integer(resetCounter),
-      mileage,
-      timeIndication: integer(timeIndication)
-    }
-  }
-
-
+/**************************** MISCELANEOUS RULES ******************************/
 dashLine 'a dash line' = '-'+ eol
 
+/**************************** DATE AND TIME RULES *****************************/
+datetime
+  = dayName ',' day ',' monthName ',' year ',' hours ':' minutes ':' seconds ':00009'
+  { return new Date(text()) }
+duration
+  = minutes:$minutes ':' seconds:$seconds
+  { return { minutes: integer(minutes), seconds: integer(seconds) } }
+dayName 'the name of a week day'
+  = 'Monday' / 'Tuesday' / 'Wednesday' / 'Thursday' / 'Friday' / 'Saturday' /
+    'Sunday'
+day 'a day number'
+  = $([0-2][0-9] / '3'[0-1])
+monthName 'the name of a month'
+  = 'January' / 'February' / 'March' / 'April' / 'May' / 'June' / 'July' /
+    'August' / 'September' / 'October' / 'November' / 'December'
+year 'a year'
+  = $[12][0-9]|3|
+hours 'hours'
+  = $( [01][0-9] / '2'[0-3] )
+minutes 'minutes'
+  = $[0-5][0-9]
+seconds 'seconds'
+  = $[0-5][0-9]
+
+/******************************* GENERIC RULES ********************************/
 dec 'a decimal character' = [0-9]
 hexa 'an hexadecimal character' = [0-9A-F]
 bin 'a binary character' = [01]
