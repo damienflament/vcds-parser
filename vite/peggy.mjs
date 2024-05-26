@@ -12,21 +12,25 @@ export default function () {
     load (id) {
       if (!grammars[id]) return null
 
-      this.addWatchFile(grammars[id])
+      const { path: grammarPath, pathname: grammarSource } = grammars[id]
 
-      const src = fs.readFileSync(grammars[id]).toString()
-      const parserCode = peggy.generate(
+      this.addWatchFile(grammarPath)
+
+      const src = fs.readFileSync(grammarPath).toString()
+      const parserSourceNode = peggy.generate(
         src,
         {
-          grammarSource: id,
-          output: 'source',
+          grammarSource,
+          output: 'source-and-map',
           format: 'es'
         }
       )
 
+      const { code, map } = parserSourceNode.toStringWithSourceMap()
+
       return {
-        code: parserCode,
-        map: { mapping: '' }
+        code,
+        map: map.toJSON()
       }
     }
   }

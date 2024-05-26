@@ -13,9 +13,11 @@ export default function () {
     load (id) {
       if (!schemas[id]) return null
 
-      this.addWatchFile(schemas[id])
+      const { path: schemaPath } = schemas[id]
 
-      const schema = fs.readJsonSync(schemas[id])
+      this.addWatchFile(schemaPath)
+
+      const schema = fs.readJsonSync(schemaPath)
 
       const ajv = new Ajv({
         strict: true,
