@@ -1,8 +1,6 @@
 /* Peggy grammar to parse VSCD auto-scan reports. */
 
-
 {{
-
   function string(str) {
     str = str.trim()
 
@@ -34,26 +32,26 @@
 start
   = Report
 
-Report // A complete VCDS report
-  = date:Datetime eol
-    'VCDS -- Windows Based VAG/VAS Emulator Running on Windows 10 x64' eol
-    'VCDS Version:' _ version:VersionSpecifier _ '(' platform:('x64') ')' eol
-    'Data version:' _ dataDate:DataVersionDate _ dataVersion:DataVersionSpecifier eol
-    'www.Ross-Tech.com' eol
+Report                                                                          // A complete VCDS report
+  = date:Datetime EOL
+    'VCDS -- Windows Based VAG/VAS Emulator Running on Windows 10 x64' EOL
+    'VCDS Version:' _ version:VersionSpecifier _ '(' platform:('x64') ')' EOL
+    'Data version:' _ dataDate:DataVersionDate _ dataVersion:DataVersionSpecifier EOL
+    'www.Ross-Tech.com' EOL
     l
-    'Dealer/Shop Name:' _ shop:$rol eol
+    'Dealer/Shop Name:' _ shop:$rol EOL
     l
-    'VIN:' _ vin:Vin _+ 'License Plate:' _ licensePlate:( $LicensePlate )? eol
+    'VIN:' _ vin:Vin _+ 'License Plate:' _ licensePlate:( $LicensePlate )? EOL
     l+
-    'Chassis Type:' _ chassis:Chassis _ '(' type:Type ')' eol
-    'Scan:' rol eol // ignore module addresses list
+    'Chassis Type:' _ chassis:Chassis _ '(' type:Type ')' EOL
+    'Scan:' rol EOL // ignore module addresses list
     l
-    'VIN:' _ Vin _+ 'Mileage:' _ km:$dec+ 'km' '-' miles:$dec+ 'miles' eol
+    'VIN:' _ Vin _+ 'Mileage:' _ km:$DEC+ 'km' '-' miles:$DEC+ 'miles' EOL
     l
     modulesStatus:ModuleStatus+
     l+
-    modulesInfos:ModuleInfo+
-    'End' '-'+ '(Elapsed Time:' _ duration:Duration ')' '-'+ '\r\n'
+    modulesInfos:ModuleInfoSection+
+    'End' '-'+ '(Elapsed Time:' _ duration:Duration ')' '-'+ EOL
 
   {
     const mappedInfos = new Map()
@@ -93,8 +91,8 @@ Report // A complete VCDS report
     }
   }
 
-ModuleStatus // A module status line
-  = address:ModuleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$[^01]+ flags:$bin|4| eol
+ModuleStatus                                                                    // A module status line
+  = address:ModuleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$NOT_BIN+ flags:$BIN|4| EOL
   {
     return {
       address,
@@ -106,104 +104,108 @@ ModuleStatus // A module status line
     }
   }
 
-ModuleInfo // A module information section
+ModuleInfoSection                                                               // A module information section
   = DashLine
-    'Address' _ address:ModuleAddress ':'
-      info:(
-          [^\r]+ // ignore module name
-          eol
-          'Cannot be reached' eol
-          {
-            return {
-              address,
-              isReachable: false,
-              info: null,
-              subsystems: [],
-              faults: []
-            }
-          }
-      /
-          [^:]+ // ignore module name
-          ':'
-          '.'? // this dot '.' just after the colon ':' may be a bug
-          _ labelsFile:$rol
-          eol
-
-        _|3| partNumber:(
-            'Part No:' _ hardware:PartNumber
-            { return { software: null, hardware } }
-            /
-            'Part No' _ 'SW:' _ software:PartNumber _+ 'HW:' _ hardware:( PartNumber / 'Hardware No' { return null } ) rol // 'Hardware No' value may be a bug
-            { return { software, hardware } }
-          ) eol
-        _|3| 'Component:' _ component:$rol eol
-        revision:( _|3| 'Revision:' _ @$w _+ )?
-          serial:( 'Serial number:' _ @$w eol )?
-        codingValue:( _|3| 'Coding:' _ @CodingValue eol )?
-        _|3| 'Shop #:' _ 'WSC' _ codingWsc:Wsc eol
-        _|3| 'VCID:' _ vcid:Vcid eol
-        vinid:( _|3| 'VINID:' _ @Vinid eol )?
-        l
-        subsystems:Subsystem*
-        faults:FaultsSection
-        readiness:( 'Readiness:' _ @Readiness eol )?
-        {
-          return {
-            address,
-            isReachable: true,
-            info: {
-              labelsFile,
-              partNumber,
-              component: string(component),
-              revision,
-              serial,
-              coding: {
-                value: codingValue,
-                wsc: codingWsc
-              },
-              vcid,
-              vinid,
-              readiness
-            },
-            subsystems,
-            faults
-          }
-        }
-      )
+    @( UnreachableModuleInfo / ModuleInfo )
     l
-    { return info }
 
-Subsystem // A module subsystem
-  = _|3| 'Subsystem' _ index:$dec+ _ '-' _ 'Part No:' _ partNumber:PartNumber labelsFile:( _+ 'Labels:' _ @$rol )? eol
-    _|3| 'Component:' _ component:$rol eol
-    coding:( _|3| 'Coding:' _ @CodingValue eol )?
-    wsc:( _|3| 'Shop #: WSC' _ @ShortWsc rol eol )?
-    ( [A-Z0-9 ]i+ eol )? // ignore this line as it contains the same info as above
-    l
-  {
-    return {
-      index: integer(index),
-      partNumber,
-      component: string(component),
-      labelsFile,
-      coding,
-      wsc
+UnreachableModuleInfo                                                           // The almost empty information section content related to and unreachable module
+  = 'Address' _ address:ModuleAddress ':' rol EOL
+    //                  ignore module name ▲
+    'Cannot be reached' EOL
+    {
+      return {
+        address,
+        isReachable: false,
+        info: null,
+        subsystems: [],
+        faults: []
+      }
     }
-  }
 
-FaultsSection // The module information section showing faults
+ModuleInfo                                                                      // The module information section content
+  = 'Address' _ address:ModuleAddress ':' [^:]+ ':' '.'? _ labelsFile:$rol EOL
+    //                   ignore module name ▲        ▲ this dot '.' just after
+    //                                                 the colon ':' may be a
+    //                                                 bug
+                    _|3| partNumber:ModuleInfoPartNumber EOL
+                    _|3| 'Component:' _ component:$rol EOL
+revisionAndSerial:( _|3| 'Revision:' _ @$UPPNUM+ _+ 'Serial number:' _ @$UPPNUM+ EOL )?
+           coding:( _|3| 'Coding:' _ @CodingValue EOL )?
+                    _|3| 'Shop #:' _ 'WSC' _ wsc:Wsc EOL
+                    _|3| 'VCID:' _ vcid:Vcid EOL
+            vinid:( _|3| 'VINID:' _ @Vinid EOL )?
+                    l
+     subsystems:Subsystem*
+         faults:FaultsSection
+    readiness:( 'Readiness:' _ @Readiness EOL )?
+    {
+      const [revision, serial] = revisionAndSerial ?? [null, null]
+
+      return {
+        address,
+        isReachable: true,
+        info: {
+          labelsFile,
+          partNumber,
+          component: string(component),
+          revision,
+          serial,
+          coding: {
+            value: coding,
+            wsc
+          },
+          vcid,
+          vinid,
+          readiness
+        },
+        subsystems,
+        faults
+      }
+    }
+
+ModuleInfoPartNumber // The module part number can apply to hardware or both hardware and software
   = (
-    'No fault code found.' eol
-    { return [] }
+      'Part No:' _ hardware:PartNumber
+      { return { software: null, hardware } }
     /
-    [1-9][0-9]* _ 'Fault' 's'? _ 'Found:' eol
-    faults:Fault+
-    { return faults }
+      'Part No' _ 'SW:' _ software:PartNumber _+ 'HW:' _ hardware:( PartNumber / BuggyHardwarePartNumber ) rol
+      { return { software, hardware } }
+    )
+
+BuggyHardwarePartNumber = 'Hardware No' { return null } // 'Hardware No' value may be a bug
+
+Subsystem                                                                       // A module subsystem
+  =          _|3| 'Subsystem' _ index:$DEC+ _ '-' _ 'Part No:' _ partNumber:PartNumber labelsFile:( _+ 'Labels:' _ @$rol )? EOL
+             _|3| 'Component:' _ component:$rol EOL
+    coding:( _|3| 'Coding:' _ @CodingValue EOL )?
+       wsc:( _|3| 'Shop #: WSC' _ @ShortWsc rol EOL )?
+           ( [A-Z0-9 ]i+ EOL )? // ignore this last line as it contains the same info as above (part number and component)
+             l
+    {
+      return {
+        index: integer(index),
+        partNumber,
+        component: string(component),
+        labelsFile,
+        coding,
+        wsc
+      }
+    }
+
+FaultsSection                                                                   // The module information section showing faults
+  = (
+      'No fault code found.' EOL
+      { return [] }
+    /
+      ( '1 Fault Found:' / DEC+ _ 'Faults Found:' ) EOL
+      faults:Fault+
+      { return faults }
   )
 
-Fault // A module fault information
-  = vagCode:VagCode _ '-' _ subject:$rol eol
-    _|12| odbCode:(@OdbCode _ '-' _)? symptomCode:SymptomCode _ '-' _ description:$rol eol
+Fault                                                                           // A module fault information
+  = vagCode:VagCode _ '-' _ subject:$rol EOL
+    _|12| odbCode:(@OdbCode _ '-' _)? symptomCode:SymptomCode _ '-' _ description:$rol EOL
     freezeFrame:(FreezeFrame)?
   {
     return {
@@ -220,47 +222,45 @@ Fault // A module fault information
     }
   }
 
-FreezeFrame // A fault freeze frame
-  = _|13| 'Freeze Frame:' eol
-    _|20| 'Fault Status:' _ status:$bin|8| eol
-    _|20| 'Fault Priority:' _ priority:dec eol
-    _|20| 'Fault Frequency:' _ frequency:$dec+ eol
-    _|20| 'Reset counter:' _ resetCounter:$dec+ eol
-    _|20| 'Mileage:' _ value:$dec+
-      _ mileage:(
-        'km' { return { km: integer(value), miles: milesFromKm(value) } }
-      /
-        'miles' { return { miles: integer(value), km: kmFromMiles(value) } }
-      ) eol
-    _|20| 'Time Indication:' _ timeIndication:$dec eol
+FreezeFrame                                                                     // A fault freeze frame
+  = _|13| 'Freeze Frame:' EOL
+    _|20| 'Fault Status:' _ status:$BIN|8| EOL
+    _|20| 'Fault Priority:' _ priority:DEC EOL
+    _|20| 'Fault Frequency:' _ frequency:$DEC+ EOL
+    _|20| 'Reset counter:' _ resetCounter:$DEC+ EOL
+    _|20| 'Mileage:' _ mileage:$DEC+ _ 'km' EOL
+    _|20| 'Time Indication:' _ timeIndication:$DEC EOL
 l
   {
     return {
       status,
       priority: integer(priority),
-      frequency: integer(frequency),
+      frequency: integer(frequency),                                            // number of occurences since the first one
       resetCounter: integer(resetCounter),
-      mileage,
+      mileage: {                                                                // mileage of the first occurence
+        km: integer(mileage),
+        miles: milesFromKm(mileage)
+      },
       timeIndication: integer(timeIndication)
     }
   }
 
 /***************************** AUTOMOTIVE RULES *******************************/
 Vin 'a VIN (Vehicule Identification Number)'
-  = $uppnum|17|
+  = $UPPNUM|17|
 LicensePlate 'a license plate number'
   = $[A-Z0-9-]+
-OdbCode 'ODB2 fault code' = $( 'P'? dec|4| )
+OdbCode 'ODB2 fault code' = $( 'P'? DEC|4| )
 
 /******************************** VAG RULES ***********************************/
 Chassis 'a VAG chassis code'
-  = @$uppnum|2|
+  = @$UPPNUM|2|
 Type 'a VAG vehicle, engine or transmission Type code'
-  = @$uppnum|3|
-Wsc 'a WSC (WorkShop Code)' = $( ShortWsc _ dec|3| _ dec|5| )
-ShortWsc 'a short WSC (WorkShop Code)' = $dec|5|
-VagCode 'VAG fault code' = $dec|5|
-SymptomCode 'fault symptom code' = $dec|3|
+  = @$UPPNUM|3|
+Wsc 'a WSC (WorkShop Code)' = $( ShortWsc _ DEC|3| _ DEC|5| )
+ShortWsc 'a short WSC (WorkShop Code)' = $DEC|5|
+VagCode 'VAG fault code' = $DEC|5|
+SymptomCode 'fault symptom code' = $DEC|3|
 
 /*
   Part Number
@@ -304,27 +304,27 @@ SymptomCode 'fault symptom code' = $dec|3|
 PartNumber 'a part number'
   = type:Type _ group:PartGroup subgroup:PartSubgroup _ number:PartSpecNumber modificationCode:(_ @PartModifCode)?
   { return text() }
-PartGroup 'the main group of a part number' = dec
-PartSubgroup 'the subgroup of a part number' = $dec|2|
-PartSpecNumber 'the specific number of a part' = $dec|3|
-PartModifCode 'the modification code of a part number' = upp
+PartGroup 'the main group of a part number' = DEC
+PartSubgroup 'the subgroup of a part number' = $DEC|2|
+PartSpecNumber 'the specific number of a part' = $DEC|3|
+PartModifCode 'the modification code of a part number' = UPP
 
 /******************************** VCDS RULES **********************************/
 VersionSpecifier 'a version specifier'
-  = $( dec+ '.' dec+ '.' dec+ '.' dec+ )
+  = $( DEC+ '.' DEC+ '.' DEC+ '.' DEC+ )
 DataVersionDate 'a VCDS data version date'
-  = $dec|8|
+  = $DEC|8|
 DataVersionSpecifier 'a VCDS data version specifier'
-  = $( 'DS' dec|3| '.' dec )
+  = $( 'DS' DEC|3| '.' DEC )
 
-ModuleAddress 'a module address' = $hexa|2|
-CodingValue 'a coding value' = $hexa+
-Vcid 'a VCID (Vag-Com identifier)' = $( hexa|18| '-' hexa|4| )
-Vinid 'a VINID' = $hexa|34|
-Readiness 'readiness flags' = $( bin|4| _ bin|4| )
+ModuleAddress 'a module address' = $HEX|2|
+CodingValue 'a coding value' = $HEX+
+Vcid 'a VCID (Vag-Com identifier)' = $( HEX|18| '-' HEX|4| )
+Vinid 'a VINID' = $HEX|34|
+Readiness 'readiness flags' = $( BIN|4| _ BIN|4| )
 
 /**************************** MISCELANEOUS RULES ******************************/
-DashLine 'a dash line' = '-'+ eol
+DashLine 'a dash line' = '-'+ EOL
 
 /**************************** DATE AND TIME RULES *****************************/
 Datetime
@@ -351,14 +351,18 @@ Seconds 'seconds'
   = $[0-5][0-9]
 
 /********************************* HELPERS ************************************/
-dec 'a decimal character' = [0-9]
-hexa 'an hexadecimal character' = [0-9A-F]
-bin 'a binary character' = [01]
-upp 'an uppercase alphabetic character' = [A-Z]
-uppnum 'an alphanumeric uppercase character' = [0-9A-Z]
-
-_ 'a blank space' = ' '
 w 'a word' = [^ \r\n]+
-l 'an empty line' = _* eol
-eol 'the end of the line' = '\r\n' // Those reports are produced under Windows
+l 'an empty line' = _* EOL
 rol 'the rest of the line' = [^\r]*
+
+/********************************* TOKENS *************************************/
+_ 'a blank space' = ' '
+DEC 'a decimal character' = [0-9]
+HEX 'an hexadecimal character' = [0-9A-F]
+BIN 'a binary character' = [01]
+UPP 'an uppercase alphabetic character' = [A-Z]
+UPPNUM 'an alphanumeric uppercase character' = [0-9A-Z]
+
+NOT_BIN 'a not binary character' = [^01]
+
+EOL 'the end of the line' = '\r\n' // Those reports are produced under Windows
