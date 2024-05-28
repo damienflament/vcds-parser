@@ -2,21 +2,37 @@
 
 {{
   function string(str) {
+    if (str === null) return null
+
     str = str.trim()
 
-    if (str.length === 0) {
-      str = null
-    }
+    if (str.length === 0) str = null
 
     return str
   }
 
   function integer(str) {
-    return parseInt(str)
+    return str === null
+      ? null
+      : Number.parseInt(str)
+  }
+
+  function float(str) {
+    return str === null
+      ? null
+      : Number.parseFloat(str)
   }
 
   function binary(str) {
-    return parseInt(str, 2)
+    return str === null
+      ? null
+      : Number.parseInt(str, 2)
+  }
+
+  function date(str) {
+    return str === null
+      ? null
+      : new Date(str)
   }
 
   const KM_TO_MILES = 0.62137119223733
@@ -61,10 +77,10 @@ Report                                                                          
     });
 
     const modules = modulesStatus
-      .filter(status => status.address !== '00') // Remove special module 00 for now
-      .map(status => Object.assign(
-        status,
-        mappedInfos.get(status.address)
+      .filter(s => s.address !== '00') // Remove special module 00 for now
+      .map(s => Object.assign(
+        s,
+        mappedInfos.get(s .address)
       ))
 
     return {
@@ -164,8 +180,8 @@ revisionAndSerial:( _|3| 'Revision:' _ @$UPPNUM+ _+ 'Serial number:' _ @$UPPNUM+
       }
     }
 
-ModuleInfoPartNumber // The module part number can apply to hardware or both hardware and software
-  = (
+ModuleInfoPartNumber                                                            // The module part number
+  = (                                                                           //can apply to hardware or both hardware and software
       'Part No:' _ hardware:PartNumber
       { return { software: null, hardware } }
     /
@@ -173,14 +189,17 @@ ModuleInfoPartNumber // The module part number can apply to hardware or both har
       { return { software, hardware } }
     )
 
-BuggyHardwarePartNumber = 'Hardware No' { return null } // 'Hardware No' value may be a bug
+BuggyHardwarePartNumber
+  = 'Hardware No' // 'Hardware No' value may be a bug
+  { return null }
 
 Subsystem                                                                       // A module subsystem
   =          _|3| 'Subsystem' _ index:$DEC+ _ '-' _ 'Part No:' _ partNumber:PartNumber labelsFile:( _+ 'Labels:' _ @$rol )? EOL
              _|3| 'Component:' _ component:$rol EOL
     coding:( _|3| 'Coding:' _ @CodingValue EOL )?
        wsc:( _|3| 'Shop #: WSC' _ @ShortWsc rol EOL )?
-           ( [A-Z0-9 ]i+ EOL )? // ignore this last line as it contains the same info as above (part number and component)
+           ( [A-Z0-9 ]i+ EOL )? // ignore this last line as it contains the same
+                                // info as above (part number and component)
              l
     {
       return {
@@ -223,15 +242,30 @@ Fault                                                                           
   }
 
 FreezeFrame                                                                     // A fault freeze frame
-  = _|13| 'Freeze Frame:' EOL
-    _|20| 'Fault Status:' _ status:$BIN|8| EOL
-    _|20| 'Fault Priority:' _ priority:DEC EOL
-    _|20| 'Fault Frequency:' _ frequency:$DEC+ EOL
-    _|20| 'Reset counter:' _ resetCounter:$DEC+ EOL
-    _|20| 'Mileage:' _ mileage:$DEC+ _ 'km' EOL
-    _|20| 'Time Indication:' _ timeIndication:$DEC EOL
-l
+  =   _|13| 'Freeze Frame:' EOL
+      _|20| 'Fault Status:' _ status:$BIN|8| EOL
+      _|20| 'Fault Priority:' _ priority:DEC EOL
+      _|20| 'Fault Frequency:' _ frequency:$DEC+ EOL
+      _|20| 'Reset counter:' _ resetCounter:$DEC+ EOL
+      _|20| 'Mileage:' _ mileage:$DEC+ _ 'km' EOL
+      _|20| 'Time Indication:' _ timeIndication:$DEC EOL
+frameDate:( _|20| 'Date:' _ @$( Year '.' Month '.' Day ) EOL )?
+frameTime:( _|20| 'Time:' _ @$( Hours ':' Minutes ':' Seconds ) EOL )?
+     (
+       l
+       _|13| 'Freeze Frame:' EOL
+     )?
+voltage:( _|20| 'Voltage:' _ @Decimal _ 'V' EOL )?
+temperature1:( _|20| 'Temperature:' _ @Decimal '�C' EOL )?
+      ( _|20| '(no units):' rol EOL )?
+      ( _|20| '(no units):' rol EOL )?
+temperature2:( _|20| 'Temperature:' _ @Decimal '�C' EOL )?
+      l
   {
+    const frameDatetime = (frameDate === null || frameTime === null)
+      ? null
+      : `${frameDate} ${frameTime}`
+
     return {
       status,
       priority: integer(priority),
@@ -241,7 +275,11 @@ l
         km: integer(mileage),
         miles: milesFromKm(mileage)
       },
-      timeIndication: integer(timeIndication)
+      date: date(frameDatetime),
+      timeIndication: integer(timeIndication),
+      voltage: float(voltage),
+      temperature1: float(temperature1),
+      temperature2: float(temperature2)
     }
   }
 
@@ -337,18 +375,23 @@ DayName 'the name of a week day'
   = 'Monday' / 'Tuesday' / 'Wednesday' / 'Thursday' / 'Friday' / 'Saturday' /
     'Sunday'
 Day 'a day number'
-  = $([0-2][0-9] / '3'[0-1])
+  = $( '0'[1-9] / [12][0-9] / '3'[01] )
+Month 'a month number'
+  = $( '0'[1-9] / '1'[0-2] )
 MonthName 'the name of a month'
   = 'January' / 'February' / 'March' / 'April' / 'May' / 'June' / 'July' /
     'August' / 'September' / 'October' / 'November' / 'December'
 Year 'a year'
-  = $[12][0-9]|3|
+  = $( [12][0-9]|3| )
 Hours 'hours'
   = $( [01][0-9] / '2'[0-3] )
 Minutes 'minutes'
-  = $[0-5][0-9]
+  = $( [0-5][0-9] )
 Seconds 'seconds'
-  = $[0-5][0-9]
+  = $( [0-5][0-9] )
+
+Decimal 'a decimal number'
+  = $( DEC+ '.' DEC+ )
 
 /********************************* HELPERS ************************************/
 w 'a word' = [^ \r\n]+

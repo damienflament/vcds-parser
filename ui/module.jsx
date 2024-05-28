@@ -88,15 +88,15 @@ const Info = ({ info }) => {
     <>
       <Title class='is-4'>Identification</Title>
       <InfoTable>
-        <InfoRow label='Software part number' info={softwarePart} clipboardCopy />
-        <InfoRow label='Hardware part number' info={hardwarePart} clipboardCopy />
-        <InfoRow label='Serial number' info={serial} clipboardCopy />
-        <InfoRow label='Revision number' info={revision} clipboardCopy />
+        <InfoRow label='Software part number' data={softwarePart} clipboardCopy />
+        <InfoRow label='Hardware part number' data={hardwarePart} clipboardCopy />
+        <InfoRow label='Serial number' data={serial} clipboardCopy />
+        <InfoRow label='Revision number' data={revision} clipboardCopy />
       </InfoTable>
       <Title class='is-4'>Coding</Title>
       <InfoTable>
-        <InfoRow label='Coding value' info={codingValue} clipboardCopy />
-        <InfoRow label='WorkShop Code (WSC)' info={wsc} clipboardCopy />
+        <InfoRow label='Coding value' data={codingValue} clipboardCopy />
+        <InfoRow label='WorkShop Code (WSC)' data={wsc} clipboardCopy />
       </InfoTable>
     </>
   )
@@ -104,14 +104,19 @@ const Info = ({ info }) => {
 
 const InfoTable = ({ children }) => <Table class='is-striped is-fullwidth'><tbody>{children}</tbody></Table>
 
-const InfoRow = ({ label, info, data = null, clipboardCopy = false }) => {
-  if (info === '' || info === null) {
-    info = '-'
-  } else if (clipboardCopy) {
-    info = data
-      ? <ClipboardCopy data={data}>{info}</ClipboardCopy>
-      : <ClipboardCopy>{info}</ClipboardCopy>
-  }
+const InfoRow = ({ label, data, format: formatSpec = null, optional = false, clipboardCopy = false }) => {
+  if (data === null && optional) return
+
+  const info =
+    data === null
+      ? '-'
+      : clipboardCopy
+        ? formatSpec
+          ? <ClipboardCopy data={data}>{format(formatSpec, data)}</ClipboardCopy>
+          : <ClipboardCopy>{data}</ClipboardCopy>
+        : formatSpec
+          ? format(formatSpec, data)
+          : data
 
   return <tr><th>{label}</th><td>{info}</td></tr>
 }
@@ -128,9 +133,9 @@ const Subsystem = ({ system }) => {
     <>
       <Subtitle class='is-5'><ClipboardCopy>{component}</ClipboardCopy></Subtitle>
       <InfoTable>
-        <InfoRow label='Part Number' info={partNumber} clipboardCopy />
-        <InfoRow label='Coding value' info={coding} clipboardCopy />
-        <InfoRow label='WorkShop Code (WSC)' info={wsc} clipboardCopy />
+        <InfoRow label='Part Number' data={partNumber} clipboardCopy />
+        <InfoRow label='Coding value' data={coding} clipboardCopy />
+        <InfoRow label='WorkShop Code (WSC)' data={wsc} clipboardCopy />
       </InfoTable>
     </>
   )
@@ -152,9 +157,9 @@ const Fault = ({ fault }) => {
     <>
       <Title class='is-5'>{subject}</Title>
       <InfoTable>
-        <InfoRow label='OBD2 Code' info={odb2} clipboardCopy />
-        <InfoRow label='VAG Code' info={vag} clipboardCopy />
-        <InfoRow label='Symptom' info={description} />
+        <InfoRow label='OBD2 Code' data={odb2} clipboardCopy />
+        <InfoRow label='VAG Code' data={vag} clipboardCopy />
+        <InfoRow label='Symptom' data={description} />
       </InfoTable>
       {fault.freezeFrame && <FreezeFrame frame={fault.freezeFrame} />}
     </>
@@ -168,19 +173,27 @@ const FreezeFrame = ({ frame }) => {
     mileage,
     frequency,
     resetCounter,
-    timeIndication
+    date,
+    timeIndication,
+    voltage,
+    temperature1,
+    temperature2
   } = frame
 
   return (
     <>
       <Title class='is-6'>Freeze frame</Title>
       <InfoTable>
-        <InfoRow label='Status' info={status} />
-        <InfoRow label='Priority' info={priority} />
-        <InfoRow label='Mileage' info={format('%n km', mileage.km)} data={mileage.km} clipboardCopy />
-        <InfoRow label='Frequency' info={frequency} />
-        <InfoRow label='Reset counter' info={resetCounter} />
-        <InfoRow label='Time indication' info={timeIndication} />
+        <InfoRow label='Status' data={status} />
+        <InfoRow label='Priority' data={priority} />
+        <InfoRow label='Mileage' data={mileage.km} format='%n km' clipboardCopy />
+        <InfoRow label='Frequency' data={frequency} />
+        <InfoRow label='Reset counter' data={resetCounter} />
+        <InfoRow label='Date' data={date} optional />
+        <InfoRow label='Time indication' data={timeIndication} />
+        <InfoRow label='Voltage' data={voltage} format='%n V' optional />
+        <InfoRow label='Temperature1' data={temperature1} format='%n °C' optional />
+        <InfoRow label='Temperature2' data={temperature2} format='%n °C' optional />
       </InfoTable>
     </>
   )

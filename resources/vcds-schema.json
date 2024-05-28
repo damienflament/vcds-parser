@@ -472,9 +472,33 @@
                 "mileage": {
                     "$ref": "#/definitions/mileage"
                 },
+                "date": {
+                    "type": [
+                        "object",
+                        "null"
+                    ]
+                },
                 "timeIndication": {
                     "type": "integer",
                     "minimum": 0
+                },
+                "voltage": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "temperature1": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "temperature2": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -483,7 +507,11 @@
                 "frequency",
                 "resetCounter",
                 "mileage",
-                "timeIndication"
+                "date",
+                "timeIndication",
+                "voltage",
+                "temperature1",
+                "temperature2"
             ]
         }
     }
