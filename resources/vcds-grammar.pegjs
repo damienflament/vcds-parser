@@ -222,9 +222,9 @@ FaultsSection                                                                   
       { return faults }
   )
 
-Fault                                                                           // A module fault information
+Fault                                                                           // A module fault
   = vagCode:VagCode _ '-' _ subject:$rol EOL
-    _|12| odbCode:(@OdbCode _ '-' _)? symptomCode:SymptomCode _ '-' _ description:$rol EOL
+    _|12| odbCode:(@OdbCode _ '-' _)? symptomCode:SymptomCode _ '-' _ description:$[^-\r]+ intermittency:( '-' _ @FaultIntermittency)? EOL
     freezeFrame:(FreezeFrame)?
   {
     return {
@@ -235,11 +235,16 @@ Fault                                                                           
       },
       symptom: {
         code: symptomCode,
-        description
+        description: string(description)
       },
+      isIntermittent: boolean(intermittency),
       freezeFrame
     }
   }
+
+FaultIntermittency
+  = 'Intermittent'
+  { return true }
 
 FreezeFrame                                                                     // A fault freeze frame
   =   _|13| 'Freeze Frame:' EOL

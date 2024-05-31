@@ -430,6 +430,9 @@
                     ],
                     "additionalProperties": false
                 },
+                "isIntermittent": {
+                    "type": "boolean"
+                },
                 "freezeFrame": {
                     "anyOf": [
                         {
@@ -445,6 +448,7 @@
                 "subject",
                 "code",
                 "symptom",
+                "isIntermittent",
                 "freezeFrame"
             ]
         },

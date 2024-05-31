@@ -150,7 +150,8 @@ const Fault = ({ fault }) => {
     },
     symptom: {
       description
-    }
+    },
+    isIntermittent
   } = fault
 
   return (
@@ -160,6 +161,7 @@ const Fault = ({ fault }) => {
         <InfoRow label='OBD2 Code' data={odb2} clipboardCopy />
         <InfoRow label='VAG Code' data={vag} clipboardCopy />
         <InfoRow label='Symptom' data={description} />
+        <InfoRow label='Intermittent' data={isIntermittent ? 'Yes' : 'No'} />
       </InfoTable>
       {fault.freezeFrame && <FreezeFrame frame={fault.freezeFrame} />}
     </>
