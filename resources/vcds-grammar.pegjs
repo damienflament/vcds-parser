@@ -11,6 +11,10 @@
     return str
   }
 
+  function boolean(v) {
+    return v === true || v === 'true'
+  }
+
   function integer(str) {
     return str === null
       ? null
@@ -56,13 +60,15 @@ Report                                                                          
     'www.Ross-Tech.com' EOL
     l
     'Dealer/Shop Name:' _ shop:$rol EOL
+    //                           ▲ Taken from user input.
+    //                             Any character can be used.
     l
-    'VIN:' _ vin:Vin _+ 'License Plate:' _ licensePlate:( $LicensePlate )? EOL
+    'VIN:' _ vin:Vin _+ 'License Plate:' _ licensePlate:($LicensePlate)? EOL
     l+
     'Chassis Type:' _ chassis:Chassis _ '(' type:Type ')' EOL
     'Scan:' rol EOL // ignore module addresses list
     l
-    'VIN:' _ Vin _+ 'Mileage:' _ km:$DEC+ 'km' '-' miles:$DEC+ 'miles' EOL
+    'VIN:' _ Vin _+ 'Mileage:' _ km:Integer 'km' '-' miles:Integer 'miles' EOL
     l
     modulesStatus:ModuleStatus+
     l+
@@ -80,8 +86,8 @@ Report                                                                          
       .filter(s => s.address !== '00') // Remove special module 00 for now
       .map(s => Object.assign(
         s,
-        mappedInfos.get(s .address)
-      ))
+        mappedInfos.get(s.address)
+    ))
 
     return {
       date,
@@ -99,8 +105,8 @@ Report                                                                          
         chassis,
         type,
         mileage: {
-          km: integer(km),
-          miles: integer(miles)
+          km,
+          miles: miles
         }
       },
       modules
@@ -108,26 +114,25 @@ Report                                                                          
   }
 
 ModuleStatus                                                                    // A module status line
-  = address:ModuleAddress '-' name:$[^-]+ '--' _ 'Status:' _ description:$NOT_BIN+ flags:$BIN|4| EOL
+  = address:ModuleAddress '-' name:Label _ '--' _ 'Status:' _ description:ModuleStatusLabel _ flags:$BIN|4| EOL
   {
     return {
       address,
-      name: string(name),
+      name,
       status: {
         flags: binary(flags),
-        description: string(description)
+        description
       }
     }
   }
 
 ModuleInfoSection                                                               // A module information section
   = DashLine
-    @( UnreachableModuleInfo / ModuleInfo )
+    @(UnreachableModuleInfo / ModuleInfo)
     l
 
 UnreachableModuleInfo                                                           // The almost empty information section content related to and unreachable module
-  = 'Address' _ address:ModuleAddress ':' rol EOL
-    //                  ignore module name ▲
+  = 'Address' _ address:ModuleAddress ':' _ Label EOL
     'Cannot be reached' EOL
     {
       return {
@@ -140,23 +145,25 @@ UnreachableModuleInfo                                                           
     }
 
 ModuleInfo                                                                      // The module information section content
-  = 'Address' _ address:ModuleAddress ':' [^:]+ ':' '.'? _ labelsFile:$rol EOL
-    //                   ignore module name ▲        ▲ this dot '.' just after
-    //                                                 the colon ':' may be a
-    //                                                 bug
-                    _|3| partNumber:ModuleInfoPartNumber EOL
-                    _|3| 'Component:' _ component:$rol EOL
-revisionAndSerial:( _|3| 'Revision:' _ @$UPPNUM+ _+ 'Serial number:' _ @$UPPNUM+ EOL )?
-           coding:( _|3| 'Coding:' _ @CodingValue EOL )?
-                    _|3| 'Shop #:' _ 'WSC' _ wsc:Wsc EOL
-                    _|3| 'VCID:' _ vcid:Vcid EOL
-            vinid:( _|3| 'VINID:' _ @Vinid EOL )?
-                    l
-     subsystems:Subsystem*
-         faults:FaultsSection
-    readiness:( 'Readiness:' _ @Readiness EOL )?
+  = 'Address' _ address:ModuleAddress ':' _ Label _+ 'Labels:' '.'? _ labelsFile:Filename EOL
+    //                                  This dot '.' just after ▲
+    //                                  the colon ':' may be a
+    //                                  bug
+                  _|3| partNumber:ModuleInfoPartNumber EOL
+                  _|3| 'Component:' _ component:$rol EOL
+    // The component label and reference are      ▲
+    // messed up. Take everything.
+    revAndSerial:(_|3| 'Revision:' _ @$UPPNUM+ _+ 'Serial number:' _ @$UPPNUM+ EOL)?
+          coding:(_|3| 'Coding:' _ @CodingValue EOL)?
+                  _|3| 'Shop #:' _ 'WSC' _ wsc:Wsc EOL
+                  _|3| 'VCID:' _ vcid:Vcid EOL
+           vinid:(_|3| 'VINID:' _ @Vinid EOL)?
+                  l
+       subsystems:Subsystem*
+           faults:FaultsSection
+       readiness:('Readiness:' _ @Readiness EOL)?
     {
-      const [revision, serial] = revisionAndSerial ?? [null, null]
+      const [revision, serial] = revAndSerial ?? [null, null]
 
       return {
         address,
@@ -181,11 +188,11 @@ revisionAndSerial:( _|3| 'Revision:' _ @$UPPNUM+ _+ 'Serial number:' _ @$UPPNUM+
     }
 
 ModuleInfoPartNumber                                                            // The module part number
-  = (                                                                           //can apply to hardware or both hardware and software
+  = (                                                                           // can apply to hardware or both hardware and software
       'Part No:' _ hardware:PartNumber
       { return { software: null, hardware } }
     /
-      'Part No' _ 'SW:' _ software:PartNumber _+ 'HW:' _ hardware:( PartNumber / BuggyHardwarePartNumber ) rol
+      'Part No' _ 'SW:' _ software:PartNumber _+ 'HW:' _ hardware:(PartNumber / BuggyHardwarePartNumber) rol
       { return { software, hardware } }
     )
 
@@ -194,16 +201,18 @@ BuggyHardwarePartNumber
   { return null }
 
 Subsystem                                                                       // A module subsystem
-  =          _|3| 'Subsystem' _ index:$DEC+ _ '-' _ 'Part No:' _ partNumber:PartNumber labelsFile:( _+ 'Labels:' _ @$rol )? EOL
-             _|3| 'Component:' _ component:$rol EOL
-    coding:( _|3| 'Coding:' _ @CodingValue EOL )?
-       wsc:( _|3| 'Shop #: WSC' _ @ShortWsc rol EOL )?
-           ( [A-Z0-9 ]i+ EOL )? // ignore this last line as it contains the same
-                                // info as above (part number and component)
+  =          _|3| 'Subsystem' _ index:Integer _ '-' _ 'Part No:' _ partNumber:PartNumber labelsFile:(_+ 'Labels:' _ @Filename)? EOL
+             _|3| 'Component:' _ component:$rol EOL // The component label and
+                                                    // references are messed up.
+                                                    // Take everything.
+     coding:(_|3| 'Coding:' _ @CodingValue EOL)?
+        wsc:(_|3| 'Shop #: WSC' _ @ShortWsc _+ EOL)?
+            ([A-Z0-9 ]i+ EOL)? // ignore this last line as it contains the same
+                               // info as above (part number and component)
              l
     {
       return {
-        index: integer(index),
+        index,
         partNumber,
         component: string(component),
         labelsFile,
@@ -217,54 +226,72 @@ FaultsSection                                                                   
       'No fault code found.' EOL
       { return [] }
     /
-      ( '1 Fault Found:' / DEC+ _ 'Faults Found:' ) EOL
-      faults:Fault+
-      { return faults }
-  )
+      '1 Fault Found:' EOL
+      fault:Fault
+      { return [fault] }
+    /
+      Integer _ 'Faults Found:' EOL
+      @faults:Fault+
+    )
 
 Fault                                                                           // A module fault
-  = vagCode:VagCode _ '-' _ subject:$rol EOL
-    _|12| odbCode:(@OdbCode _ '-' _)? symptomCode:SymptomCode _ '-' _ description:$[^-\r]+ intermittency:( '-' _ @FaultIntermittency)? EOL
+  = vagCode:VagCode _ '-' _ subject:FaultSubject _ EOL
+    _|12| detail:FaultDetail EOL
     freezeFrame:(FreezeFrame)?
   {
+    const { odbCode, symptom, isIntermittent } = detail
+
     return {
       subject: string(subject),
       code: {
         odb2: odbCode,
         vag: vagCode
       },
-      symptom: {
-        code: symptomCode,
-        description: string(description)
-      },
-      isIntermittent: boolean(intermittency),
+      symptom,
+      isIntermittent,
       freezeFrame
     }
   }
 
-FaultIntermittency
-  = 'Intermittent'
-  { return true }
+FaultSubject = $([0-9a-z/,.;()-]i+)|1.., ' '| // This label may contain '-' which
+                                              // is a delimiter for other labels
+
+FaultDetail                                                                     // Detail about the fault
+  = odbCode:(@OdbCode _ '-' _)? symptomCode:SymptomCode _ '-' _ label:(Label / BuggySymptomLabel) intermittency:(_ '-' _ @FaultIntermittency)?
+  {
+    return {
+      odbCode,
+      symptom: {
+        code: symptomCode,
+        label
+      },
+      isIntermittent: boolean(intermittency),
+    }
+  }
+
+BuggySymptomLabel 'a buggy symptom label' = '-' { return null }
+
+FaultIntermittency = 'Intermittent' { return true }
 
 FreezeFrame                                                                     // A fault freeze frame
-  =   _|13| 'Freeze Frame:' EOL
-      _|20| 'Fault Status:' _ status:$BIN|8| EOL
-      _|20| 'Fault Priority:' _ priority:DEC EOL
-      _|20| 'Fault Frequency:' _ frequency:$DEC+ EOL
-      _|20| 'Reset counter:' _ resetCounter:$DEC+ EOL
-      _|20| 'Mileage:' _ mileage:$DEC+ _ 'km' EOL
-      _|20| 'Time Indication:' _ timeIndication:$DEC EOL
-frameDate:( _|20| 'Date:' _ @$( Year '.' Month '.' Day ) EOL )?
-frameTime:( _|20| 'Time:' _ @$( Hours ':' Minutes ':' Seconds ) EOL )?
-     (
-       l
-       _|13| 'Freeze Frame:' EOL
-     )?
-voltage:( _|20| 'Voltage:' _ @Decimal _ 'V' EOL )?
-temperature1:( _|20| 'Temperature:' _ @Decimal '�C' EOL )?
-      ( _|20| '(no units):' rol EOL )?
-      ( _|20| '(no units):' rol EOL )?
-temperature2:( _|20| 'Temperature:' _ @Decimal '�C' EOL )?
+  =        _|13| 'Freeze Frame:' EOL
+           _|20| 'Fault Status:' _ status:$BIN|8| EOL
+           _|20| 'Fault Priority:' _ priority:Integer EOL
+           _|20| 'Fault Frequency:' _ frequency:Integer EOL
+           _|20| 'Reset counter:' _ resetCounter:Integer EOL
+           _|20| 'Mileage:' _ mileage:Integer _ 'km' EOL
+           _|20| 'Time Indication:' _ timeIndication:Integer EOL
+frameDate:(_|20| 'Date:' _ @$(Year '.' Month '.' Day) EOL)?
+frameTime:(_|20| 'Time:' _ @$(Hours ':' Minutes ':' Seconds) EOL)?
+    (
+           l
+           _|13| 'Freeze Frame:' EOL
+    )?
+  voltage:(_|20| 'Voltage:' _ @Decimal _ 'V' EOL)?
+    temp1:(_|20| 'Temperature:' _ @Decimal '�C' EOL)?
+          (_|20| '(no units):' rol EOL)?
+          (_|20| '(no units):' rol EOL)?
+    temp2:(_|20| 'Temperature:' _ @Decimal '�C' EOL)?
       l
   {
     const frameDatetime = (frameDate === null || frameTime === null)
@@ -273,37 +300,33 @@ temperature2:( _|20| 'Temperature:' _ @Decimal '�C' EOL )?
 
     return {
       status,
-      priority: integer(priority),
-      frequency: integer(frequency),                                            // number of occurences since the first one
-      resetCounter: integer(resetCounter),
+      priority,
+      frequency,                                                                // number of occurences since the first one
+      resetCounter,
       mileage: {                                                                // mileage of the first occurence
-        km: integer(mileage),
+        km: mileage,
         miles: milesFromKm(mileage)
       },
       date: date(frameDatetime),
-      timeIndication: integer(timeIndication),
-      voltage: float(voltage),
-      temperature1: float(temperature1),
-      temperature2: float(temperature2)
+      timeIndication: timeIndication,
+      voltage,
+      temperature1: temp1,
+      temperature2: temp2
     }
   }
 
 /***************************** AUTOMOTIVE RULES *******************************/
-Vin 'a VIN (Vehicule Identification Number)'
-  = $UPPNUM|17|
-LicensePlate 'a license plate number'
-  = $[A-Z0-9-]+
-OdbCode 'ODB2 fault code' = $( 'P'? DEC|4| )
+Vin 'a VIN (Vehicule Identification Number)' = $UPPNUM|17|
+LicensePlate 'a license plate number' = $[A-Z0-9-]+
+OdbCode 'an ODB2 fault code' = $('P' DEC|4|)
 
 /******************************** VAG RULES ***********************************/
-Chassis 'a VAG chassis code'
-  = @$UPPNUM|2|
-Type 'a VAG vehicle, engine or transmission Type code'
-  = @$UPPNUM|3|
-Wsc 'a WSC (WorkShop Code)' = $( ShortWsc _ DEC|3| _ DEC|5| )
+Chassis 'a VAG chassis code' = @$UPPNUM|2|
+Type 'a VAG vehicle, engine or transmission Type code' = @$UPPNUM|3|
+Wsc 'a WSC (WorkShop Code)' = $(ShortWsc _ DEC|3| _ DEC|5|)
 ShortWsc 'a short WSC (WorkShop Code)' = $DEC|5|
-VagCode 'VAG fault code' = $DEC|5|
-SymptomCode 'fault symptom code' = $DEC|3|
+VagCode 'a VAG fault code' = $DEC|5|
+SymptomCode 'a fault symptom code' = $DEC|3|
 
 /*
   Part Number
@@ -353,21 +376,38 @@ PartSpecNumber 'the specific number of a part' = $DEC|3|
 PartModifCode 'the modification code of a part number' = UPP
 
 /******************************** VCDS RULES **********************************/
-VersionSpecifier 'a version specifier'
-  = $( DEC+ '.' DEC+ '.' DEC+ '.' DEC+ )
+VersionSpecifier 'a VCDS version specifier'
+  = $(DEC+ '.' DEC+ '.' DEC+ '.' DEC+)
 DataVersionDate 'a VCDS data version date'
   = $DEC|8|
 DataVersionSpecifier 'a VCDS data version specifier'
-  = $( 'DS' DEC|3| '.' DEC )
+  = $('DS' DEC|3| '.' DEC)
 
 ModuleAddress 'a module address' = $HEX|2|
 CodingValue 'a coding value' = $HEX+
-Vcid 'a VCID (Vag-Com identifier)' = $( HEX|18| '-' HEX|4| )
+Vcid 'a VCID (Vag-Com identifier)' = $(HEX|18| '-' HEX|4|)
 Vinid 'a VINID' = $HEX|34|
-Readiness 'readiness flags' = $( BIN|4| _ BIN|4| )
+Readiness 'readiness flags' = $(BIN|4| _ BIN|4|)
+
+/*
+  Module status
+  =============
+  0000  OK
+  0010  Malfunction
+  1000  Sporadic communication error
+  1100  Cannot be reached
+*/
+ModuleStatusLabel
+  = 'OK'
+  / 'Malfunction'
+  / 'Sporadic communication error'
+  / 'Cannot be reached'
 
 /**************************** MISCELANEOUS RULES ******************************/
 DashLine 'a dash line' = '-'+ EOL
+Filename 'a filename' = $[0-9a-z.-]i+
+Label 'a label'
+  = $([0-9a-z/,.]i+)|1.., ' '|
 
 /**************************** DATE AND TIME RULES *****************************/
 Datetime
@@ -380,26 +420,31 @@ DayName 'the name of a week day'
   = 'Monday' / 'Tuesday' / 'Wednesday' / 'Thursday' / 'Friday' / 'Saturday' /
     'Sunday'
 Day 'a day number'
-  = $( '0'[1-9] / [12][0-9] / '3'[01] )
+  = $('0'[1-9] / [12][0-9] / '3'[01])
 Month 'a month number'
-  = $( '0'[1-9] / '1'[0-2] )
+  = $('0'[1-9] / '1'[0-2])
 MonthName 'the name of a month'
   = 'January' / 'February' / 'March' / 'April' / 'May' / 'June' / 'July' /
     'August' / 'September' / 'October' / 'November' / 'December'
 Year 'a year'
-  = $( [12][0-9]|3| )
+  = $([12][0-9]|3|)
 Hours 'hours'
-  = $( [01][0-9] / '2'[0-3] )
+  = $([01][0-9] / '2'[0-3])
 Minutes 'minutes'
-  = $( [0-5][0-9] )
+  = $([0-5][0-9])
 Seconds 'seconds'
-  = $( [0-5][0-9] )
+  = $([0-5][0-9])
+
+/***************************** STANDARD RULES *********************************/
+Integer 'an integer'
+  = DEC+
+  { return integer(text()) }
 
 Decimal 'a decimal number'
-  = $( DEC+ '.' DEC+ )
+  = $(DEC+ '.' DEC+)
+  { return float(text()) }
 
 /********************************* HELPERS ************************************/
-w 'a word' = [^ \r\n]+
 l 'an empty line' = _* EOL
 rol 'the rest of the line' = [^\r]*
 
