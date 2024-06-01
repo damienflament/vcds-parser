@@ -6,7 +6,7 @@ import { ModuleView, ModuleReadError } from './module.jsx'
 
 import bulma from '../lib/bulma.js'
 
-const { Field, Control, Message, MessageHeader, MessageBody, Tag, Tags } = bulma.elements
+const { Field, Control, Message, MessageHeader, MessageBody, Tag, Tags, Title } = bulma.elements
 
 const ReportView = ({ report }) => {
   const {
@@ -65,7 +65,8 @@ const ReportParseError = ({ error: { name, message, stack } }) =>
     <MessageBody class='content'>
       <p>This error is <strong>NOT related to the vehicle</strong>. This is a problem with <strong>VCDS Parser</strong>.</p>
       <Spoiler>
-        <p><strong>{name}</strong>: {message}</p>
+        <Title class='is-5'>{name}</Title>
+        <pre>{message}</pre>
         <pre>{stack}</pre>
       </Spoiler>
     </MessageBody>

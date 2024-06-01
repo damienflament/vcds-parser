@@ -17,20 +17,29 @@ export default function () {
       this.addWatchFile(grammarPath)
 
       const src = fs.readFileSync(grammarPath).toString()
-      const parserSourceNode = peggy.generate(
-        src,
-        {
-          grammarSource,
-          output: 'source-and-map',
-          format: 'es'
+
+      try {
+        const parserSourceNode = peggy.generate(
+          src,
+          {
+            grammarSource,
+            output: 'source-and-map',
+            format: 'es'
+          }
+        )
+
+        const { code, map } = parserSourceNode.toStringWithSourceMap()
+
+        return {
+          code,
+          map: map.toJSON()
         }
-      )
+      } catch (e) {
+        if (e instanceof peggy.parser.SyntaxError) {
+          e.message = e.format([{ source: grammarSource, text: src }])
+        }
 
-      const { code, map } = parserSourceNode.toStringWithSourceMap()
-
-      return {
-        code,
-        map: map.toJSON()
+        throw e
       }
     }
   }
